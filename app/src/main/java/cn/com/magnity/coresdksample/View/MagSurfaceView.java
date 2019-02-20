@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample;
+package cn.com.magnity.coresdksample.View;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
 
+import static cn.com.magnity.coresdksample.utils.Config.SavaJuGeDirName;
+import static cn.com.magnity.coresdksample.utils.Config.SavaPersonDirName;
+import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCallback {
@@ -132,8 +135,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         mEnumHandler.sendEmptyMessage(START_TIMER_ID);
 
         /* runtime permit */
-        Utils.requestRuntimePermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE, 0, R.string.writeSDPermission);
+        Utils.requestRuntimePermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 0, R.string.writeSDPermission);
 
         /* restore parameter */
         if (savedInstanceState != null) {
@@ -152,7 +154,8 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
             mRestoreHandler.postDelayed(mRestoreRunnable, 200);
         }
     }
-
+/**
+ * 初始化ui*/
     private void initUi() {
         /* new object */
         mDev = new MagDevice();
@@ -390,13 +393,13 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
                     if (null == file) {
                         return;
                     }
-                    file = new File(file, "magnity/mx/media/");
+                    file = new File(file, SavaRootDirName);
                     if (!file.exists()) {
                         file.mkdirs();
                     }
 
                     if (mDev.saveBMP(0, file.getAbsolutePath() +
-                            File.separator + System.currentTimeMillis() + ".bmp")) {
+                            File.separator + System.currentTimeMillis() + "JuGe.bmp")) {
                         Toast.makeText(MainActivity.this, file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -455,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 try {
                     File pictureFile = new File(Environment.getExternalStorageDirectory(),
-                            System.currentTimeMillis() + "CS_image.jpg");
+                            SavaPersonDirName+System.currentTimeMillis() + "Person.jpg");
                     FileOutputStream fos = new FileOutputStream(pictureFile);//图片保存路径
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);//压缩格式，质量，压缩路径
                     camera.stopPreview();

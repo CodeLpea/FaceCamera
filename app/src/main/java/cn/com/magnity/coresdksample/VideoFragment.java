@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import cn.com.magnity.coresdk.MagDevice;
+import cn.com.magnity.coresdksample.View.MagSurfaceView;
 
 public class VideoFragment extends Fragment implements MagDevice.INewFrameCallback {
     private MagSurfaceView mView;
