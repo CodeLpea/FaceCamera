@@ -139,7 +139,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         mDev.lock();
         bmp = mDev.getOutputImage();
         mDev.getFrameStatisticInfo(info);
-        Log.i(TAG, "指定区域的温度: "+  mDev.getTemperatureProbe(5,1));
+       // Log.i(TAG, "指定区域的温度: "+  mDev.getTemperatureProbe(5,1));
         mDev.getCameraInfo(cameraInfo);
         mDev.unlock();
 
