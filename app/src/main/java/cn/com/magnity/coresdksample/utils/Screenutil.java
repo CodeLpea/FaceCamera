@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.Surface;
-
+/**
+ * 屏幕工具
+ *
+* */
 public class Screenutil {
     /**
      * 设置摄像头图像的预览角度
