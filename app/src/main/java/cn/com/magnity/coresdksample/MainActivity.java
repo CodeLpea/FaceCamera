@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -34,12 +35,12 @@ import java.util.ArrayList;
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
 
-import static cn.com.magnity.coresdksample.utils.Config.SavaJuGeDirName;
-import static cn.com.magnity.coresdksample.utils.Config.SavaPersonDirName;
+
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCallback {
+    private static final String TAG="MainActivity";
     //const
     private static final int START_TIMER_ID = 0;
     private static final int TIMER_INTERVAL = 500;//ms
@@ -170,9 +171,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 EnumInfo dev = mDevices.get(position);
-                if (mSelectedDev == null ||
-                        mSelectedDev.id != dev.id ||
-                        !mDev.isLinked()) {
+                if (mSelectedDev == null || mSelectedDev.id != dev.id || !mDev.isLinked()) {
                     mDev.dislinkCamera();
                     mSelectedDev = dev;
                     mTextSelectedDevice.setText(mSelectedDev.name);
@@ -283,6 +282,53 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         }
 
         mListAdapter.notifyDataSetChanged();
+
+        //直接连接link已经扫描到的设备
+        if (mDevices!=null&&mDevices.size()>0){
+            EnumInfo dev = mDevices.get(0);
+        if (mSelectedDev == null || mSelectedDev.id != dev.id || !mDev.isLinked()) {//判断是否已经连接
+            Log.i(TAG, "mDevices.get(0).name: "+mDevices.get(0).name);
+            Log.i(TAG, "mDevices.get(0).id: "+mDevices.get(0).id);
+            mDev.dislinkCamera();//确保断开连接
+            mSelectedDev = dev;
+            mTextSelectedDevice.setText(mSelectedDev.name);
+            updateButtons();
+            //以上将扫描到的设备显示出来，添加到mSelecteDev中缓存，以待下面连接
+
+            Link();   //自动连接
+        }
+        }
+
+    }
+/**
+ * 自动连接摄像头*/
+    private void Link() {
+        Toast.makeText(this,"开启播放：",Toast.LENGTH_SHORT).show();
+        int r = mDev.linkCamera(MainActivity.this, mSelectedDev.id,
+                new MagDevice.ILinkCallback() {
+                    @Override
+                    public void linkResult(int result) {
+                        if (result == MagDevice.CONN_SUCC) {
+                            /* 连接成功 */play();
+                        } else if (result == MagDevice.CONN_FAIL) {
+                            /* 连接失败 */
+                        } else if (result == MagDevice.CONN_DETACHED) {
+                            /* 连接失败*/
+                        }
+                        updateButtons();
+                    }
+                });
+
+        if (r == MagDevice.CONN_SUCC) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    play();
+                }
+            });
+        }
+        updateButtons();
+
     }
 
     private void updateButtons() {
@@ -343,10 +389,13 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     public void linkResult(int result) {
         if (result == MagDevice.CONN_SUCC) {
             /* 连接成功 */
+
         } else if (result == MagDevice.CONN_FAIL) {
             /* 连接失败 */
+
         } else if (result == MagDevice.CONN_DETACHED) {
-            /* 设备拔出*/
+            /* 连接失败*/
+
         }
         updateButtons();
     }
@@ -381,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
                     }
                     mDev.stopProcessImage();
                     mVideoFragment.stopDrawingThread();
-                    mDev.setImageTransform(0, mDegree);
+                    mDev.setImageTransform(0, mDegree);//在设置旋转方向之前要停止预览和标记操作
                     play();
                     break;
                 case R.id.btnSavePic:
@@ -458,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 try {
                     File pictureFile = new File(Environment.getExternalStorageDirectory(),
-                            SavaPersonDirName+System.currentTimeMillis() + "Person.jpg");
+                            SavaRootDirName+File.separator+System.currentTimeMillis() + "Person.jpg");
                     FileOutputStream fos = new FileOutputStream(pictureFile);//图片保存路径
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);//压缩格式，质量，压缩路径
                     camera.stopPreview();
