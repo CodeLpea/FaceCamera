@@ -3,8 +3,14 @@ package cn.com.magnity.coresdksample;
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Environment;
 import android.os.Handler;
@@ -26,6 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.iflytek.cloud.FaceDetector;
+import com.iflytek.cloud.SpeechUtility;
+import com.iflytek.cloud.util.Accelerometer;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -34,6 +45,9 @@ import java.util.ArrayList;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
+import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
+import cn.com.magnity.coresdksample.Detect.FaceRect;
+import cn.com.magnity.coresdksample.Detect.Result;
 
 
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
@@ -77,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
 
 
     private SurfaceView mPreviewSurface;//用于显示预览图像
+    private SurfaceView mFaceSurface;//用于绘制检测人脸的返回信息
+    private SurfaceHolder mSurfaceHolder;//纹理控制器
     private Camera mCamera;//摄像头对象
     private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;//设置为默认开启后置摄像头
     // 默认设置640*480,截至目前也只是支持640*480
@@ -87,13 +103,18 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     private byte[] buffer;
     // 缩放矩阵
     private Matrix mScaleMatrix = new Matrix();
+    // 加速度感应器，用于获取手机的朝向
+    private Accelerometer accelerometer;
+    private FaceDetector mFaceDetector;//调用讯飞的SDK来实现人脸识别
     private int degrees;//旋转角度
+    private boolean istaken;//拍照状态按钮
+    private boolean stop;//人脸检测开关
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_amin_activity);
-
+        SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
         initJuge(savedInstanceState);//温度摄像头初始化
         initPersonCamera();// 人像摄像头初始化
 
@@ -104,6 +125,14 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     private void initPersonCamera() {
         mPreviewSurface = (SurfaceView) findViewById(R.id.preview);
         mPreviewSurface.getHolder().addCallback(mPreviewCallback);
+        mFaceSurface = (SurfaceView) findViewById(R.id.face);
+        mSurfaceHolder =mFaceSurface.getHolder();
+        mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+        mFaceSurface.setZOrderOnTop(true);
+        nv21 = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
+        buffer = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
+        accelerometer = new Accelerometer(this);
+        mFaceDetector = FaceDetector.createDetector(this, null);//实例化人脸检测对象
         setSurfaceSize();
        // openCamera();//打开摄像头
 
@@ -434,7 +463,8 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
                     play();
                     break;
                 case R.id.btnSavePic:
-                    takePhoto();
+                    istaken=true;
+                    //takePhoto();
                     if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                         return;
                     }
@@ -483,15 +513,57 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         //给摄像头设置参数配置
         mCamera.setParameters(params);
         //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
-       // mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
+        //mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
             mCamera.startPreview();
         } catch (IOException e) {
             e.printStackTrace();
         }
+           mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+               @Override
+               public void onPreviewFrame(byte[] bytes, Camera camera) {
+                   System.arraycopy(bytes, 0, nv21, 0, bytes.length);
+
+                   if(istaken==true){
+                       istaken=false;
+                   Camera.Size size = camera.getParameters().getPreviewSize();
+                   try{
+                       YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+                       if(image!=null){
+                           ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                           image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
+                           Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+                           saveBitmap(bmp);
+                           stream.close();
+                       }
+                   }catch(Exception ex){
+                       Log.e("Sys","Error:"+ex.getMessage());
+                   }
+               }
+               }
+           });
 
 
+    }
+    public  void saveBitmap(Bitmap bitmap) {
+        Log.e(TAG, "保存图片");
+        File f = new File(Environment.getExternalStorageDirectory(),
+                SavaRootDirName+File.separator+System.currentTimeMillis() + "Person.jpg");
+        if (f.exists()) {
+            f.delete();
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+            Log.i(TAG, "已经保存");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     /**
      * 拍照*/
@@ -563,8 +635,74 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             mScaleMatrix.setScale(width / (float) PREVIEW_HEIGHT,
+
                     height / (float) PREVIEW_WIDTH);//设置缩放比例
         }
     };
 
+  @Override
+    protected void onResume() {
+        super.onResume();
+        if (null != accelerometer) {
+            accelerometer.start();
+        }
+        stop = false;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!stop) {
+                    if (null == nv21) {
+                        continue;
+                    }
+                    synchronized (nv21) {
+                        System.arraycopy(nv21, 0, buffer, 0, nv21.length);
+                    }
+                    int direction = Accelerometer.getDirection();// 获取手机朝向
+                    boolean frontCamera = (Camera.CameraInfo.CAMERA_FACING_FRONT == mCameraId);
+                    if (frontCamera) {
+                        direction = (4 - direction) % 4;// 0,1,2,3,4分别表示0,90,180,270和360度
+                    }
+                    String result = mFaceDetector.trackNV21(
+                            buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, direction);//获取人脸检测结果
+                    FaceRect face = Result.result(result);//获取返回的数据
+                    Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
+                    Canvas canvas = mSurfaceHolder.lockCanvas();//锁定画布用于绘制
+                    if (null == canvas) {
+                        continue;
+                    }
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//清除之前的绘制图像
+                    canvas.setMatrix(mScaleMatrix);
+                    if (face == null) {
+                        mSurfaceHolder.unlockCanvasAndPost(canvas);
+                        continue;
+                    }
+                    if (face != null) {
+                        face.bound = DrawFaceRect.RotateDeg90(face.bound, PREVIEW_HEIGHT);//绘制人脸的区域
+                        if (face.point != null) {//绘制脸上关键点
+                            for (int i = 0; i < face.point.length; i++) {
+                                face.point[i] = DrawFaceRect.RotateDeg90(face.point[i], PREVIEW_HEIGHT);
+                            }
+                            //绘制人脸检测的区域
+                            DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, frontCamera);
+                        }
+                    } else {
+                        Log.e(TAG, "没有检测出人脸");
+                    }
+                    mSurfaceHolder.unlockCanvasAndPost(canvas);
+                }
+            }
+        }).start();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stop = true;
+        if (null != accelerometer) {
+            accelerometer.stop();
+        }
+        closeCamera();
+
+    }
 }
