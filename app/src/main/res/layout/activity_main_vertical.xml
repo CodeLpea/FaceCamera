@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <!--上方占比2：1首先横向LinearLayout包裹，将其分成左右两边，左右占比1：1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/ll_1"
+            android:layout_width="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:background="@drawable/llback01"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- 巨哥热成像显示-->
+                <LinearLayout
+                    android:id="@+id/videoLayout"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_location1"
+                    android:text="00,00"
+                    android:visibility="invisible"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <cn.com.magnity.coresdksample.View.QiuView
+                    android:id="@+id/view1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+                <TextView
+                    android:id="@+id/tv_point1"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:textColor="@color/point"
+                    android:gravity="center"
+                    android:textSize="10dp"
+                    android:textStyle="bold"
+                    android:text="O"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_2"
+            android:layout_width="0dp"
+            android:background="@drawable/llback01"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- 人像摄像头显示-->
+                <LinearLayout
+                    android:id="@+id/CameraLayout"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <!-- 显示预览的图像 -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <SurfaceView
+                            android:id="@+id/preview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                        <SurfaceView
+                            android:id="@+id/face"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_location2"
+                    android:text="00,00"
+                    android:visibility="invisible"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <cn.com.magnity.coresdksample.View.QiuView
+                    android:id="@+id/view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+                <TextView
+                    android:id="@+id/tv_point2"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible"
+                    android:textColor="@color/point"
+                    android:gravity="center"
+                    android:textSize="10dp"
+                    android:textStyle="bold"
+                    android:text="O"/>
+            </RelativeLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+    <!--下方占比2：1 下方用来展示fragment-->
+    <LinearLayout
+        android:background="@drawable/llback01"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+       <RelativeLayout
+           android:background="@color/colorPrimary"
+           android:layout_above="@+id/ll_set"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+           <!--连接和设置fragment-->
+           <FrameLayout
+               android:id="@+id/frame_layout"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent">
+           </FrameLayout>
+
+       </RelativeLayout>
+            <!-- 用于加载fragment选项-->
+            <LinearLayout
+                android:id="@+id/ll_set"
+                android:layout_marginBottom="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:orientation="horizontal"
+                >
+                <!-- 复习按钮控件-->
+                <Button
+                    android:text="连接设置"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="3dp"
+                    android:background="@android:color/holo_blue_light"
+                    android:layout_weight="1"
+                    android:textColor="#FFFFFF"
+
+                    /> <!-- 复习按钮控件-->
+                <Button
+                    android:text="校准设置"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="3dp"
+                    android:background="@android:color/holo_blue_light"
+                    android:layout_weight="1"
+                    android:textColor="#FFFFFF"
+                    />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
+</LinearLayout>

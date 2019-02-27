@@ -1,6 +1,10 @@
 package cn.com.magnity.coresdksample;
 
 import android.Manifest;
+
+
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,6 +19,7 @@ import android.hardware.Camera;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +28,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -109,15 +115,50 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     private int degrees;//旋转角度
     private boolean istaken;//拍照状态按钮
     private boolean stop;//人脸检测开关
+    private FragmentTransaction transaction;//定义用于加载连接和设置界面
+    private LinkFragment linkFragment;
+    private LoactionFragment loactionFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_amin_activity);
         SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
+        //initFragment();
         initJuge(savedInstanceState);//温度摄像头初始化
         initPersonCamera();// 人像摄像头初始化
 
+
+    }
+    /**初始化Fragment
+     * */
+    private void initFragment(){
+        linkFragment=new LinkFragment();
+        loactionFragment=new LoactionFragment();
+        transaction=getFragmentManager().beginTransaction();
+        //初始化transaction
+        transaction.add(R.id.frame_layout,linkFragment);
+        transaction.add(R.id.frame_layout,loactionFragment);
+        setFragment(linkFragment);
+    }
+    /**
+     * 设置显示的fragement
+     * @param fragment
+     */
+    public void setFragment(Fragment fragment) {
+        Log.e(TAG, "setFragment: "+(fragment==null) );
+        transaction.show(linkFragment);//展示
+        transaction.commit();
+      /*  Fragment current = getFragmentManager().findFragmentById(R.id.frame_layout);
+        if (current != null && current instanceof LinkFragment){
+            transaction.hide(loactionFragment);  //隐藏
+            transaction.show(linkFragment);//展示
+        }else {
+            transaction.hide(linkFragment);  //隐藏
+            transaction.show(loactionFragment);//展示
+        }
+        transaction.commit();*/
     }
 /**
  * 人像摄像头初始化
