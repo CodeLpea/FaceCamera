@@ -43,7 +43,7 @@ public class Result {
                 point++;
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return rect;
     }

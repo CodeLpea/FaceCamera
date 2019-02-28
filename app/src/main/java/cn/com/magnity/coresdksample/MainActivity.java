@@ -56,10 +56,12 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 
 
+import static cn.com.magnity.coresdksample.MyApplication.istaken;
+import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
-public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCallback {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG="MainActivity";
     //const
     private static final int START_TIMER_ID = 0;
@@ -73,29 +75,14 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     private static final String USBID_ARGS = "usbid";
 
     //non-const
-    private MagDevice mDev;
+  //  private MagDevice mDev;
 
     private ArrayList<EnumInfo> mDevices;
     private ArrayList<String> mDeviceStrings;
-    private ArrayAdapter mListAdapter;
-    private EnumInfo mSelectedDev;
-    private ListView mDevList;
-    private Button mLinkBtn;
-    private Button mPlayBtn;
-    private Button mStopBtn;
-    private Button mDislinkBtn;
-    private Button mRotateBtn;
-    private Button mSavePicBtn;
-    private TextView mTextSelectedDevice;
     private Handler mEnumHandler;
     private Handler mRestoreHandler;
     private Runnable mRestoreRunnable;
     private VideoFragment mVideoFragment;
-
-    private int mDegree;//0 - 90, 1 - 180, 2 - 270
-
-
-
     private SurfaceView mPreviewSurface;//用于显示预览图像
     private SurfaceView mFaceSurface;//用于绘制检测人脸的返回信息
     private SurfaceHolder mSurfaceHolder;//纹理控制器
@@ -113,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     private Accelerometer accelerometer;
     private FaceDetector mFaceDetector;//调用讯飞的SDK来实现人脸识别
     private int degrees;//旋转角度
-    private boolean istaken;//拍照状态按钮
+/*    private boolean istaken;//拍照状态按钮*/
     private boolean stop;//人脸检测开关
     private FragmentTransaction transaction;//定义用于加载连接和设置界面
     private LinkFragment linkFragment;
@@ -122,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_amin_activity);
+        setContentView(R.layout.activity_main_vertical);
         SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
-        //initFragment();
+        initFragment();
         initJuge(savedInstanceState);//温度摄像头初始化
         initPersonCamera();// 人像摄像头初始化
 
@@ -138,9 +125,10 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         loactionFragment=new LoactionFragment();
         transaction=getFragmentManager().beginTransaction();
         //初始化transaction
-        transaction.add(R.id.frame_layout,linkFragment);
-        transaction.add(R.id.frame_layout,loactionFragment);
-        setFragment(linkFragment);
+        transaction.replace(R.id.frame_layout,linkFragment);
+        //transaction.add(R.id.frame_layout,loactionFragment);
+        transaction.commit();
+        //setFragment(linkFragment);
     }
     /**
      * 设置显示的fragement
@@ -148,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
      */
     public void setFragment(Fragment fragment) {
         Log.e(TAG, "setFragment: "+(fragment==null) );
-        transaction.show(linkFragment);//展示
+        //transaction.show(linkFragment);//展示
         transaction.commit();
       /*  Fragment current = getFragmentManager().findFragmentById(R.id.frame_layout);
         if (current != null && current instanceof LinkFragment){
@@ -160,9 +148,9 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         }
         transaction.commit();*/
     }
-/**
- * 人像摄像头初始化
-* */
+    /**
+     * 人像摄像头初始化
+     * */
     private void initPersonCamera() {
         mPreviewSurface = (SurfaceView) findViewById(R.id.preview);
         mPreviewSurface.getHolder().addCallback(mPreviewCallback);
@@ -175,18 +163,19 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         accelerometer = new Accelerometer(this);
         mFaceDetector = FaceDetector.createDetector(this, null);//实例化人脸检测对象
         setSurfaceSize();
-       // openCamera();//打开摄像头
+        // openCamera();//打开摄像头
 
     }
 
     /**温度摄像头初始化
- * */
+     * */
     private void initJuge(Bundle savedInstanceState ) {
         /* global init */
         MagDevice.init(this);
 
         /* init ui */
-        initUi();
+        // initUi();
+        initUi1();
 
         /* enum timer handler */
         mEnumHandler = new Handler() {
@@ -216,7 +205,9 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
             mRestoreRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    restore(usbId, status);
+                    //restore(usbId, status);
+                    updateDeviceList();
+                    Log.i(TAG, "restore");
                 }
             };
 
@@ -225,113 +216,27 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
             mRestoreHandler.postDelayed(mRestoreRunnable, 200);
         }
     }
-/**
- * 初始化ui*/
-    private void initUi() {
-        /* new object */
+    private void initUi1() {
         mDev = new MagDevice();
         mDevices = new ArrayList<>();
         mDeviceStrings = new ArrayList<>();
-        mListAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_expandable_list_item_1, mDeviceStrings);
-
-        mDevList = (ListView)findViewById(R.id.listDev);
-        mDevList.setAdapter(mListAdapter);
-        mDevList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                EnumInfo dev = mDevices.get(position);
-                if (mSelectedDev == null || mSelectedDev.id != dev.id || !mDev.isLinked()) {
-                    mDev.dislinkCamera();
-                    mSelectedDev = dev;
-                    mTextSelectedDevice.setText(mSelectedDev.name);
-                    updateButtons();
-                }
-            }
-        });
-
-        MagOnClickListener listener = new MagOnClickListener();
-        mLinkBtn = (Button)findViewById(R.id.btnLink);
-        mLinkBtn.setOnClickListener(listener);
-        mPlayBtn = (Button)findViewById(R.id.btnPlay);
-        mPlayBtn.setOnClickListener(listener);
-        mStopBtn = (Button)findViewById(R.id.btnStop);
-        mStopBtn.setOnClickListener(listener);
-        mDislinkBtn = (Button)findViewById(R.id.btnDislink);
-        mDislinkBtn.setOnClickListener(listener);
-        mRotateBtn = (Button)findViewById(R.id.btnRotate);
-        mRotateBtn.setOnClickListener(listener);
-        mSavePicBtn = (Button)findViewById(R.id.btnSavePic);
-        mSavePicBtn.setOnClickListener(listener);
-        mTextSelectedDevice = (TextView) findViewById(R.id.tvSelectedName);
-
-        updateButtons();
-
         FragmentManager fm = getSupportFragmentManager();
         mVideoFragment = (VideoFragment)fm.findFragmentById(R.id.videoLayout);
+        linkFragment.setmVideoFragment(mVideoFragment);
         if (mVideoFragment == null) {
             mVideoFragment = new VideoFragment();
+            linkFragment.setmVideoFragment(mVideoFragment);
             fm.beginTransaction().add(R.id.videoLayout, mVideoFragment).commit();
         }
     }
 
-    private void restore(int usbId, int status) {
-        /* restore list status */
-       MagDevice.getDevices(this, 33596, 1, mDevices);
-
-        mDeviceStrings.clear();
-        for (EnumInfo dev : mDevices) {
-            if (dev.id == usbId) {
-                mSelectedDev = dev;
-            }
-            mDeviceStrings.add(dev.name);
-        }
-        if (mSelectedDev == null) {
-            return;
-        }
-
-        mTextSelectedDevice.setText(mSelectedDev.name);
-
-        /* restore camera status */
-        switch (status) {
-            case STATUS_IDLE:
-                //do nothing
-                break;
-            case STATUS_LINK:
-                mDev.linkCamera(MainActivity.this, mSelectedDev.id, MainActivity.this);
-                updateButtons();
-                break;
-            case STATUS_TRANSFER:
-                int r = mDev.linkCamera(MainActivity.this, mSelectedDev.id,
-                    new MagDevice.ILinkCallback() {
-                        @Override
-                        public void linkResult(int result) {
-                            if (result == MagDevice.CONN_SUCC) {
-                            /* 连接成功 */
-                                play();
-                            } else if (result == MagDevice.CONN_FAIL) {
-                            /* 连接失败 */
-                            } else if (result == MagDevice.CONN_DETACHED) {
-                            /* 连接失败*/
-                            }
-                            updateButtons();
-                        }
-                    });
-
-                if (r == MagDevice.CONN_SUCC) {
-                    play();
-                }
-                updateButtons();
-                break;
-        }
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         /* save parameter for restore when screen rotating */
-        int status = STATUS_IDLE;
+        /*int status = STATUS_IDLE;
         if (mDev.isProcessingImage()) {
             status = STATUS_TRANSFER;
         } else if (mDev.isLinked()) {
@@ -340,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         outState.putInt(STATUS_ARGS, status);
         if (mSelectedDev != null) {
             outState.putInt(USBID_ARGS, mSelectedDev.id);
-        }
+        }*/
     }
 
     private void updateDeviceList() {
@@ -350,81 +255,14 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         for (EnumInfo dev : mDevices) {
             mDeviceStrings.add(dev.name);
         }
+        linkFragment.setmDevices(mDevices);
+        linkFragment.setmDeviceStrings(mDeviceStrings);
 
-        mListAdapter.notifyDataSetChanged();
+        linkFragment.autoConnect();
 
-        //直接连接link已经扫描到的设备
-        if (mDevices!=null&&mDevices.size()>0){
-            EnumInfo dev = mDevices.get(0);
-        if (mSelectedDev == null || mSelectedDev.id != dev.id || !mDev.isLinked()) {//判断是否已经连接
-            Log.i(TAG, "mDevices.get(0).name: "+mDevices.get(0).name);
-            Log.i(TAG, "mDevices.get(0).id: "+mDevices.get(0).id);
-            mDev.dislinkCamera();//确保断开连接
-            mSelectedDev = dev;
-            mTextSelectedDevice.setText(mSelectedDev.name);
-            updateButtons();
-            //以上将扫描到的设备显示出来，添加到mSelecteDev中缓存，以待下面连接
-
-            Link();   //自动连接
-        }
-        }
-
-    }
-/**
- * 自动连接摄像头*/
-    private void Link() {
-        Toast.makeText(this,"开启播放：",Toast.LENGTH_SHORT).show();
-        int r = mDev.linkCamera(MainActivity.this, mSelectedDev.id,
-                new MagDevice.ILinkCallback() {
-                    @Override
-                    public void linkResult(int result) {
-                        if (result == MagDevice.CONN_SUCC) {
-                            /* 连接成功 */play();
-                        } else if (result == MagDevice.CONN_FAIL) {
-                            /* 连接失败 */
-                        } else if (result == MagDevice.CONN_DETACHED) {
-                            /* 连接失败*/
-                        }
-                        updateButtons();
-                    }
-                });
-
-        if (r == MagDevice.CONN_SUCC) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    play();
-                }
-            });
-        }
-        updateButtons();
 
     }
 
-    private void updateButtons() {
-        if (mDev.isProcessingImage()) {
-            mLinkBtn.setEnabled(false);
-            mPlayBtn.setEnabled(false);
-            mStopBtn.setEnabled(true);
-            mDislinkBtn.setEnabled(true);
-            mRotateBtn.setEnabled(true);
-            mSavePicBtn.setEnabled(true);
-        } else if (mDev.isLinked()) {
-            mLinkBtn.setEnabled(false);
-            mPlayBtn.setEnabled(true);
-            mStopBtn.setEnabled(false);
-            mDislinkBtn.setEnabled(true);
-            mRotateBtn.setEnabled(true);
-            mSavePicBtn.setEnabled(false);
-        } else {
-            mLinkBtn.setEnabled(mSelectedDev!=null);
-            mPlayBtn.setEnabled(false);
-            mStopBtn.setEnabled(false);
-            mDislinkBtn.setEnabled(false);
-            mRotateBtn.setEnabled(false);
-            mSavePicBtn.setEnabled(false);
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -446,86 +284,6 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         }
         mDev = null;
         super.onDestroy();
-    }
-
-    private void play() {
-        mDev.setColorPalette(MagDevice.ColorPalette.PaletteIronBow);
-        if (mDev.startProcessImage(mVideoFragment, 0, 0)) {
-            mVideoFragment.startDrawingThread(mDev);
-        }
-    }
-
-    @Override
-    public void linkResult(int result) {
-        if (result == MagDevice.CONN_SUCC) {
-            /* 连接成功 */
-
-        } else if (result == MagDevice.CONN_FAIL) {
-            /* 连接失败 */
-
-        } else if (result == MagDevice.CONN_DETACHED) {
-            /* 连接失败*/
-
-        }
-        updateButtons();
-    }
-
-    private class MagOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            switch(v.getId()) {
-                case R.id.btnLink:
-                    mDev.linkCamera(MainActivity.this, mSelectedDev.id, MainActivity.this);
-                    updateButtons();
-                    break;
-                case R.id.btnPlay:
-                    play();
-                    updateButtons();
-                    break;
-                case R.id.btnStop:
-                    mDev.stopProcessImage();
-                    mVideoFragment.stopDrawingThread();
-                    updateButtons();
-                    break;
-                case R.id.btnDislink:
-                    mDev.dislinkCamera();
-                    mVideoFragment.stopDrawingThread();
-                    mDegree = 0;
-                    updateButtons();
-                    break;
-                case R.id.btnRotate:
-                    mDegree++;
-                    if (mDegree > 3) {
-                        mDegree = 0;
-                    }
-                    mDev.stopProcessImage();
-                    mVideoFragment.stopDrawingThread();
-                    mDev.setImageTransform(0, mDegree);//在设置旋转方向之前要停止预览和标记操作
-                    play();
-                    break;
-                case R.id.btnSavePic:
-                    istaken=true;
-                    //takePhoto();
-                    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                        return;
-                    }
-                    File file = Environment.getExternalStorageDirectory();
-                    if (null == file) {
-                        return;
-                    }
-                    file = new File(file, SavaRootDirName);
-                    if (!file.exists()) {
-                        file.mkdirs();
-                    }
-
-                    if (mDev.saveBMP(0, file.getAbsolutePath() +
-                            File.separator + System.currentTimeMillis() + "JuGe.bmp")) {
-                        Toast.makeText(MainActivity.this, file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-            mDevList.requestFocus();
-        }
     }
 
     /**
@@ -561,29 +319,28 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         } catch (IOException e) {
             e.printStackTrace();
         }
-           mCamera.setPreviewCallback(new Camera.PreviewCallback() {
-               @Override
-               public void onPreviewFrame(byte[] bytes, Camera camera) {
-                   System.arraycopy(bytes, 0, nv21, 0, bytes.length);
-
-                   if(istaken==true){
-                       istaken=false;
-                   Camera.Size size = camera.getParameters().getPreviewSize();
-                   try{
-                       YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-                       if(image!=null){
-                           ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                           image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
-                           Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-                           saveBitmap(bmp);
-                           stream.close();
-                       }
-                   }catch(Exception ex){
-                       Log.e("Sys","Error:"+ex.getMessage());
-                   }
-               }
-               }
-           });
+        mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+            @Override
+            public void onPreviewFrame(byte[] bytes, Camera camera) {
+                System.arraycopy(bytes, 0, nv21, 0, bytes.length);
+                if(istaken==true){
+                    istaken=false;
+                    Camera.Size size = camera.getParameters().getPreviewSize();
+                    try{
+                        YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+                        if(image!=null){
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
+                            Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+                            saveBitmap(bmp);
+                            stream.close();
+                        }
+                    }catch(Exception ex){
+                        Log.e("Sys","Error:"+ex.getMessage());
+                    }
+                }
+            }
+        });
 
 
     }
@@ -663,13 +420,14 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-
+            Log.i(TAG, "surfaceDestroyed: ");
             closeCamera();//关闭摄像头，并释放资源
         }
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             //requestPermission(new String[]{Manifest.permission.CAMERA},2000);
+            Log.i(TAG, "surfaceCreated: ");
             openCamera();//打开摄像头
         }
 
@@ -681,9 +439,11 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
         }
     };
 
-  @Override
+    @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume: ");
+        //openCamera();
         if (null != accelerometer) {
             accelerometer.start();
         }
@@ -706,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
                     String result = mFaceDetector.trackNV21(
                             buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, direction);//获取人脸检测结果
                     FaceRect face = Result.result(result);//获取返回的数据
-                    Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
+                   // Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
                     Canvas canvas = mSurfaceHolder.lockCanvas();//锁定画布用于绘制
                     if (null == canvas) {
                         continue;
@@ -739,11 +499,24 @@ public class MainActivity extends AppCompatActivity implements MagDevice.ILinkCa
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i(TAG, "onPause: ");
         stop = true;
         if (null != accelerometer) {
             accelerometer.stop();
         }
-        closeCamera();
+        //closeCamera();
 
+    }
+
+    @Override
+    protected void onStart() {
+        Log.i(TAG, "onStart: ");
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.i(TAG, "onRestart: ");
+        super.onRestart();
     }
 }

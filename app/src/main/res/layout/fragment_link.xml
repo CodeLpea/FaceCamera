@@ -3,83 +3,100 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context=".LinkFragment">
 
     <!-- 热成像仪器列表和操作按钮-->
     <LinearLayout
         android:id="@+id/Button_Layout"
-        android:orientation="vertical"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ListView
-            android:id="@+id/listDev"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            ></ListView>
-        <TextView
-            android:text="@string/selected_device_text"
-            android:id="@+id/tvSelectedName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!-- 左侧显示热成像仪列表-->
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2">
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent">
-                <Button
-                    android:id="@+id/btnLink"
-                    android:text="@string/link"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
-                <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+            <ListView
+                android:id="@+id/listDev"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                ></ListView>
+        </LinearLayout>
 
-                    android:id="@+id/btnStop"
-                    android:text="@string/stop"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-                <Button
-                    android:id="@+id/btnRotate"
-                    android:text="@string/rotate"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+        <!-- 右侧显示操作按钮-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <!-- 当前相机id-->
+            <TextView
+                android:text="@string/selected_device_text"
+                android:id="@+id/tvSelectedName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <!-- 操作按钮-->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:id="@+id/btnLink"
+                        android:text="@string/link"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+                    <Button
+
+                        android:id="@+id/btnStop"
+                        android:text="@string/stop"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                    <Button
+                        android:id="@+id/btnRotate"
+                        android:text="@string/rotate"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_height="match_parent">
+
+                    <Button
+                        android:id="@+id/btnPlay"
+                        android:text="@string/play"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                    <Button
+                        android:id="@+id/btnDislink"
+                        android:text="@string/dislink"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                    <Button
+                        android:id="@+id/btnSavePic"
+                        android:text="@string/save_pic"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
 
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_height="match_parent">
 
-                <Button
-                    android:id="@+id/btnPlay"
-                    android:text="@string/play"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-                <Button
-                    android:id="@+id/btnDislink"
-                    android:text="@string/dislink"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-                <Button
-                    android:id="@+id/btnSavePic"
-                    android:text="@string/save_pic"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
 
 
         </LinearLayout>
