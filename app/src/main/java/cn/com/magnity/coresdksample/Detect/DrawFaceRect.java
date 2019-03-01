@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 public class DrawFaceRect {
     /**
@@ -37,6 +38,11 @@ public class DrawFaceRect {
         int drawR = rect.right + len;
         int drawU = rect.top - len;
         int drawD = rect.bottom + len;
+     /*    Log.i("人脸框坐标", "len "+len);
+         Log.i("人脸框坐标", "left "+drawL);
+         Log.i("人脸框坐标", "right "+drawR);
+         Log.i("人脸框坐标", "top "+drawU);
+         Log.i("人脸框坐标", "bottom "+drawD);*/
         //绘制人脸识别框，每两个一组
         canvas.drawLine(drawL, drawD, drawL, drawD - len, paint);
         canvas.drawLine(drawL, drawD, drawL + len, drawD, paint);

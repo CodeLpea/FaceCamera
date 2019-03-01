@@ -156,11 +156,16 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         //get the fpa coordinate
         int yFPA = info.maxPos / cameraInfo.fpaWidth;
         int xFPA = info.maxPos - yFPA * cameraInfo.fpaWidth;
-
+      /*  Log.i(TAG, "yFPA: "+yFPA);
+        Log.i(TAG, "xFPA: "+xFPA);
+        Log.i(TAG, "maxPos: "+info.maxPos);
+        Log.i(TAG, "maxPos: "+info.maxPos);
+        Log.i(TAG, "cameraInfo.fpaWidth: "+cameraInfo.fpaWidth);*/
         //convert to the screen coordinate
         int x = xFPA * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
         int y = dstRect.height() - yFPA * dstRect.height() / cameraInfo.fpaHeight + dstRect.top;
-
+      /*  Log.i(TAG, "x: "+x);
+        Log.i(TAG, "y: "+y);*/
         /* text to show */
         String s = String.format(Locale.ENGLISH, "%.1fC", temp * 0.001f);
 

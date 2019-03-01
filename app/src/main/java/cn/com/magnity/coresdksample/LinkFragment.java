@@ -169,15 +169,17 @@ public class LinkFragment extends Fragment {
             mSavePicBtn.setEnabled(false);
         }
     }
-
+private int conut=1;
     public void autoConnect() {
         //直接连接link已经扫描到的设备
         if (mDevices!=null&&mDevices.size()>0){
             EnumInfo dev = mDevices.get(0);
-            if (!mDev.isLinked()) {//判断是否已经连接
+            if (!mDev.isLinked()&&!mDev.isProcessingImage()) {//判断是否已经连接
                 Log.i(TAG, "mDevices.get(0).name: "+mDevices.get(0).name);
                 Log.i(TAG, "mDevices.get(0).id: "+mDevices.get(0).id);
-                mDev.dislinkCamera();//确保断开连接
+                stop();//确保断开连接
+                Toast.makeText(view.getContext(),"第"+conut++ +"次连接   id："+mDevices.get(0).id,Toast.LENGTH_SHORT).show();
+                //mDev.dislinkCamera();//确保断开连接
                 mSelectedDev = dev;
                 mTextSelectedDevice.setText(mSelectedDev.name);
                 updateButtons();
@@ -252,7 +254,7 @@ public class LinkFragment extends Fragment {
     }
 
     private void Link() {
-        Toast.makeText(view.getContext(),"开启播放：",Toast.LENGTH_SHORT).show();
+       // Toast.makeText(view.getContext(),"开启播放：",Toast.LENGTH_SHORT).show();
         int r = mDev.linkCamera(view.getContext(), mSelectedDev.id,
                 new MagDevice.ILinkCallback() {
                     @Override
@@ -263,13 +265,14 @@ public class LinkFragment extends Fragment {
                         } else if (result == MagDevice.CONN_FAIL) {
                             /* 连接失败 */
                         } else if (result == MagDevice.CONN_DETACHED) {
-                            /* 连接失败*/
+                            /* 拔出*/
+                            stop();
                         }
                         updateButtons();
                     }
                 });
 
-        if (r == MagDevice.CONN_SUCC) {
+      /*  if (r == MagDevice.CONN_SUCC) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -277,12 +280,20 @@ public class LinkFragment extends Fragment {
                 }
             });
         }
-        updateButtons();
+        updateButtons();*/
     }
     private void play() {
         mDev.setColorPalette(MagDevice.ColorPalette.PaletteIronBow);
         if (mDev.startProcessImage(mVideoFragment, 0, 0)) {
             mVideoFragment.startDrawingThread(mDev);
+        }else {
+           /* 传输失败 */mDev.dislinkCamera();
         }
+    }
+    public void stop() {
+        /* 停止传输 */
+        mDev.stopProcessImage();
+        /* 断开连接 */
+        mDev.dislinkCamera();
     }
 }

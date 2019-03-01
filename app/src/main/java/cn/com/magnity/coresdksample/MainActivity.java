@@ -54,22 +54,20 @@ import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
+import cn.com.magnity.coresdksample.View.QiuView;
 
 
+import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG="MainActivity";
     //const
     private static final int START_TIMER_ID = 0;
     private static final int TIMER_INTERVAL = 500;//ms
-
-    private static final int STATUS_IDLE = 0;
-    private static final int STATUS_LINK = 1;
-    private static final int STATUS_TRANSFER = 2;
 
     private static final String STATUS_ARGS = "status";
     private static final String USBID_ARGS = "usbid";
@@ -106,18 +104,84 @@ public class MainActivity extends AppCompatActivity {
     private LinkFragment linkFragment;
     private LoactionFragment loactionFragment;
 
+    private TextView Tvlocation1,Tvlocation2,Tvpoint1,Tvpoint2;
+    private QiuView QiuView1,QiuView2;
+    private Button BtLocate,BtLink;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_vertical);
         SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
+        initView();
         initFragment();
         initJuge(savedInstanceState);//温度摄像头初始化
         initPersonCamera();// 人像摄像头初始化
 
 
     }
+
+    /**
+     * initView
+     * */
+    private void initView() {
+        Tvlocation1=(TextView) findViewById(R.id.tv_location1);
+        Tvlocation2=(TextView) findViewById(R.id.tv_location2);
+        Tvpoint1=(TextView) findViewById(R.id.tv_point1);
+        Tvpoint2=(TextView) findViewById(R.id.tv_point2);
+        QiuView1= (QiuView) findViewById(R.id.view1);
+        QiuView2= (QiuView)findViewById(R.id.view2);
+        BtLink= (Button) findViewById(R.id.bt_linkSet);
+        BtLocate= (Button) findViewById(R.id.bt_locateSet);
+        BtLink.setOnClickListener(this);
+        BtLocate.setOnClickListener(this);
+    }
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.bt_linkSet://连接设置跳转到LINKFragemnt
+                transaction=getFragmentManager().beginTransaction();
+                //初始化transaction
+                transaction.hide(loactionFragment);
+                transaction.show(linkFragment);//连接LinkFragment隐藏locationFragment
+                WhereFragmentID=1;
+                showLocationView(false);//隐藏LocationFragment中需要用到的mainActivity的控件
+                transaction.commit();
+                break;
+            case R.id.bt_locateSet://连接设置跳转到LocationFragemnt
+                transaction=getFragmentManager().beginTransaction();
+                //初始化transaction
+                transaction.hide(linkFragment);
+                transaction.show(loactionFragment);//默认进入locationFragment隐藏LinkFragment
+                WhereFragmentID=2;
+                showLocationView(true);//展示出LocationFragment中需要用到的mainActivity的控件
+                transaction.commit();
+                break;
+        }
+    }
+/**
+ *展示/隐藏
+ * LocationFragment中需要用到的mainActivity的控件
+ * */
+    private void showLocationView(Boolean status) {
+        if(status){
+            Tvlocation1.setVisibility(View.VISIBLE);
+            Tvlocation2.setVisibility(View.VISIBLE);
+            Tvpoint1.setVisibility(View.VISIBLE);
+            Tvpoint2.setVisibility(View.VISIBLE);
+            QiuView1.setVisibility(View.VISIBLE);
+            QiuView2.setVisibility(View.VISIBLE);
+        }else {//隐藏控件
+            Tvlocation1.setVisibility(View.INVISIBLE);
+            Tvlocation2.setVisibility(View.INVISIBLE);
+            Tvpoint1.setVisibility(View.INVISIBLE);
+            Tvpoint2.setVisibility(View.INVISIBLE);
+            QiuView1.setVisibility(View.INVISIBLE);
+            QiuView2.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
     /**初始化Fragment
      * */
     private void initFragment(){
@@ -125,28 +189,11 @@ public class MainActivity extends AppCompatActivity {
         loactionFragment=new LoactionFragment();
         transaction=getFragmentManager().beginTransaction();
         //初始化transaction
-        transaction.replace(R.id.frame_layout,linkFragment);
-        //transaction.add(R.id.frame_layout,loactionFragment);
+        transaction.add(R.id.frame_layout,linkFragment);
+        transaction.add(R.id.frame_layout,loactionFragment);
+        transaction.hide(loactionFragment);
+        transaction.show(linkFragment);//默认进入linkFragment隐藏locationFragment
         transaction.commit();
-        //setFragment(linkFragment);
-    }
-    /**
-     * 设置显示的fragement
-     * @param fragment
-     */
-    public void setFragment(Fragment fragment) {
-        Log.e(TAG, "setFragment: "+(fragment==null) );
-        //transaction.show(linkFragment);//展示
-        transaction.commit();
-      /*  Fragment current = getFragmentManager().findFragmentById(R.id.frame_layout);
-        if (current != null && current instanceof LinkFragment){
-            transaction.hide(loactionFragment);  //隐藏
-            transaction.show(linkFragment);//展示
-        }else {
-            transaction.hide(linkFragment);  //隐藏
-            transaction.show(loactionFragment);//展示
-        }
-        transaction.commit();*/
     }
     /**
      * 人像摄像头初始化
@@ -166,17 +213,14 @@ public class MainActivity extends AppCompatActivity {
         // openCamera();//打开摄像头
 
     }
-
     /**温度摄像头初始化
      * */
     private void initJuge(Bundle savedInstanceState ) {
         /* global init */
         MagDevice.init(this);
-
         /* init ui */
         // initUi();
-        initUi1();
-
+        initJuGeUi();
         /* enum timer handler */
         mEnumHandler = new Handler() {
             @Override
@@ -216,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
             mRestoreHandler.postDelayed(mRestoreRunnable, 200);
         }
     }
-    private void initUi1() {
+    private void initJuGeUi() {
         mDev = new MagDevice();
         mDevices = new ArrayList<>();
         mDeviceStrings = new ArrayList<>();
@@ -519,4 +563,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onRestart: ");
         super.onRestart();
     }
+
+
 }

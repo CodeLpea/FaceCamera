@@ -150,6 +150,7 @@
                 >
                 <!-- 连接设置-->
                 <Button
+                    android:id="@+id/bt_linkSet"
                     android:text="连接设置"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -160,6 +161,7 @@
 
                     /> <!-- 校准设置-->
                 <Button
+                    android:id="@+id/bt_locateSet"
                     android:text="校准设置"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
