@@ -58,6 +58,7 @@ import cn.com.magnity.coresdksample.View.QiuView;
 
 
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
+//import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_vertical);
+        Log.i(TAG, "onCreate: ");
         SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
         initView();
@@ -249,9 +251,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mRestoreRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    //restore(usbId, status);
                     updateDeviceList();
                     Log.i(TAG, "restore");
+
                 }
             };
 
@@ -261,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     private void initJuGeUi() {
-        mDev = new MagDevice();
+        //mDev = new MagDevice();
         mDevices = new ArrayList<>();
         mDeviceStrings = new ArrayList<>();
         FragmentManager fm = getSupportFragmentManager();
@@ -294,16 +296,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void updateDeviceList() {
         MagDevice.getDevices(this, 33596, 1, mDevices);
-
-        mDeviceStrings.clear();
-        for (EnumInfo dev : mDevices) {
-            mDeviceStrings.add(dev.name);
-        }
         linkFragment.setmDevices(mDevices);
-        linkFragment.setmDeviceStrings(mDeviceStrings);
-
         linkFragment.autoConnect();
-
 
     }
 
@@ -341,22 +335,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mCamera = Camera.open(mCameraId);
             Toast.makeText(this,"摄像头已开启,请勿拔下摄像头",Toast.LENGTH_SHORT).show();
             this.degrees=setCameraDisplayOrientation(this, mCameraId, mCamera);//设置摄像头的预览方向
+            //获取摄像头参数对象
+            Camera.Parameters params = mCamera.getParameters();
+            //设置预览的格式
+            params.setPreviewFormat(ImageFormat.NV21);
+            //设置预览的分辨率，这里设置640*480，到目前为止只支持该分辨率的人脸检测
+            params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            params.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            //给摄像头设置参数配置
+            mCamera.setParameters(params);
+            //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
+            //mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
         } catch (Exception e) {
             e.printStackTrace();
             closeCamera();
             return;
         }
-        //获取摄像头参数对象
-        Camera.Parameters params = mCamera.getParameters();
-        //设置预览的格式
-        params.setPreviewFormat(ImageFormat.NV21);
-        //设置预览的分辨率，这里设置640*480，到目前为止只支持该分辨率的人脸检测
-        params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        params.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        //给摄像头设置参数配置
-        mCamera.setParameters(params);
-        //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
-        //mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
             mCamera.startPreview();

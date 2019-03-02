@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
 
+import static cn.com.magnity.coresdksample.MyApplication.isQuest;
+import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 
@@ -44,7 +46,7 @@ public class LinkFragment extends Fragment {
     private ArrayAdapter mListAdapter;
     private EnumInfo mSelectedDev;
 
-    private ListView mDevList;
+   // private ListView mDevList;
     private Button mLinkBtn;
     private Button mPlayBtn;
     private Button mStopBtn;
@@ -109,10 +111,10 @@ public class LinkFragment extends Fragment {
         /* new object */
        // mDev = new MagDevice();
         mDevices = new ArrayList<>();
-        mDeviceStrings = new ArrayList<>();
-        mListAdapter = new ArrayAdapter<String>(view.getContext(),
+        /* mDeviceStrings = new ArrayList<>();
+           mListAdapter = new ArrayAdapter<String>(view.getContext(),
                 android.R.layout.simple_expandable_list_item_1, mDeviceStrings);
-        mDevList = (ListView)view.findViewById(R.id.listDev);
+    mDevList = (ListView)view.findViewById(R.id.listDev);
         mDevList.setAdapter(mListAdapter);
         mDevList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -125,7 +127,7 @@ public class LinkFragment extends Fragment {
                     updateButtons();
                 }
             }
-        });
+        });*/
 
         MagOnClickListener listener = new MagOnClickListener();
         mLinkBtn = (Button)view.findViewById(R.id.btnLink);
@@ -174,7 +176,9 @@ private int conut=1;
         //直接连接link已经扫描到的设备
         if (mDevices!=null&&mDevices.size()>0){
             EnumInfo dev = mDevices.get(0);
-            if (!mDev.isLinked()&&!mDev.isProcessingImage()) {//判断是否已经连接
+           // Log.i(TAG, "autoConnect: 尝试连接");
+            if (!mDev.isLinked()) {//判断是否已经连接
+                isQuest=true;//等待询问权限，避免重复连接冲突。
                 Log.i(TAG, "mDevices.get(0).name: "+mDevices.get(0).name);
                 Log.i(TAG, "mDevices.get(0).id: "+mDevices.get(0).id);
                 stop();//确保断开连接
@@ -185,6 +189,7 @@ private int conut=1;
                 updateButtons();
                 //以上将扫描到的设备显示出来，添加到mSelecteDev中缓存，以待下面连接
                 Link();   //自动连接
+
             }
         }
     }
@@ -249,7 +254,7 @@ private int conut=1;
                     }
                     break;
             }
-            mDevList.requestFocus();
+           //mDevList.requestFocus();
         }
     }
 
@@ -261,34 +266,48 @@ private int conut=1;
                     public void linkResult(int result) {
                         if (result == MagDevice.CONN_SUCC) {
                             /* 连接成功 */
-                            play();
+                            Log.i(TAG, "linkResult: 连接成功");
                         } else if (result == MagDevice.CONN_FAIL) {
                             /* 连接失败 */
+                            Log.i(TAG, "linkResult: 连接失败");
+                            isplay=false;
+                            isQuest=false;//修改状态，方便下次进入连接流程
                         } else if (result == MagDevice.CONN_DETACHED) {
                             /* 拔出*/
-                            stop();
+                            Log.i(TAG, "linkResult: 拔出");
+                            //stop();
+                             isplay=false;
+                            isQuest=false;//修改状态，方便下次进入连接流程
                         }
                         updateButtons();
                     }
                 });
 
-      /*  if (r == MagDevice.CONN_SUCC) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+        if (r == MagDevice.CONN_SUCC) {
                     play();
-                }
-            });
+                    Log.i(TAG, "linkResult: runOnUiThread 连接成功");
+                    isQuest=false;//修改状态，方便下次进入连接流程
         }
-        updateButtons();*/
+        updateButtons();
     }
     private void play() {
         mDev.setColorPalette(MagDevice.ColorPalette.PaletteIronBow);
         if (mDev.startProcessImage(mVideoFragment, 0, 0)) {
+            Log.i(TAG, "传输成功 startDrawingThread: ");
             mVideoFragment.startDrawingThread(mDev);
         }else {
            /* 传输失败 */mDev.dislinkCamera();
+            Log.i(TAG, "传输失败 dislinkCamera: ");
         }
+        if(!isplay){
+            Log.i(TAG, "断开连接重新播放 ");
+            mDev.dislinkCamera();
+            mVideoFragment.stopDrawingThread();
+            mDegree = 0;
+            updateButtons();
+        }
+        isplay=true;
+
     }
     public void stop() {
         /* 停止传输 */
