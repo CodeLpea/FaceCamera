@@ -42,8 +42,6 @@ public class LinkFragment extends Fragment {
     //private MagDevice mDev;
     private int mDegree;//0 - 90, 1 - 180, 2 - 270
     private ArrayList<EnumInfo> mDevices;
-    private ArrayList<String> mDeviceStrings;
-    private ArrayAdapter mListAdapter;
     private EnumInfo mSelectedDev;
 
    // private ListView mDevList;
@@ -65,16 +63,6 @@ public class LinkFragment extends Fragment {
         this.mDevices = mDevices;
     }
 
-    public void setmDeviceStrings(ArrayList<String> mDeviceStrings) {
-        this.mDeviceStrings = mDeviceStrings;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mListAdapter.notifyDataSetChanged();
-            }
-        });
-
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,24 +99,6 @@ public class LinkFragment extends Fragment {
         /* new object */
        // mDev = new MagDevice();
         mDevices = new ArrayList<>();
-        /* mDeviceStrings = new ArrayList<>();
-           mListAdapter = new ArrayAdapter<String>(view.getContext(),
-                android.R.layout.simple_expandable_list_item_1, mDeviceStrings);
-    mDevList = (ListView)view.findViewById(R.id.listDev);
-        mDevList.setAdapter(mListAdapter);
-        mDevList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                EnumInfo dev = mDevices.get(position);
-                if (mSelectedDev == null || mSelectedDev.id != dev.id || !mDev.isLinked()) {
-                    mDev.dislinkCamera();
-                    mSelectedDev = dev;
-                    mTextSelectedDevice.setText(mSelectedDev.name);
-                    updateButtons();
-                }
-            }
-        });*/
-
         MagOnClickListener listener = new MagOnClickListener();
         mLinkBtn = (Button)view.findViewById(R.id.btnLink);
         mLinkBtn.setOnClickListener(listener);
@@ -143,7 +113,6 @@ public class LinkFragment extends Fragment {
         mSavePicBtn = (Button)view.findViewById(R.id.btnSavePic);
         mSavePicBtn.setOnClickListener(listener);
         mTextSelectedDevice = (TextView)view.findViewById(R.id.tvSelectedName);
-
         updateButtons();
 
     }

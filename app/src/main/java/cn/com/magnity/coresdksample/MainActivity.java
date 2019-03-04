@@ -242,7 +242,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /* runtime permit */
         Utils.requestRuntimePermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, 0, R.string.writeSDPermission);
-
         /* restore parameter */
         if (savedInstanceState != null) {
             final int usbId = savedInstanceState.getInt(USBID_ARGS);
@@ -281,17 +280,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        /* save parameter for restore when screen rotating */
-        /*int status = STATUS_IDLE;
-        if (mDev.isProcessingImage()) {
-            status = STATUS_TRANSFER;
-        } else if (mDev.isLinked()) {
-            status = STATUS_LINK;
-        }
-        outState.putInt(STATUS_ARGS, status);
-        if (mSelectedDev != null) {
-            outState.putInt(USBID_ARGS, mSelectedDev.id);
-        }*/
     }
 
     private void updateDeviceList() {
