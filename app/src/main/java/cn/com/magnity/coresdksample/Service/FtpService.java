@@ -92,6 +92,7 @@ public class FtpService extends Service {
 
         server = serverFactory.createServer();
         server.start();
+        Log.i(TAG, "server.isStopped(): "+server.isStopped());
     }
 
 

@@ -17,6 +17,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.net.wifi.ScanResult;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -50,6 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
@@ -58,6 +60,7 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.View.QiuView;
+import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
 
 
@@ -108,10 +111,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FragmentTransaction transaction;//定义用于加载连接和设置界面
     private LinkFragment linkFragment;
     private LoactionFragment loactionFragment;
-
+    //校准相关控件
     private TextView Tvlocation1,Tvlocation2,Tvpoint1,Tvpoint2;
     private QiuView QiuView1,QiuView2;
     private Button BtLocate,BtLink;
+    //wifi管理
+    WifiAdmin wifiAdmin ;
+    private Handler WifiScanHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,14 +125,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.i(TAG, "onCreate: ");
         SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
+        //初始化控件
         initView();
+        //初始化Fragment
         initFragment();
-        initJuge(savedInstanceState);//温度摄像头初始化
-        initPersonCamera();// 人像摄像头初始化
-        initFtp();//初始化ftp
-
+        //温度摄像头初始化
+        initJuge(savedInstanceState);
+        // 人像摄像头初始化
+        initPersonCamera();
+        //连接指定wifi
+        wifiScan();
+        //初始化ftp
+        initFtp();
 
     }
+    /**
+     * 连接指定的wifi
+     * */
+    private void wifiScan() {
+        WifiScanHandler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case 1:
+                        WifiScanHandler.removeMessages(1);
+                        wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
+                        wifiAdmin.openWifi();
+                        //执行搜索
+                        String di="XIAONUO1";
+                        if(!wifiAdmin.getSSID().equals("\"" +di + "\"")){
+                            //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
+                            wifiAdmin.startScan();
+                            List<ScanResult> scanResultList;
+                            scanResultList= wifiAdmin.getWifiList();
+                            //Log.i(TAG, "scanResultList.size(): "+scanResultList.size());
+                            for(int i=0;i<scanResultList.size();i++){
+                                // Log.i(TAG, "scanResultList.SSID(): "+scanResultList.get(i).SSID);
+                                if (scanResultList.get(i).SSID.equals("XIAONUO1")){
+                                    Log.i(TAG, "找到指定wifi： XIAONUO1  准备连接: ");
+                                    wifiAdmin.addNetwork(
+                                            wifiAdmin.CreateWifiInfo("XIAONUO1",
+                                                    "XiaoNuo2018",3));
+                                    break;
+                                }
+                            }
+                        }
+                        WifiScanHandler.sendEmptyMessageDelayed(1,500);
+                        break;
+
+                }
+            }
+        };
+        WifiScanHandler.sendEmptyMessage(1);//启动
+    }
+
 /***
  * 初始化ftp
  * */
