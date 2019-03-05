@@ -7,11 +7,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Rect;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Locale;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -131,10 +134,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
         mDev = null;
     }
-
+    Bitmap bmp;
     private void drawImage(Canvas canvas, Rect dstRect, CameraInfo cameraInfo,
                            StatisticInfo info, Paint paint) {
-        Bitmap bmp;
+
 
         mDev.lock();
         bmp = mDev.getOutputImage();
@@ -146,6 +149,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         if (bmp != null) {
             canvas.drawBitmap(bmp, null, dstRect, null);
             drawMaxTemp(canvas, dstRect, cameraInfo, info, paint);
+
+
         }
     }
 
@@ -156,11 +161,11 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         //get the fpa coordinate
         int yFPA = info.maxPos / cameraInfo.fpaWidth;
         int xFPA = info.maxPos - yFPA * cameraInfo.fpaWidth;
-      /*  Log.i(TAG, "yFPA: "+yFPA);
+        Log.i(TAG, "yFPA: "+yFPA);
         Log.i(TAG, "xFPA: "+xFPA);
         Log.i(TAG, "maxPos: "+info.maxPos);
         Log.i(TAG, "maxPos: "+info.maxPos);
-        Log.i(TAG, "cameraInfo.fpaWidth: "+cameraInfo.fpaWidth);*/
+        Log.i(TAG, "cameraInfo.fpaWidth: "+cameraInfo.fpaWidth);
         //convert to the screen coordinate
         int x = xFPA * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
         int y = dstRect.height() - yFPA * dstRect.height() / cameraInfo.fpaHeight + dstRect.top;
@@ -192,6 +197,14 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             y -= pad * 2 + cy * 2;
         }
         canvas.drawText(s, x, y, paint);
+        if(temp>30){
+            Canvas canvas1=new Canvas(bmp);
+            canvas1.drawLine(xFPA - lineWidth, yFPA, xFPA + lineWidth, yFPA, paint);
+            canvas1.drawLine(x, yFPA - lineWidth, xFPA, yFPA + lineWidth, paint);
+            canvas.drawText(s, xFPA, yFPA, paint);
+            saveBitmap(bmp);
+            Log.i(TAG, "saveBitmap: ");
+        }
     }
 
     void drawBackground(Canvas canvas, Paint paint) {
@@ -230,4 +243,19 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             } //while
         }
     }
+    /**
+     114      * 保存图片到SD卡上
+     115      */
+   protected void saveBitmap(Bitmap baseBitmap) {
+        try {
+                   // 保存图片到SD卡上
+                   File file = new File(Environment.getExternalStorageDirectory(),
+                           "test"+File.separator+System.currentTimeMillis() + ".png");
+              FileOutputStream stream = new FileOutputStream(file);
+                baseBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+              } catch (Exception e) {
+
+              e.printStackTrace();
+           }
+             }
 }

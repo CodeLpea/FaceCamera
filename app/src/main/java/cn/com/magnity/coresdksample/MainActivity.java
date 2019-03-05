@@ -5,6 +5,7 @@ import android.Manifest;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,6 +24,7 @@ import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -54,7 +56,9 @@ import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
+import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.View.QiuView;
+import cn.com.magnity.coresdksample.utils.WifiUtil;
 
 
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
@@ -119,8 +123,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initFragment();
         initJuge(savedInstanceState);//温度摄像头初始化
         initPersonCamera();// 人像摄像头初始化
+        initFtp();//初始化ftp
 
 
+    }
+/***
+ * 初始化ftp
+ * */
+    private void initFtp() {
+        WifiUtil wifiUtil=new WifiUtil();
+        String ip = wifiUtil.getIp(this);
+        if(TextUtils.isEmpty(ip)){
+            Log.e(TAG,"获取不到IP，请连接网络");
+        }else{
+            String str = "请在IE浏览器上输入网址访问FTP服务\n" +
+                    "ftp://"+ip+":2221\n" +
+                    "账号:didano\n" +
+                    "密码:12345678";
+            Log.i(TAG,str);
+        }
+        startService(new Intent(this, FtpService.class));
     }
 
     /**
@@ -230,7 +252,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switch (msg.what) {
                     case START_TIMER_ID:
                         mEnumHandler.removeMessages(START_TIMER_ID);
-                        updateDeviceList();
+                        if(!mDev.isLinked()){
+                            updateDeviceList();
+                        }
                         mEnumHandler.sendEmptyMessageDelayed(START_TIMER_ID, TIMER_INTERVAL);
                         break;
                 }
@@ -390,33 +414,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     /**
-     * 拍照*/
-    public void takePhoto(){
-
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                //技术：图片压缩技术（如果图片不压缩，图片大小会过大，会报一个oom内存溢出的错误）
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                Matrix matrix = new Matrix();//获取矩阵对象用于图形变换
-                matrix.setRotate(degrees);//设置旋转角度
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                try {
-                    File pictureFile = new File(Environment.getExternalStorageDirectory(),
-                            SavaRootDirName+File.separator+System.currentTimeMillis() + "Person.jpg");
-                    FileOutputStream fos = new FileOutputStream(pictureFile);//图片保存路径
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);//压缩格式，质量，压缩路径
-                    camera.stopPreview();
-                    camera.startPreview();
-                    bitmap.recycle();//回收bitmap空间
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-    }
-    /**
      * 释放摄像头资源
      */
     private void closeCamera() {
@@ -436,6 +433,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int width = metrics.widthPixels;
         int height = (int) (width * PREVIEW_WIDTH / (float) PREVIEW_HEIGHT);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
+        Log.i(TAG, "setSurfaceSize:width "+width);
+        Log.i(TAG, "setSurfaceSize:height "+height);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         mPreviewSurface.setLayoutParams(params);
     }
@@ -462,6 +461,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mScaleMatrix.setScale(width / (float) PREVIEW_HEIGHT,
 
                     height / (float) PREVIEW_WIDTH);//设置缩放比例
+            Log.i(TAG, "surfaceChanged:width "+width);
+            Log.i(TAG, "surfaceChanged:height "+height);
+            Log.i(TAG, "surfaceChanged:width / (float) PREVIEW_HEIGHT "+width / (float) PREVIEW_HEIGHT);
+            Log.i(TAG, "surfaceChanged:height / (float) PREVIEW_WIDTH "+height / (float) PREVIEW_WIDTH);
         }
     };
 
@@ -488,9 +491,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     boolean frontCamera = (Camera.CameraInfo.CAMERA_FACING_FRONT == mCameraId);
                     if (frontCamera) {
                         direction = (4 - direction) % 4;// 0,1,2,3,4分别表示0,90,180,270和360度
+                        Log.i(TAG, "direction: "+direction);
                     }
                     String result = mFaceDetector.trackNV21(
-                            buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, direction);//获取人脸检测结果
+                            buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, 1);//获取人脸检测结果
                     FaceRect face = Result.result(result);//获取返回的数据
                    // Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
                     Canvas canvas = mSurfaceHolder.lockCanvas();//锁定画布用于绘制
