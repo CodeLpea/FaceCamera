@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import cn.com.magnity.coresdk.MagDevice;
+import cn.com.magnity.coresdksample.utils.TtsUtil;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
@@ -12,12 +13,21 @@ public class MyApplication extends Application {
     public static  boolean isplay=false; //红外播放状态
     public static  boolean isQuest=false; //红外权限状态
     public static    int WhereFragmentID=1;//用来标记当前出于哪个Fragment，1为linkFragment，2为LocationFragment；
+    public TtsUtil ttsUtil;
 
+    public TtsUtil getTtsUtil() {
+        return ttsUtil;
+    }
+    private static MyApplication myApplication = null;
+    public static MyApplication getInstance() {
+        return myApplication;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
+        myApplication = this;
         Log.i(TAG, "onCreate: ");
-        mDev =new MagDevice();
-
+        mDev =new MagDevice();//初始化全局MagDevice
+        ttsUtil=new TtsUtil(this);//初始化全局语音播放工具
     }
 }

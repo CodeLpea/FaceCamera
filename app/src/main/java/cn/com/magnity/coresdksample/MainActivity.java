@@ -3,7 +3,6 @@ package cn.com.magnity.coresdksample;
 import android.Manifest;
 
 
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,7 +22,6 @@ import android.os.Handler;
 import android.os.Message;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -32,10 +30,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +55,7 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.View.QiuView;
+import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
 
@@ -71,7 +67,7 @@ import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG="MainActivity";
     //const
     private static final int START_TIMER_ID = 0;
@@ -118,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //wifi管理
     WifiAdmin wifiAdmin ;
     private Handler WifiScanHandler;
+    private Handler DelayStartHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,12 +130,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initJuge(savedInstanceState);
         // 人像摄像头初始化
         initPersonCamera();
-        //连接指定wifi
+       //连接指定wifi
         wifiScan();
-        //初始化ftp
-        initFtp();
-
+        //延时启动ftp wifi扫描等功能
+        delayStart();
     }
+/**
+ * 延时启动ftp wifi扫描等功能
+ * 以便tts语音已经被初始化
+ * */
+    private void delayStart() {
+        DelayStartHandler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case 2:
+                        //初始化ftp
+                        initFtp();
+                        break;
+                }
+            }
+        };
+        DelayStartHandler.sendEmptyMessageDelayed(2,5000);
+    }
+
     /**
      * 连接指定的wifi
      * */
@@ -188,12 +204,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String ip = wifiUtil.getIp(this);
         if(TextUtils.isEmpty(ip)){
             Log.e(TAG,"获取不到IP，请连接网络");
+            MyApplication.getInstance().getTtsUtil().SpeechAdd("网络不通，请检查");
         }else{
             String str = "请在IE浏览器上输入网址访问FTP服务\n" +
                     "ftp://"+ip+":2221\n" +
                     "账号:didano\n" +
                     "密码:12345678";
             Log.i(TAG,str);
+            MyApplication.getInstance().getTtsUtil().SpeechAdd("正在开启ftp服务器，当前 i p 为"+ip);
         }
         startService(new Intent(this, FtpService.class));
     }
@@ -217,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.bt_linkSet://连接设置跳转到LINKFragemnt
+                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt");
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(loactionFragment);
@@ -226,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 transaction.commit();
                 break;
             case R.id.bt_locateSet://连接设置跳转到LocationFragemnt
+                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt");
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(linkFragment);

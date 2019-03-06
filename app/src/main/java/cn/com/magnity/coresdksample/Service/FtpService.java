@@ -19,6 +19,11 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.com.magnity.coresdksample.MainActivity;
+import cn.com.magnity.coresdksample.MyApplication;
+
+
+
 /**
  * Created by Administrator on 2018.03.28.
  */
@@ -45,10 +50,12 @@ public class FtpService extends Service {
         try {
             init();
             Toast.makeText(this, "启动ftp服务成功", Toast.LENGTH_SHORT).show();
+            MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务成功");
             Log.i(TAG, "启动ftp服务成功: ");
         } catch (FtpException e) {
             e.printStackTrace();
             Toast.makeText(this, "启动ftp服务失败", Toast.LENGTH_SHORT).show();
+             MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务失败");
             Log.i(TAG, "启动ftp服务失败: ");
         }
 
