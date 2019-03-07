@@ -65,6 +65,7 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
+import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -75,6 +76,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String STATUS_ARGS = "status";
     private static final String USBID_ARGS = "usbid";
+    private static final int MSG1 = 100;//自动连接指定的wifi
+    private static final int MSG2 =MSG1+1 ;
+    private static final int MSG3 = MSG2+1;
+    private static final int MSG4 = MSG3+1;
 
     //non-const
   //  private MagDevice mDev;
@@ -133,9 +138,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
        //连接指定wifi
         wifiScan();
         //延时启动ftp wifi扫描等功能
+        initFile();//初始化文件夹
         delayStart();
     }
 /**
+ * 初始化文件夹
+* */
+    private void initFile() {
+        File file1 = Environment.getExternalStorageDirectory();
+        File file2 = Environment.getExternalStorageDirectory();
+        if (null != file1) {
+            file1 = new File(file1, SavaRootDirName);
+            if (!file1.exists()) {
+                file1.mkdirs();
+            }
+        }
+        if (null != file2) {
+            file2 = new File(file2, SavaTestDirName);
+            if (!file2.exists()) {
+                file2.mkdirs();
+            }
+        }
+
+    }
+
+    /**
  * 延时启动ftp wifi扫描等功能
  * 以便tts语音已经被初始化
  * */
@@ -145,14 +172,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what){
-                    case 2:
+                    case MSG2://启动ftp服务器
                         //初始化ftp
                         initFtp();
+                        break;
+                    case MSG3://延时播放语音
+                        String voice=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice);
+                        Log.i(TAG, "延时播放语音: "+voice);
                         break;
                 }
             }
         };
-        DelayStartHandler.sendEmptyMessageDelayed(2,5000);
+        DelayStartHandler.sendEmptyMessageDelayed(MSG2,5000);
     }
 
     /**
@@ -164,7 +196,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what){
-                    case 1:
+                    case MSG1://自动连接指定的wifi
                         WifiScanHandler.removeMessages(1);
                         wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
                         wifiAdmin.openWifi();
@@ -187,7 +219,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                 }
                             }
                         }
-                        WifiScanHandler.sendEmptyMessageDelayed(1,500);
+                        WifiScanHandler.sendEmptyMessageDelayed(MSG1,500);
                         break;
 
                 }
@@ -396,7 +428,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mRestoreRunnable = null;
             mRestoreHandler = null;
         }
-
+        WifiScanHandler.removeCallbacksAndMessages(null);
+        DelayStartHandler.removeCallbacksAndMessages(null);
         /* disconnect camera when app exited */
         if (mDev.isProcessingImage()) {
             mDev.stopProcessImage();
@@ -434,11 +467,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
             closeCamera();
+            Message message=Message.obtain();
+            message.what=MSG3;
+            message.obj="人脸摄像头开启失败，请检查";
+            DelayStartHandler.sendMessageDelayed(message,6000);
             return;
         }
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
             mCamera.startPreview();
+            Message message=Message.obtain();
+            message.what=MSG3;
+            message.obj="人脸摄像头开启成功";
+            DelayStartHandler.sendMessageDelayed(message,6000);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -467,6 +508,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     }
+
     public  void saveBitmap(Bitmap bitmap) {
         Log.e(TAG, "保存图片");
         File f = new File(Environment.getExternalStorageDirectory(),
@@ -607,6 +649,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (null != accelerometer) {
             accelerometer.stop();
         }
+
         //closeCamera();
 
     }

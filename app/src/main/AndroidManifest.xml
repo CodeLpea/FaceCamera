@@ -18,6 +18,13 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!--//允许程序禁用键盘锁-->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <!--允许一个程序接收到 ACTION_BOOT_COMPLETED广播在系统完成启动-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--允许使用PowerManager的 WakeLocks保持进程在休眠时从屏幕消失-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -37,6 +44,17 @@
             </intent-filter>
         </activity>
         <service android:name=".Service.FtpService"/>
+        <!--//BootReceiver是上面建的广播类-->
+        <receiver android:name=".Broadcast.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="2147483647"><!--//优先级-->
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <category android:name="android.intent.category.HOME"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

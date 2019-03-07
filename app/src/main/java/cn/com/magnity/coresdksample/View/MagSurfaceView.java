@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.iflytek.thirdparty.E;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Locale;
@@ -24,6 +26,7 @@ import cn.com.magnity.coresdk.types.CameraInfo;
 import cn.com.magnity.coresdk.types.StatisticInfo;
 
 import static android.content.ContentValues.TAG;
+import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
 
 public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private volatile boolean mIsDrawing;
@@ -41,6 +44,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
     private CameraInfo mCameraInfo;
 
     private Paint mPaint;
+    private Paint SavePhotoPaint;
     private PaintFlagsDrawFilter mPfd;
 
     public MagSurfaceView(Context context, AttributeSet attrs) {
@@ -57,6 +61,13 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         mPaint.setColor(Color.GREEN);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
 
+
+        SavePhotoPaint=new Paint();
+        SavePhotoPaint.setStyle(Paint.Style.FILL);
+        SavePhotoPaint.setStrokeWidth(1f);
+        SavePhotoPaint.setTextSize(10f);
+        SavePhotoPaint.setColor(Color.GREEN);
+        SavePhotoPaint.setStrokeCap(Paint.Cap.ROUND);
         /* bilinear */
         mPfd = new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     }
@@ -161,16 +172,19 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         //get the fpa coordinate
         int yFPA = info.maxPos / cameraInfo.fpaWidth;
         int xFPA = info.maxPos - yFPA * cameraInfo.fpaWidth;
-        Log.i(TAG, "yFPA: "+yFPA);
+      /*  Log.i(TAG, "yFPA: "+yFPA);
         Log.i(TAG, "xFPA: "+xFPA);
         Log.i(TAG, "maxPos: "+info.maxPos);
         Log.i(TAG, "maxPos: "+info.maxPos);
         Log.i(TAG, "cameraInfo.fpaWidth: "+cameraInfo.fpaWidth);
+        Log.i(TAG, "maxTemperature: "+temp * 0.001);*/
         //convert to the screen coordinate
         int x = xFPA * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
         int y = dstRect.height() - yFPA * dstRect.height() / cameraInfo.fpaHeight + dstRect.top;
-      /*  Log.i(TAG, "x: "+x);
-        Log.i(TAG, "y: "+y);*/
+        Log.i(TAG, "x: "+x);
+        Log.i(TAG, "y: "+y);
+       /* Log.i(TAG, "bmp: getWidth "+bmp.getWidth());
+        Log.i(TAG, "bmp: getHeight"+bmp.getHeight());*/
         /* text to show */
         String s = String.format(Locale.ENGLISH, "%.1fC", temp * 0.001f);
 
@@ -196,12 +210,34 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         if (y > dstRect.height()) {
             y -= pad * 2 + cy * 2;
         }
+
         canvas.drawText(s, x, y, paint);
-        if(temp>30){
-            Canvas canvas1=new Canvas(bmp);
-            canvas1.drawLine(xFPA - lineWidth, yFPA, xFPA + lineWidth, yFPA, paint);
-            canvas1.drawLine(x, yFPA - lineWidth, xFPA, yFPA + lineWidth, paint);
-            canvas.drawText(s, xFPA, yFPA, paint);
+        if(temp * 0.001f>30){//超过30度，就标记出来并保存。
+            Canvas saveBmpCanvas=new Canvas(bmp);
+            float x2=xFPA;
+            float y2=120-yFPA;
+            float xStart=x2-4f;
+            float xStop=x2+4f;
+            float yStart=y2-4f;
+            float yStop=y2+4f;
+            saveBmpCanvas.drawLine(xStart, y2, xStop, y2, SavePhotoPaint);
+            saveBmpCanvas.drawLine(x2, yStart, x2, yStop, SavePhotoPaint);
+            /* draw text */
+            Rect rt2 = new Rect();
+            Paint textPaint=SavePhotoPaint;
+            textPaint.getTextBounds(s, 0, s.length(), rt2);
+            int cx2 = rt2.width();
+            int cy2 = rt2.height();
+            final int pad2 = 6;
+            x2 += pad2;
+            y2 += cy2 + pad2;
+            if (x2 > 160-cx2) {
+                x2 -= pad2 * 2 + cx2;
+            }
+            if (y2 >120) {
+                y2 -= pad2 * 2 + cy2 * 2;
+            }
+            saveBmpCanvas.drawText(s, x2, y2, textPaint);
             saveBitmap(bmp);
             Log.i(TAG, "saveBitmap: ");
         }
@@ -232,14 +268,18 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                 if (!mIsDrawing) {
                     break;
                 }
-
-                Canvas canvas = getHolder().lockCanvas();
-                if (canvas != null) {
-                    canvas.setDrawFilter(mPfd);
-                    drawBackground(canvas, mPaint);
-                    drawImage(canvas, mDstRect, mCameraInfo, mStatisticInfo, mPaint);
-                    getHolder().unlockCanvasAndPost(canvas);
+                try {
+                    Canvas canvas = getHolder().lockCanvas();
+                    if (canvas != null) {
+                        canvas.setDrawFilter(mPfd);
+                        drawBackground(canvas, mPaint);
+                        drawImage(canvas, mDstRect, mCameraInfo, mStatisticInfo, mPaint);
+                        getHolder().unlockCanvasAndPost(canvas);
+                    }
+                }catch (Exception e){//捕捉 Exception locking surface异常
+                    e.printStackTrace();
                 }
+
             } //while
         }
     }
@@ -249,12 +289,16 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
    protected void saveBitmap(Bitmap baseBitmap) {
         try {
                    // 保存图片到SD卡上
-                   File file = new File(Environment.getExternalStorageDirectory(),
-                           "test"+File.separator+System.currentTimeMillis() + ".png");
-              FileOutputStream stream = new FileOutputStream(file);
-                baseBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            File file = new File(Environment.getExternalStorageDirectory(),
+                    SavaTestDirName+File.separator+System.currentTimeMillis()+ ".png");
+            if (file.exists()) {
+                file.delete();
+            }
+            FileOutputStream stream = new FileOutputStream(file);
+            baseBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.flush();
+            stream.close();
               } catch (Exception e) {
-
               e.printStackTrace();
            }
              }
