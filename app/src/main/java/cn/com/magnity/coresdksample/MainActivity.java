@@ -62,6 +62,7 @@ import cn.com.magnity.coresdksample.utils.WifiUtil;
 
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 //import static cn.com.magnity.coresdksample.MyApplication.isplay;
+import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
@@ -460,6 +461,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             //设置预览的分辨率，这里设置640*480，到目前为止只支持该分辨率的人脸检测
             params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
             params.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            params.setPreviewFrameRate(5);
             //给摄像头设置参数配置
             mCamera.setParameters(params);
             //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
@@ -623,6 +625,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         continue;
                     }
                     if (face != null) {
+                        isGetFace=true;
+                        Log.i(TAG, "检测到人脸: ");
                         face.bound = DrawFaceRect.RotateDeg90(face.bound, PREVIEW_HEIGHT);//绘制人脸的区域
                         if (face.point != null) {//绘制脸上关键点
                             for (int i = 0; i < face.point.length; i++) {

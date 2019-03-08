@@ -7,6 +7,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
+import cn.com.magnity.coresdksample.MyApplication;
+
 public class DrawFaceRect {
     /**
      * 绘制人脸检测框
@@ -38,11 +40,19 @@ public class DrawFaceRect {
         int drawR = rect.right + len;
         int drawU = rect.top - len;
         int drawD = rect.bottom + len;
-         Log.i("人脸框坐标", "len "+len);
+    /*     Log.i("人脸框坐标", "len "+len);
          Log.i("人脸框坐标", "left "+drawL);
          Log.i("人脸框坐标", "right "+drawR);
          Log.i("人脸框坐标", "top "+drawU);
-         Log.i("人脸框坐标", "bottom "+drawD);
+         Log.i("人脸框坐标", "bottom "+drawD);*/
+         if(MyApplication.getInstance().mView!=null){
+             MyApplication.getInstance().faceRect.bound=face.bound;
+             MyApplication.getInstance().faceRect.point=face.point;
+         MyApplication.getInstance().juGeFaceRect.setxStart(drawL);//设置区域
+         MyApplication.getInstance().juGeFaceRect.setxStop(drawR);
+         MyApplication.getInstance().juGeFaceRect.setyStart(drawU);
+         MyApplication.getInstance().juGeFaceRect.setyStop(drawD);
+         }
         //绘制人脸识别框，每两个一组
         canvas.drawLine(drawL, drawD, drawL, drawD - len, paint);
         canvas.drawLine(drawL, drawD, drawL + len, drawD, paint);
