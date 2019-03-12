@@ -25,6 +25,7 @@ import cn.com.magnity.coresdk.types.CameraInfo;
 import cn.com.magnity.coresdk.types.StatisticInfo;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.utils.Config;
 
 import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
@@ -213,7 +214,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         if (MyApplication.getInstance().faceRect.point != null) {
             //遍历检测点，并绘制
             for (Point p : MyApplication.getInstance().faceRect.point) {
-                    p.y = getWidth() - p.y;
+                   /* p.y = getHeight() - p.y;*/
                     canvas.drawPoint(p.x, p.y, paint);
             }
         }
@@ -411,7 +412,13 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                   String maxTmp=String.valueOf(inf[1]*0.001f);
                   if(maxTmp.length()>=4){
                       maxTmp=maxTmp.substring(0,4);
-                      MyApplication.getInstance().ttsUtil.SpeechRepead("检测到人脸,最高温度为 "+maxTmp);
+                      if(inf[1]*0.001f>32){
+                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp, Config.heightTempVoiceVolume);
+                      }
+                      else {
+                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常 ",Config.normolTempVoiceVolume);
+                      }
+                     // MyApplication.getInstance().ttsUtil.SpeechRepead("检测到人脸,最高温度为 "+maxTmp);
                   }
 
                 /*  //获取单点温度

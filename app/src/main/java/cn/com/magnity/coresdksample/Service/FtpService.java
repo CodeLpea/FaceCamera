@@ -22,6 +22,7 @@ import java.util.List;
 import cn.com.magnity.coresdksample.MainActivity;
 import cn.com.magnity.coresdksample.MyApplication;
 
+import static cn.com.magnity.coresdksample.utils.Config.currtentVoiceVolume;
 
 
 /**
@@ -50,12 +51,12 @@ public class FtpService extends Service {
         try {
             init();
             Toast.makeText(this, "启动ftp服务成功", Toast.LENGTH_SHORT).show();
-            MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务成功");
+            MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务成功",currtentVoiceVolume);
             Log.i(TAG, "启动ftp服务成功: ");
         } catch (FtpException e) {
             e.printStackTrace();
             Toast.makeText(this, "启动ftp服务失败", Toast.LENGTH_SHORT).show();
-             MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务失败");
+             MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务失败",currtentVoiceVolume);
             Log.i(TAG, "启动ftp服务失败: ");
         }
 

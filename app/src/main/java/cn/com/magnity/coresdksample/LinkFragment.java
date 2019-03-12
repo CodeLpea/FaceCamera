@@ -30,6 +30,7 @@ import static cn.com.magnity.coresdksample.MyApplication.isQuest;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
+import static cn.com.magnity.coresdksample.utils.Config.currtentVoiceVolume;
 
 
 public class LinkFragment extends Fragment {
@@ -256,6 +257,10 @@ private int conut=1;
                     play();
                     Log.i(TAG, "linkResult: runOnUiThread 连接成功");
                     isQuest=false;//修改状态，方便下次进入连接流程
+        }
+        if (r == MagDevice.CONN_DETACHED) {
+            Log.i(TAG, "linkResult: 拔出");
+            MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
         }
         updateButtons();
     }

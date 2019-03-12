@@ -55,6 +55,7 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.View.QiuView;
+import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
@@ -179,7 +180,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         break;
                     case MSG3://延时播放语音
                         String voice=msg.obj.toString();
-                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice);
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice, Config.currtentVoiceVolume);
                         Log.i(TAG, "延时播放语音: "+voice);
                         break;
                 }
@@ -237,14 +238,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String ip = wifiUtil.getIp(this);
         if(TextUtils.isEmpty(ip)){
             Log.e(TAG,"获取不到IP，请连接网络");
-            MyApplication.getInstance().getTtsUtil().SpeechAdd("网络不通，请检查");
+            MyApplication.getInstance().getTtsUtil().SpeechAdd("网络不通，请检查",Config.currtentVoiceVolume);
         }else{
             String str = "请在IE浏览器上输入网址访问FTP服务\n" +
                     "ftp://"+ip+":2221\n" +
                     "账号:didano\n" +
                     "密码:12345678";
             Log.i(TAG,str);
-            MyApplication.getInstance().getTtsUtil().SpeechAdd("正在开启ftp服务器，当前 i p 为"+ip);
+            MyApplication.getInstance().getTtsUtil().SpeechAdd("正在开启ftp服务器，当前 i p 为"+ip,Config.currtentVoiceVolume);
         }
         startService(new Intent(this, FtpService.class));
     }
@@ -268,7 +269,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.bt_linkSet://连接设置跳转到LINKFragemnt
-                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt");
+                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(loactionFragment);
@@ -278,7 +279,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 transaction.commit();
                 break;
             case R.id.bt_locateSet://连接设置跳转到LocationFragemnt
-                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt");
+                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(linkFragment);
