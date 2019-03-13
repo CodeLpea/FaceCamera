@@ -58,6 +58,8 @@ public class LoadService extends IntentService {
             Config.currtentVoiceVolume=Integer.parseInt(keyValueMap.get("默认播报音量").toString());
             Config.normolTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温正常播报音量").toString());
             Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
+            Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
+            Config.DefaultTempThreshold=Config.TempThreshold;
                 message.what=MSG4;
                 message.obj="读取配置文件成功";
                 MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);

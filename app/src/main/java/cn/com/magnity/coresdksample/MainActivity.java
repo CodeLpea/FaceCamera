@@ -58,6 +58,7 @@ import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.View.QiuView;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
+import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
@@ -68,6 +69,7 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
+import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.MSG1;
 import static cn.com.magnity.coresdksample.utils.Config.MSG2;
 import static cn.com.magnity.coresdksample.utils.Config.MSG3;
@@ -75,8 +77,10 @@ import static cn.com.magnity.coresdksample.utils.Config.MSG4;
 import static cn.com.magnity.coresdksample.utils.Config.MSG5;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
+import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.WifiName;
 import static cn.com.magnity.coresdksample.utils.Config.WifiPassWord;
+import static cn.com.magnity.coresdksample.utils.Config.iftaken;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -519,8 +523,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onPreviewFrame(byte[] bytes, Camera camera) {
                 System.arraycopy(bytes, 0, nv21, 0, bytes.length);
-                if(istaken==true){
-                    istaken=false;
+                if(iftaken==true){
+                    iftaken=false;
                     Camera.Size size = camera.getParameters().getPreviewSize();
                     try{
                         YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
@@ -542,7 +546,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     public  void saveBitmap(Bitmap bitmap) {
-        Log.e(TAG, "保存图片");
+        Log.e(TAG, "保存人脸图片");
         File f = new File(Environment.getExternalStorageDirectory(),
                 SavaRootDirName+File.separator+System.currentTimeMillis() + "Person.jpg");
         if (f.exists()) {
@@ -656,7 +660,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     }
                     if (face != null) {
                         isGetFace=true;
-                        Log.i(TAG, "检测到人脸: ");
+                        //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
+                        //否则同一个人不会反复拍摄同样温度的照片
+                        if(TimeUitl.timeInterval(100)){
+                            Log.i(TAG, "检测到人脸  ");
+                            TempThreshold=DefaultTempThreshold;//超过间隔则表示第二个人，则回复默认的阈值
+                        }
                         face.bound = DrawFaceRect.RotateDeg90(face.bound, PREVIEW_HEIGHT);//绘制人脸的区域
                         if (face.point != null) {//绘制脸上关键点
                             for (int i = 0; i < face.point.length; i++) {

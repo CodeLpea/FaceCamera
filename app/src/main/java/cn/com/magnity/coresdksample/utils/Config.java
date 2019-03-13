@@ -3,9 +3,25 @@ package cn.com.magnity.coresdksample.utils;
 /**
  * 配置信息*/
 public class Config {
+    /*拍照标记*/
+    public static  boolean iftaken; //拍照状态按钮
+
+    /*温度阀值*/
+    //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
+    //否则同一个人不会反复拍摄同样温度的照片
+    public static float TempThreshold=35;
+    public static float DefaultTempThreshold=35;
+
+
+    /*x方向校准参数，y方向校准参数*/
+    public static int XPalce=30;
+    public static int YPalce=30;
+
     /*文件保存目录*/
     public static String SavaRootDirName="DdnTemp";
     public static String SavaTestDirName="Test";
+
+
     /*音量参数*/
     public static int currtentVoiceVolume=10;
     public static int heightTempVoiceVolume=10;

@@ -29,7 +29,10 @@ import cn.com.magnity.coresdksample.utils.Config;
 
 import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
+import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
+import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
+import static cn.com.magnity.coresdksample.utils.Config.iftaken;
 
 public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private volatile boolean mIsDrawing;
@@ -167,7 +170,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         if (bmp != null) {
             canvas.drawBitmap(bmp, null, dstRect, null);
             drawMaxTemp(canvas, dstRect, cameraInfo, info, paint);
-            if(isGetFace){
+            if(isGetFace){//如果捕捉到人脸
                 isGetFace=false;
                 Log.i(TAG, "drawImage: 检测到人脸框，准备获取热成像相关温度");
                 GetRectTemperature();//获取规定区域内的温度信息,并绘制人脸
@@ -267,38 +270,54 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         }
 
         canvas.drawText(s, x, y, paint);
-        if(temp * 0.001f>30){//超过30度，就标记出来并保存。
+        if(isGetFace){//检测到人脸就判断是否超过阈值
+            if(temp * 0.001f>TempThreshold){//超过默认阈值温度，就标记出来并保存。而且检测到人脸
+                iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
+                TempThreshold=temp * 0.001f;//超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
+                String maxTmp=String.valueOf(TempThreshold);
+                MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp.substring(0,4), Config.heightTempVoiceVolume);
            /* Log.i(TAG, "xFPA: "+xFPA);
             Log.i(TAG, "yFPA: "+yFPA);
             Log.i(TAG, "info.maxPos: "+info.maxPos);*/
-            Canvas saveBmpCanvas=new Canvas(bmp);
-            float x2=xFPA;
-            float y2=120-yFPA;
-            float xStart=x2-4f;
-            float xStop=x2+4f;
-            float yStart=y2-4f;
-            float yStop=y2+4f;
-            saveBmpCanvas.drawLine(xStart, y2, xStop, y2, SavePhotoPaint);
-            saveBmpCanvas.drawLine(x2, yStart, x2, yStop, SavePhotoPaint);
-            /* draw text */
-            Rect rt2 = new Rect();
-            Paint textPaint=SavePhotoPaint;
-            textPaint.getTextBounds(s, 0, s.length(), rt2);
-            int cx2 = rt2.width();
-            int cy2 = rt2.height();
-            final int pad2 = 6;
-            x2 += pad2;
-            y2 += cy2 + pad2;
-            if (x2 > 160-cx2) {
-                x2 -= pad2 * 2 + cx2;
+                Canvas saveBmpCanvas=new Canvas(bmp);
+                float x2=xFPA;
+                float y2=120-yFPA;
+                float xStart=x2-4f;
+                float xStop=x2+4f;
+                float yStart=y2-4f;
+                float yStop=y2+4f;
+                saveBmpCanvas.drawLine(xStart, y2, xStop, y2, SavePhotoPaint);
+                saveBmpCanvas.drawLine(x2, yStart, x2, yStop, SavePhotoPaint);
+                /* draw text */
+                Rect rt2 = new Rect();
+                Paint textPaint=SavePhotoPaint;
+                textPaint.getTextBounds(s, 0, s.length(), rt2);
+                int cx2 = rt2.width();
+                int cy2 = rt2.height();
+                final int pad2 = 6;
+                x2 += pad2;
+                y2 += cy2 + pad2;
+                if (x2 > 160-cx2) {
+                    x2 -= pad2 * 2 + cx2;
+                }
+                if (y2 >120) {
+                    y2 -= pad2 * 2 + cy2 * 2;
+                }
+                saveBmpCanvas.drawText(s, x2, y2, textPaint);
+                saveBitmap(bmp);
+                Log.i(TAG, "saveBitmap: ");
+            }else {
+                if(TempThreshold!=DefaultTempThreshold){//当前温度阈值与默认温度阈值不同的时播报异常
+                    MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   ", Config.heightTempVoiceVolume);
+                }
+                else {//在没有超过阈值的情况下才会播报异常
+                    MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常   ", Config.normolTempVoiceVolume);
+                }
+
+
             }
-            if (y2 >120) {
-                y2 -= pad2 * 2 + cy2 * 2;
-            }
-            saveBmpCanvas.drawText(s, x2, y2, textPaint);
-            //saveBitmap(bmp);
-           // Log.i(TAG, "saveBitmap: ");
         }
+
     }
 
     void drawBackground(Canvas canvas, Paint paint) {
@@ -343,8 +362,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         }
     }
     /**
-     114      * 保存图片到SD卡上
-     115      */
+     * 保存图片到SD卡上
+     */
    protected void saveBitmap(Bitmap baseBitmap) {
         try {
                    // 保存图片到SD卡上
@@ -408,11 +427,11 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                   String maxTmp=String.valueOf(inf[1]*0.001f);
                   if(maxTmp.length()>=4){
                       maxTmp=maxTmp.substring(0,4);
-                      if(inf[1]*0.001f>32){
-                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp, Config.heightTempVoiceVolume);
+                      if(inf[1]*0.001f>TempThreshold){
+                          //MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp, Config.heightTempVoiceVolume);
                       }
                       else {
-                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常 ",Config.normolTempVoiceVolume);
+                         // MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常 ",Config.normolTempVoiceVolume);
                       }
                      // MyApplication.getInstance().ttsUtil.SpeechRepead("检测到人脸,最高温度为 "+maxTmp);
                   }
