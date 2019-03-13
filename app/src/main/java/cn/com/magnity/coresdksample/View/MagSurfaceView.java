@@ -402,11 +402,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                   Log.i(TAG, "GetRectTemperature: y0: "+y0);
                   Log.i(TAG, "GetRectTemperature: y1: "+y1);
                   int[] inf=new int[5];
-
-
                   mDev.getRectTemperatureInfo(x0,y0,x1,y1,inf);//获取规定区域内的温度信息
-
-
                   Log.i(TAG, "GetRectTemperature:最高温度 "+inf[1]*0.001f);
                   Log.i(TAG, "GetRectTemperature:最高温度位置 "+inf[4]);
                   String maxTmp=String.valueOf(inf[1]*0.001f);

@@ -54,8 +54,10 @@ import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
+import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.View.QiuView;
 import cn.com.magnity.coresdksample.utils.Config;
+import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
@@ -66,8 +68,15 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
+import static cn.com.magnity.coresdksample.utils.Config.MSG1;
+import static cn.com.magnity.coresdksample.utils.Config.MSG2;
+import static cn.com.magnity.coresdksample.utils.Config.MSG3;
+import static cn.com.magnity.coresdksample.utils.Config.MSG4;
+import static cn.com.magnity.coresdksample.utils.Config.MSG5;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
+import static cn.com.magnity.coresdksample.utils.Config.WifiName;
+import static cn.com.magnity.coresdksample.utils.Config.WifiPassWord;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -78,10 +87,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String STATUS_ARGS = "status";
     private static final String USBID_ARGS = "usbid";
-    private static final int MSG1 = 100;//自动连接指定的wifi
-    private static final int MSG2 =MSG1+1 ;
-    private static final int MSG3 = MSG2+1;
-    private static final int MSG4 = MSG3+1;
 
     //non-const
   //  private MagDevice mDev;
@@ -121,7 +126,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     //wifi管理
     WifiAdmin wifiAdmin ;
     private Handler WifiScanHandler;
-    private Handler DelayStartHandler;
+    public static Handler DelayStartHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,38 +136,44 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
         //初始化控件
         initView();
+
         //初始化Fragment
         initFragment();
+
+        //连接指定wifi
+        wifiScan();
+
+        //初始化延迟Handler
+        delayStart();
+
         //温度摄像头初始化
         initJuge(savedInstanceState);
+
         // 人像摄像头初始化
         initPersonCamera();
-       //连接指定wifi
-        wifiScan();
-        //延时启动ftp wifi扫描等功能
-        initFile();//初始化文件夹
-        delayStart();
-    }
-/**
- * 初始化文件夹
-* */
-    private void initFile() {
-        File file1 = Environment.getExternalStorageDirectory();
-        File file2 = Environment.getExternalStorageDirectory();
-        if (null != file1) {
-            file1 = new File(file1, SavaRootDirName);
-            if (!file1.exists()) {
-                file1.mkdirs();
-            }
-        }
-        if (null != file2) {
-            file2 = new File(file2, SavaTestDirName);
-            if (!file2.exists()) {
-                file2.mkdirs();
-            }
-        }
+
+       //检查文件夹
+        FlieUtil.initFile(SavaRootDirName);//初始化文件夹
+        FlieUtil.initFile(SavaTestDirName);//初始化文件夹
+
+        //启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
+        initLoadService();
+
+        //初始化ftp
+        initFtp();
+
 
     }
+/**
+ * 启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
+ * */
+    private void initLoadService() {
+        Log.i(TAG, "initLoadService: 开启加载数据服务");
+        LoadService loadService=new LoadService();
+        Intent toLoadService=new Intent(this,loadService.getClass());
+        startService(toLoadService);
+    }
+
 
     /**
  * 延时启动ftp wifi扫描等功能
@@ -174,19 +185,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what){
-                    case MSG2://启动ftp服务器
-                        //初始化ftp
-                        initFtp();
+                    case MSG2://延时播放ftp服务器语音，包括网络信息
+                        String voice2=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice2, Config.currtentVoiceVolume);
+                        Log.i(TAG, "延时播放ftp服务器语音: "+voice2);
                         break;
-                    case MSG3://延时播放语音
-                        String voice=msg.obj.toString();
-                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice, Config.currtentVoiceVolume);
-                        Log.i(TAG, "延时播放语音: "+voice);
+                    case MSG3://延时人脸摄像头语音
+                        String voice3=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice3, Config.currtentVoiceVolume);
+                        Log.i(TAG, "延时人脸摄像头语音: "+voice3);
+                        break;
+                    case MSG4://延时的文件检查
+                        String voice4=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice4, Config.currtentVoiceVolume);
+                        Log.i(TAG, "延时的文件检查: "+voice4);
+                        break;
+                    case MSG5://延时播放温度摄像头语音
+                        String voice5=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice5, Config.currtentVoiceVolume);
+                        Log.i(TAG, "延时播放温度摄像头语音: "+voice5);
                         break;
                 }
             }
         };
-        DelayStartHandler.sendEmptyMessageDelayed(MSG2,5000);
+        //DelayStartHandler.sendEmptyMessageDelayed(MSG2,5000);
     }
 
     /**
@@ -203,8 +225,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
                         wifiAdmin.openWifi();
                         //执行搜索
-                        String di="XIAONUO1";
-                        if(!wifiAdmin.getSSID().equals("\"" +di + "\"")){
+                        if(!wifiAdmin.getSSID().equals("\"" +WifiName + "\"")){
                             //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
                             wifiAdmin.startScan();
                             List<ScanResult> scanResultList;
@@ -212,16 +233,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             //Log.i(TAG, "scanResultList.size(): "+scanResultList.size());
                             for(int i=0;i<scanResultList.size();i++){
                                 // Log.i(TAG, "scanResultList.SSID(): "+scanResultList.get(i).SSID);
-                                if (scanResultList.get(i).SSID.equals("XIAONUO1")){
-                                    Log.i(TAG, "找到指定wifi： XIAONUO1  准备连接: ");
+                                if (scanResultList.get(i).SSID.equals(WifiName)){//搜索到wifi名称相同
+                                    Log.i(TAG, "找到指定wifi： "+WifiName+"  准备连接: ");
                                     wifiAdmin.addNetwork(
-                                            wifiAdmin.CreateWifiInfo("XIAONUO1",
-                                                    "XiaoNuo2018",3));
+                                            wifiAdmin.CreateWifiInfo(WifiName,
+                                                    WifiPassWord,3));
                                     break;
                                 }
                             }
                         }
-                        WifiScanHandler.sendEmptyMessageDelayed(MSG1,500);
+                        WifiScanHandler.sendEmptyMessageDelayed(MSG1,500);//每隔500ms询问一次
                         break;
 
                 }
@@ -234,18 +255,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
  * 初始化ftp
  * */
     private void initFtp() {
+        Message message=Message.obtain();
         WifiUtil wifiUtil=new WifiUtil();
         String ip = wifiUtil.getIp(this);
         if(TextUtils.isEmpty(ip)){
             Log.e(TAG,"获取不到IP，请连接网络");
-            MyApplication.getInstance().getTtsUtil().SpeechAdd("网络不通，请检查",Config.currtentVoiceVolume);
+            message.what=MSG2;
+            message.obj="网络不通，请检查";
+            DelayStartHandler.sendMessageDelayed(message,7000);
         }else{
             String str = "请在IE浏览器上输入网址访问FTP服务\n" +
                     "ftp://"+ip+":2221\n" +
                     "账号:didano\n" +
                     "密码:12345678";
             Log.i(TAG,str);
-            MyApplication.getInstance().getTtsUtil().SpeechAdd("正在开启ftp服务器，当前 i p 为"+ip,Config.currtentVoiceVolume);
+            message.what=MSG2;
+            message.obj="正在开启ftp服务器，当前 i p 为"+ip;
+            DelayStartHandler.sendMessageDelayed(message,7000);
         }
         startService(new Intent(this, FtpService.class));
     }
@@ -425,13 +451,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onDestroy() {
         /* remove pending messages */
         mEnumHandler.removeCallbacksAndMessages(null);
+        mEnumHandler=null;
         if (mRestoreHandler != null) {
             mRestoreHandler.removeCallbacksAndMessages(null);
             mRestoreRunnable = null;
             mRestoreHandler = null;
         }
         WifiScanHandler.removeCallbacksAndMessages(null);
+        WifiScanHandler=null;
         DelayStartHandler.removeCallbacksAndMessages(null);
+        WifiScanHandler=null;
         /* disconnect camera when app exited */
         if (mDev.isProcessingImage()) {
             mDev.stopProcessImage();

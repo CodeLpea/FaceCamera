@@ -260,7 +260,7 @@ private int conut=1;
         }
         if (r == MagDevice.CONN_DETACHED) {
             Log.i(TAG, "linkResult: 拔出");
-            MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
+            //MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
         }
         updateButtons();
     }

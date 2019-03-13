@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,18 +16,15 @@ import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import cn.com.magnity.coresdksample.MainActivity;
-import cn.com.magnity.coresdksample.MyApplication;
+import static cn.com.magnity.coresdksample.utils.Config.MSG2;
 
-import static cn.com.magnity.coresdksample.utils.Config.currtentVoiceVolume;
 
 
 /**
- * Created by Administrator on 2018.03.28.
+ * Created by Administrator on 2019.03.08.
  */
 
 public class FtpService extends Service {
@@ -47,16 +45,23 @@ public class FtpService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Message message=Message.obtain();
         rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         try {
             init();
             Toast.makeText(this, "启动ftp服务成功", Toast.LENGTH_SHORT).show();
-            MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务成功",currtentVoiceVolume);
+            message.what=MSG2;
+            message.obj="启动ftp服务成功";
+            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+
             Log.i(TAG, "启动ftp服务成功: ");
         } catch (FtpException e) {
             e.printStackTrace();
+            message.what=MSG2;
+            message.obj="启动ftp服务失败，请检查";
+            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
             Toast.makeText(this, "启动ftp服务失败", Toast.LENGTH_SHORT).show();
-             MyApplication.getInstance().getTtsUtil().SpeechAdd("启动ftp服务失败",currtentVoiceVolume);
+
             Log.i(TAG, "启动ftp服务失败: ");
         }
 
