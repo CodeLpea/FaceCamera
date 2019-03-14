@@ -14,8 +14,8 @@ public class Config {
 
 
     /*x方向校准参数，y方向校准参数*/
-    public static int XPalce=30;
-    public static int YPalce=30;
+    public static int XPalce=1;
+    public static int YPalce=1;
 
     /*文件保存目录*/
     public static String SavaRootDirName="DdnTemp";
@@ -39,6 +39,8 @@ public class Config {
     public  static String KeyWifiName="KeyWifiName";
     public  static String KeyWifiPassWord="KeyWifiCode";
     public  static String KeyLithgt="KeyLithgt";
+    public  static String KeyXplace="KeyXplace";
+    public  static String KeyYplace="KeyYplace";
 
     /*静态语音延迟播放Hanlder的MSG*/
     public static final int MSG1 = 100;//自动连接指定的wifi

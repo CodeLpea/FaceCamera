@@ -172,9 +172,9 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             drawMaxTemp(canvas, dstRect, cameraInfo, info, paint);
             if(isGetFace){//如果捕捉到人脸
                 isGetFace=false;
-                Log.i(TAG, "drawImage: 检测到人脸框，准备获取热成像相关温度");
-                GetRectTemperature();//获取规定区域内的温度信息,并绘制人脸
-                drawFaceDetect(canvas,dstRect,cameraInfo,paint);
+               // Log.i(TAG, "drawImage: 检测到人脸框，准备获取热成像相关温度");
+                GetRectTemperature(cameraInfo);//获取规定区域内的温度信息,并绘制人脸
+                drawFaceDetect(canvas,dstRect,cameraInfo,paint);//画出预览画面中的人两款
             }
         }
     }
@@ -189,11 +189,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         } else {
             paint.setStrokeWidth(2);//设置画笔的粗度
         }
-
-        int drawL=MyApplication.getInstance().juGeFaceRect.getxStart()/4;
-        int drawR=MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-        int drawU=120-MyApplication.getInstance().juGeFaceRect.getyStart()/4;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
-        int drawD=120-MyApplication.getInstance().juGeFaceRect.getyStop()/4;
+        int drawL=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
+        int drawR=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
+        int drawU=120-(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
+        int drawD=120-(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
      /*   int drawL = MyApplication.getInstance().faceRect.bound.left/4-len;
         int drawR = MyApplication.getInstance().faceRect.bound.right/4+len;
         int drawD = MyApplication.getInstance().faceRect.bound.top/4-len;
@@ -211,16 +210,16 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         canvas.drawLine(drawL, drawU, drawL + len, drawU, paint);
         canvas.drawLine(drawR, drawU, drawR, drawU + len, paint);
         canvas.drawLine(drawR, drawU, drawR - len, drawU, paint);
-        /**
+    /*    *//**
          * 绘制人脸监测点
-         */
+         *//*
         if (MyApplication.getInstance().faceRect.point != null) {
             //遍历检测点，并绘制
             for (Point p : MyApplication.getInstance().faceRect.point) {
-                   /* p.y = getHeight() - p.y;*/
+                   *//* p.y = getHeight() - p.y;*//*
                     canvas.drawPoint(p.x, p.y, paint);
             }
-        }
+        }*/
     }
 
     private void drawMaxTemp(Canvas canvas, Rect dstRect, CameraInfo cameraInfo,
@@ -270,15 +269,15 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         }
 
         canvas.drawText(s, x, y, paint);
-        if(isGetFace){//检测到人脸就判断是否超过阈值
+     /*   if(isGetFace){//检测到人脸就判断是否超过阈值
             if(temp * 0.001f>TempThreshold){//超过默认阈值温度，就标记出来并保存。而且检测到人脸
                 iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
                 TempThreshold=temp * 0.001f;//超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
                 String maxTmp=String.valueOf(TempThreshold);
                 MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp.substring(0,4), Config.heightTempVoiceVolume);
-           /* Log.i(TAG, "xFPA: "+xFPA);
+           *//* Log.i(TAG, "xFPA: "+xFPA);
             Log.i(TAG, "yFPA: "+yFPA);
-            Log.i(TAG, "info.maxPos: "+info.maxPos);*/
+            Log.i(TAG, "info.maxPos: "+info.maxPos);*//*
                 Canvas saveBmpCanvas=new Canvas(bmp);
                 float x2=xFPA;
                 float y2=120-yFPA;
@@ -288,7 +287,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                 float yStop=y2+4f;
                 saveBmpCanvas.drawLine(xStart, y2, xStop, y2, SavePhotoPaint);
                 saveBmpCanvas.drawLine(x2, yStart, x2, yStop, SavePhotoPaint);
-                /* draw text */
+                *//* draw text *//*
                 Rect rt2 = new Rect();
                 Paint textPaint=SavePhotoPaint;
                 textPaint.getTextBounds(s, 0, s.length(), rt2);
@@ -316,7 +315,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
 
             }
-        }
+        }*/
 
     }
 
@@ -394,17 +393,13 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                  info：返回区域温度统计信息，数组长度应不小于5，依次为[0] - 最低温度; [1] - 最高温度; [2] - 平均温度， [3] - 最低温度位置; [4] - 最高温
                  度位置。位置计算公式如下：
                  y = pos / w;
-                 x = pos - y * w; (w - CameraInfo中的FPAWidth值)*/
-             private  void GetRectTemperature(){
-
-             /*    Log.i(TAG, "MyApplication.getInstance().juGeFaceRect.getxStart: "+MyApplication.getInstance().juGeFaceRect.getxStart());
-                 Log.i(TAG, "MyApplication.getInstance().juGeFaceRect.getxStop:  "+MyApplication.getInstance().juGeFaceRect.getxStop());
-                 Log.i(TAG, "MyApplication.getInstance().juGeFaceRect.getyStart: "+MyApplication.getInstance().juGeFaceRect.getyStart());
-                 Log.i(TAG, "MyApplication.getInstance().juGeFaceRect.getyStop:  "+MyApplication.getInstance().juGeFaceRect.getyStop());*/
-                  int x0=MyApplication.getInstance().juGeFaceRect.getxStart()/4;
-                  int x1=MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-                  int y1=120-MyApplication.getInstance().juGeFaceRect.getyStart()/4;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
-                  int y0=120-MyApplication.getInstance().juGeFaceRect.getyStop()/4;
+                 x = pos - y * w; (w - CameraInfo中的FPAWidth值)
+                 * @param cameraInfo*/
+             private  void GetRectTemperature(CameraInfo cameraInfo){
+                  int x0=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
+                  int x1=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
+                  int y1=120-(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
+                  int y0=120-(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
                   if(x0<0){
                       x0=0;
                   }
@@ -416,29 +411,65 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                  }if(y1<0){
                      y1=0;
                  }
-                  Log.i(TAG, "GetRectTemperature: x0: "+x0);
-                  Log.i(TAG, "GetRectTemperature: x1: "+x1);
-                  Log.i(TAG, "GetRectTemperature: y0: "+y0);
-                  Log.i(TAG, "GetRectTemperature: y1: "+y1);
                   int[] inf=new int[5];
                   mDev.getRectTemperatureInfo(x0,y0,x1,y1,inf);//获取规定区域内的温度信息
-                  Log.i(TAG, "GetRectTemperature:最高温度 "+inf[1]*0.001f);
-                  Log.i(TAG, "GetRectTemperature:最高温度位置 "+inf[4]);
-                  String maxTmp=String.valueOf(inf[1]*0.001f);
-                  if(maxTmp.length()>=4){
-                      maxTmp=maxTmp.substring(0,4);
+                  /*Log.i(TAG, "GetRectTemperature:最高温度 "+inf[1]*0.001f);
+                  Log.i(TAG, "GetRectTemperature:最高温度位置 "+inf[4]);*/
+                  int maxTmp= (int) (inf[1]*0.001f);
+                 int YFPA = inf[4] / cameraInfo.fpaWidth;
+                 int XFPA = inf[4] - YFPA * cameraInfo.fpaWidth;
+
+
                       if(inf[1]*0.001f>TempThreshold){
-                          //MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp, Config.heightTempVoiceVolume);
+                          iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
+                          TempThreshold=inf[1]*0.001f;//超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
+                          String maxTmp2=String.valueOf(TempThreshold);
+                          if(String.valueOf(inf[1]*0.001f).length()>=4){//最多保留4位
+                              maxTmp2=maxTmp2.substring(0,4);
+                          }
+                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp2, Config.heightTempVoiceVolume);
+                          Canvas saveBmpCanvas=new Canvas(bmp);
+                          float x2=XFPA;
+                          float y2=120-YFPA;
+                          float xStart=x2-4f;
+                          float xStop=x2+4f;
+                          float yStart=y2-4f;
+                          float yStop=y2+4f;
+                          saveBmpCanvas.drawLine(xStart, y2, xStop, y2, SavePhotoPaint);
+                          saveBmpCanvas.drawLine(x2, yStart, x2, yStop, SavePhotoPaint);
+                          Rect rt2 = new Rect();
+                          Paint textPaint=SavePhotoPaint;
+                          textPaint.getTextBounds(maxTmp2, 0, maxTmp2.length(), rt2);
+                          int cx2 = rt2.width();
+                          int cy2 = rt2.height();
+                          final int pad2 = 6;
+                          x2 += pad2;
+                          y2 += cy2 + pad2;
+                          if (x2 > 160-cx2) {
+                              x2 -= pad2 * 2 + cx2;
+                          }
+                          if (y2 >120) {
+                              y2 -= pad2 * 2 + cy2 * 2;
+                          }
+                          saveBmpCanvas.drawText(maxTmp2, x2, y2, textPaint);
+                          saveBitmap(bmp);
+                          Log.i(TAG, "saveBitmap: ");
+
                       }
                       else {
-                         // MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常 ",Config.normolTempVoiceVolume);
+                          if(TempThreshold!=DefaultTempThreshold){//当前温度阈值与默认温度阈值不同的时播报异常
+                              MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   ", Config.heightTempVoiceVolume);
+                          }
+                          else {//在没有超过阈值的情况下才会播报异常
+                              MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常   ", Config.normolTempVoiceVolume);
+                          }
+
                       }
-                     // MyApplication.getInstance().ttsUtil.SpeechRepead("检测到人脸,最高温度为 "+maxTmp);
+
                   }
 
-                /*  //获取单点温度
-                 mDev. getTemperatureProbe(1,1,1);*/
 
-                }
+
+
 
 }

@@ -46,20 +46,40 @@ public class LoadService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        //加载温度人脸框微调信息
+        LoadFacePlace();
+
+        //加载配置文件的数据
+        LoadConfigFlie(intent);
+
+
+
+    }
+
+    private void LoadFacePlace() {
+        Config.XPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyXplace,1);
+        Config.YPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyYplace,1);
+        Log.i(TAG, "LoadFacePlace: X  = "+Config.XPalce);
+        Log.i(TAG, "LoadFacePlace: Y  = "+Config.YPalce);
+
+    }
+
+    private void LoadConfigFlie(Intent intent) {
         HashMap keyValueMap;
         Message message=Message.obtain();
         //进行加载任务
         Log.i(TAG, "--------------------------------进行加载数据----------------------------------");
         if (intent != null&&isExistFlie()) {//如果文件夹存在才进行加载，否则为默认值
             try{
-            keyValueMap=readKeyValueTxtToMap();
-            Config.WifiName=keyValueMap.get("网络名称").toString();
-            Config.WifiPassWord=keyValueMap.get("网络密码").toString();
-            Config.currtentVoiceVolume=Integer.parseInt(keyValueMap.get("默认播报音量").toString());
-            Config.normolTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温正常播报音量").toString());
-            Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
-            Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
-            Config.DefaultTempThreshold=Config.TempThreshold;
+                keyValueMap=readKeyValueTxtToMap();
+                Config.WifiName=keyValueMap.get("网络名称").toString();
+                Config.WifiPassWord=keyValueMap.get("网络密码").toString();
+                Config.currtentVoiceVolume=Integer.parseInt(keyValueMap.get("默认播报音量").toString());
+                Config.normolTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温正常播报音量").toString());
+                Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
+                Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
+                Config.DefaultTempThreshold=Config.TempThreshold;
+
                 message.what=MSG4;
                 message.obj="读取配置文件成功";
                 MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);

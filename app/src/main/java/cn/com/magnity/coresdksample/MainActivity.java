@@ -663,7 +663,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
                         //否则同一个人不会反复拍摄同样温度的照片
                         if(TimeUitl.timeInterval(100)){
-                            Log.i(TAG, "检测到人脸  ");
+                            Log.i(TAG, "检测到不同人脸  ");
                             TempThreshold=DefaultTempThreshold;//超过间隔则表示第二个人，则回复默认的阈值
                         }
                         face.bound = DrawFaceRect.RotateDeg90(face.bound, PREVIEW_HEIGHT);//绘制人脸的区域

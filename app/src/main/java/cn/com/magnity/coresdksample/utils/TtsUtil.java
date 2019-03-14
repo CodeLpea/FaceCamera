@@ -49,12 +49,12 @@ public class TtsUtil {
         this.SetVoiceVolume(volume);
         int result;
         result=textToSpeech.speak(text.toString(), TextToSpeech.QUEUE_ADD, null);
-        Log.i(TAG, "SpeechAdd: result"+result);
-        Log.i(TAG, "GetVoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
+       // Log.i(TAG, "SpeechAdd: result"+result);
+      //  Log.i(TAG, "GetVoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
     }
     public void SetVoiceVolume(int tempVolume){
             mgr.setStreamVolume(AudioManager.STREAM_MUSIC,tempVolume,0);//tempVolume:音量绝对值
-            Log.i(TAG, "当前音量VoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
+           // Log.i(TAG, "当前音量VoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
     }
     /**
      *
@@ -77,7 +77,7 @@ public class TtsUtil {
         this.SetVoiceVolume(volume);
         int result;
         result=textToSpeech.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
-        Log.i(TAG, "SpeechFlush: ");
+       // Log.i(TAG, "SpeechFlush: ");
     }
 
    /**
