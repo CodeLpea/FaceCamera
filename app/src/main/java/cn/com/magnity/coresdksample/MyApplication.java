@@ -7,7 +7,10 @@ import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
+import cn.com.magnity.coresdksample.utils.Config;
+import cn.com.magnity.coresdksample.utils.ShellUtils;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
+import cn.com.magnity.coresdksample.utils.lampUtil;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
@@ -37,5 +40,6 @@ public class MyApplication extends Application {
         juGeFaceRect=new JuGeFaceRect();//初始化全局标记框
         faceRect=new FaceRect();
         ttsUtil=new TtsUtil(this);//初始化全局语音播放工具
+        new lampUtil(Config.LAMP,Config.TIME);
     }
 }

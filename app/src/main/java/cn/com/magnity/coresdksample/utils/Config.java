@@ -21,6 +21,11 @@ public class Config {
     public static String SavaRootDirName="DdnTemp";
     public static String SavaTestDirName="Test";
 
+    /*系统运行状态标记，用来显示灯光*/
+    public static int LAMP=1;//1:绿色，2:红色
+    public static int TIME=1000;
+
+
 
     /*音量参数*/
     public static int currtentVoiceVolume=10;

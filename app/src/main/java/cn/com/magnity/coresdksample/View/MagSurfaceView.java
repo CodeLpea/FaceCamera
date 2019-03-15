@@ -26,10 +26,12 @@ import cn.com.magnity.coresdk.types.StatisticInfo;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.Config;
+import cn.com.magnity.coresdksample.utils.lampUtil;
 
 import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
+import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
 import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.iftaken;
@@ -367,7 +369,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         try {
                    // 保存图片到SD卡上
             File file = new File(Environment.getExternalStorageDirectory(),
-                    SavaTestDirName+File.separator+System.currentTimeMillis()+ ".png");
+                    SavaRootDirName+File.separator+System.currentTimeMillis()+ "Temp.png");
             if (file.exists()) {
                 file.delete();
             }
@@ -428,6 +430,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                               maxTmp2=maxTmp2.substring(0,4);
                           }
                           MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp2, Config.heightTempVoiceVolume);
+                          lampUtil.setlamp(2,500,3000);
                           Canvas saveBmpCanvas=new Canvas(bmp);
                           float x2=XFPA;
                           float y2=120-YFPA;
@@ -459,9 +462,11 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                       else {
                           if(TempThreshold!=DefaultTempThreshold){//当前温度阈值与默认温度阈值不同的时播报异常
                               MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   ", Config.heightTempVoiceVolume);
+                              lampUtil.setlamp(2,500,3000);
                           }
                           else {//在没有超过阈值的情况下才会播报异常
                               MyApplication.getInstance().ttsUtil.SpeechRepead("体温正常   ", Config.normolTempVoiceVolume);
+                              lampUtil.setlamp(1,500,2000);
                           }
 
                       }
