@@ -70,6 +70,9 @@ import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
+import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiName;
+import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiPassWord;
+import static cn.com.magnity.coresdksample.utils.Config.MSG0;
 import static cn.com.magnity.coresdksample.utils.Config.MSG1;
 import static cn.com.magnity.coresdksample.utils.Config.MSG2;
 import static cn.com.magnity.coresdksample.utils.Config.MSG3;
@@ -130,6 +133,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     //wifi管理
     WifiAdmin wifiAdmin ;
     private Handler WifiScanHandler;
+    private String  NoewIp="0";
     public static Handler DelayStartHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +168,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initLoadService();
 
         //初始化ftp
-        initFtp();
+       // initFtp();
 
 
     }
@@ -225,11 +229,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 super.handleMessage(msg);
                 switch (msg.what){
                     case MSG1://自动连接指定的wifi
-                        WifiScanHandler.removeMessages(1);
+                        WifiScanHandler.removeMessages(MSG1);
                         wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
                         wifiAdmin.openWifi();
                         //执行搜索
-                        if(!wifiAdmin.getSSID().equals("\"" +WifiName + "\"")){
+                        if(!wifiAdmin.getSSID().equals("\"" +WifiName + "\"")&&!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")){//连接的wifi与设置的wifi不同。
                             //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
                             wifiAdmin.startScan();
                             List<ScanResult> scanResultList;
@@ -246,13 +250,45 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                 }
                             }
                         }
-                        WifiScanHandler.sendEmptyMessageDelayed(MSG1,500);//每隔500ms询问一次
+                        WifiScanHandler.sendEmptyMessageDelayed(MSG1,5000);//每隔500ms询问一次
+                        break;
+                    case MSG0://自动连接指定的默认wifi
+                        WifiScanHandler.removeMessages(MSG0);
+                        wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
+                        wifiAdmin.openWifi();
+                        //执行搜索
+                        if(!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")){//连接的wifi与设置的wifi不同。
+                            //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
+                            wifiAdmin.startScan();
+                            List<ScanResult> scanResultList;
+                            scanResultList= wifiAdmin.getWifiList();
+                            //Log.i(TAG, "scanResultList.size(): "+scanResultList.size());
+                            for(int i=0;i<scanResultList.size();i++){
+                                // Log.i(TAG, "scanResultList.SSID(): "+scanResultList.get(i).SSID);
+                                if (scanResultList.get(i).SSID.equals(DefaultWifiName)){//搜索到wifi名称相同
+                                    Log.i(TAG, "找到指定wifi： "+DefaultWifiName+"  准备连接: ");
+                                    wifiAdmin.addNetwork(
+                                            wifiAdmin.CreateWifiInfo(DefaultWifiName,
+                                                    DefaultWifiPassWord,3));
+                                    break;
+                                }
+                            }
+                        }
+                        WifiScanHandler.sendEmptyMessageDelayed(MSG0,1000);//每隔500ms询问一次
+                        break;
+
+                    case 404:  //初始化ftp
+                        WifiScanHandler.removeMessages(404);
+                        initFtp();
+                        WifiScanHandler.sendEmptyMessageDelayed(404,3000);//每隔500ms询问一次
                         break;
 
                 }
             }
         };
-        WifiScanHandler.sendEmptyMessage(1);//启动
+        WifiScanHandler.sendEmptyMessage(MSG1);//启动
+        WifiScanHandler.sendEmptyMessage(MSG0);//启动
+        WifiScanHandler.sendEmptyMessage(404);//启动
     }
 
 /***
@@ -262,12 +298,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Message message=Message.obtain();
         WifiUtil wifiUtil=new WifiUtil();
         String ip = wifiUtil.getIp(this);
-        if(TextUtils.isEmpty(ip)){
+        wifiUtil=null;
+        if(ip.equals("0.0.0.0")){
             Log.e(TAG,"获取不到IP，请连接网络");
             message.what=MSG2;
             message.obj="网络不通，请检查";
             DelayStartHandler.sendMessageDelayed(message,7000);
-        }else{
+        }else if(!ip.equals(NoewIp)){
+            NoewIp=ip;
             String str = "请在IE浏览器上输入网址访问FTP服务\n" +
                     "ftp://"+ip+":2221\n" +
                     "账号:didano\n" +
@@ -276,8 +314,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             message.what=MSG2;
             message.obj="正在开启ftp服务器，当前 i p 为"+ip;
             DelayStartHandler.sendMessageDelayed(message,7000);
+            startService(new Intent(this, FtpService.class));
         }
-        startService(new Intent(this, FtpService.class));
+
     }
 
     /**

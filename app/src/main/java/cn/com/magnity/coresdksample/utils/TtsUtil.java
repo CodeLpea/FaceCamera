@@ -20,7 +20,7 @@ public class TtsUtil {
     public TtsUtil(Context context) {
         this.context=context;
         //实例化
-        mgr = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        mgr = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
  /*       //最大音量
         maxVolume =mgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         //当前音量
@@ -28,7 +28,7 @@ public class TtsUtil {
         Log.i(TAG, "最大音量:  "+maxVolume);
         Log.i(TAG, "当前音量:  "+currentVolume);*/
 
-        textToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(context.getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == textToSpeech.SUCCESS) {

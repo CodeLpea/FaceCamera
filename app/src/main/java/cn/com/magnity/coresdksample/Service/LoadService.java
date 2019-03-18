@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -86,7 +88,8 @@ public class LoadService extends IntentService {
             }catch (Exception e){
                 e.printStackTrace();
                 message.what=MSG4;
-                message.obj="读取配置文件失败，请检查";
+                message.obj="读取配置文件失败";
+                //writeTxtToFile();
                 MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
                 //MyApplication.getInstance().ttsUtil.SpeechFlush("读取配置文件失败",8);
             }
@@ -163,4 +166,53 @@ public class LoadService extends IntentService {
         }
 
     }
+
+
+    /**
+     *
+     * 将字符串写入到文本文件中
+     * */
+    private void writeTxtToFile() {
+        /*
+        *     Config.WifiName=keyValueMap.get("网络名称").toString();
+                Config.WifiPassWord=keyValueMap.get("网络密码").toString();
+                Config.currtentVoiceVolume=Integer.parseInt(keyValueMap.get("默认播报音量").toString());
+                Config.normolTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温正常播报音量").toString());
+                Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
+                Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
+        * */
+        try {
+        isExistFlie();
+        String strContent=
+                "网络名称"+"="+Config.WifiName+ "\r\n"
+                +"网络密码"+"="+Config.WifiPassWord+ "\r\n"
+                +"默认播报音量"+"="+Config.currtentVoiceVolume+ "\r\n"
+                +"体温正常播报音量"+"="+Config.normolTempVoiceVolume+ "\r\n"
+                +"体温偏高播报音量"+"="+Config.heightTempVoiceVolume+ "\r\n"
+                +"温度阈值"+"="+Config.TempThreshold+ "\r\n";
+        strContent.getBytes();
+        strContent=new String(strContent.getBytes(),"GBK");
+            File file = new File(Environment.getExternalStorageDirectory().getPath()+"/"+Config.DdnProperties);
+            RandomAccessFile raf = new RandomAccessFile(file, "rwd");
+            raf.seek(file.length());
+            raf.write(strContent.getBytes());
+            raf.close();
+        } catch (Exception e) {
+            Log.e("TestFile", "Error on write File:" + e);
+        }
+    }
+    private void change(String plain){
+        plain = "你好";
+        byte[] bytes = new byte[0];
+        try {
+            bytes = plain.getBytes("utf-8");
+        byte[] bytes2 = new String(bytes, "utf-8").getBytes("gbk");
+        plain=new String(bytes2, "gbk");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }

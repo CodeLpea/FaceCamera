@@ -45,6 +45,9 @@ public class FtpService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+    }
+
+    private void initFtp() {
         Message message=Message.obtain();
         rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         try {
@@ -64,7 +67,12 @@ public class FtpService extends Service {
 
             Log.i(TAG, "启动ftp服务失败: ");
         }
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        initFtp();
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
