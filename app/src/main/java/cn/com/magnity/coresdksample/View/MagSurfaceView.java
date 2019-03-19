@@ -379,8 +379,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
    protected void saveBitmap(Bitmap baseBitmap) {
         try {
                    // 保存图片到SD卡上
+            SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+            String formatStr =formatter.format(new Date());
             File file = new File(Environment.getExternalStorageDirectory(),
-                    SavaRootDirName+File.separator+TempThreshold+"_"+new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss:SSS").format(new Date()) + "Temp.png");
+                    SavaRootDirName+File.separator+String.valueOf(TempThreshold)+"_"+formatStr+  "Temp.png");
             if (file.exists()) {
                 file.delete();
             }

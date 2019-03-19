@@ -602,8 +602,10 @@ private int count=0;
 
     public  void saveBitmap(Bitmap bitmap) {
         Log.e(TAG, "保存人脸图片");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+        String formatStr =formatter.format(new Date());
         File f = new File(Environment.getExternalStorageDirectory(),
-                SavaRootDirName+File.separator+TempThreshold+"_"+new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss:SSS").format(new Date())+ "Person.jpg");
+                SavaRootDirName+File.separator+String.valueOf(TempThreshold)+"_"+formatStr+ "Person.jpg");
         if (f.exists()) {
             f.delete();
         }
