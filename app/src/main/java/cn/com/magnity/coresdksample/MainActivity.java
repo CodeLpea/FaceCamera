@@ -62,6 +62,7 @@ import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
+import cn.com.magnity.coresdksample.utils.lampUtil;
 
 
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
@@ -133,7 +134,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     //wifi管理
     WifiAdmin wifiAdmin ;
     private Handler WifiScanHandler;
-    private String  NoewIp="0";
+    private String  NoewIp="0.0.0.0";
     public static Handler DelayStartHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,23 +289,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         };
         WifiScanHandler.sendEmptyMessage(MSG1);//启动
         WifiScanHandler.sendEmptyMessage(MSG0);//启动
-        WifiScanHandler.sendEmptyMessage(404);//启动
+        WifiScanHandler.sendEmptyMessageDelayed(404,7000);//延时启动
     }
 
 /***
  * 初始化ftp
  * */
+private int count=0;
     private void initFtp() {
         Message message=Message.obtain();
         WifiUtil wifiUtil=new WifiUtil();
         String ip = wifiUtil.getIp(this);
         wifiUtil=null;
-        if(ip.equals("0.0.0.0")){
+        if(ip.equals("0.0.0.0")){//每隔30个周期
+            count++;
+            Log.i(TAG, "count++: "+count);
+            if(count>=10){
+                count=0;
             Log.e(TAG,"获取不到IP，请连接网络");
             message.what=MSG2;
             message.obj="网络不通，请检查";
-            DelayStartHandler.sendMessageDelayed(message,7000);
-        }else if(!ip.equals(NoewIp)){
+            DelayStartHandler.sendMessageDelayed(message,1000);
+            lampUtil.setlamp(2,500,-1);
+            }
+        }else if(!ip.equals(NoewIp)&&!ip.equals("0.0.0.0")){
             NoewIp=ip;
             String str = "请在IE浏览器上输入网址访问FTP服务\n" +
                     "ftp://"+ip+":2221\n" +
@@ -313,8 +321,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Log.i(TAG,str);
             message.what=MSG2;
             message.obj="正在开启ftp服务器，当前 i p 为"+ip;
-            DelayStartHandler.sendMessageDelayed(message,7000);
+            DelayStartHandler.sendMessageDelayed(message,5000);
             startService(new Intent(this, FtpService.class));
+            lampUtil.setlamp(1,500,-1);
         }
 
     }
@@ -513,6 +522,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mDev.dislinkCamera();
         }
         mDev = null;
+
+        stopService(new Intent(this,FtpService.class));
+
         super.onDestroy();
     }
 
@@ -675,7 +687,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         continue;
                     }
                     synchronized (nv21) {
-                        System.arraycopy(nv21, 0, buffer, 0, nv21.length);
+                       //System.arraycopy(nv21, 0, buffer, 0, nv21.length);
                     }
                     int direction = Accelerometer.getDirection();// 获取手机朝向
                     boolean frontCamera = (Camera.CameraInfo.CAMERA_FACING_FRONT == mCameraId);
@@ -684,7 +696,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         Log.i(TAG, "direction: "+direction);
                     }
                     String result = mFaceDetector.trackNV21(
-                            buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, 1);//获取人脸检测结果
+                            nv21, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, 1);//获取人脸检测结果
                     FaceRect face = Result.result(result);//获取返回的数据
                    // Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
                     Canvas canvas = mSurfaceHolder.lockCanvas();//锁定画布用于绘制
