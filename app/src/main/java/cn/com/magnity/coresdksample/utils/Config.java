@@ -31,7 +31,7 @@ public class Config {
     public static int currtentVoiceVolume=15;
     public static int heightTempVoiceVolume=15;
     public static int normolTempVoiceVolume=10;
-    public static String WifiName="XIAONUO";
+    public static String WifiName="XIAONUO1";
     public static String WifiPassWord="XiaoNuo2018";
     public static String DefaultWifiName="didano";
     public static String DefaultWifiPassWord="12345678";
