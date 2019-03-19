@@ -603,7 +603,7 @@ private int count=0;
     public  void saveBitmap(Bitmap bitmap) {
         Log.e(TAG, "保存人脸图片");
         File f = new File(Environment.getExternalStorageDirectory(),
-                SavaRootDirName+File.separator+new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss:SSS").format(new Date())+ "Person.jpg");
+                SavaRootDirName+File.separator+TempThreshold+"_"+new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss:SSS").format(new Date())+ "Person.jpg");
         if (f.exists()) {
             f.delete();
         }

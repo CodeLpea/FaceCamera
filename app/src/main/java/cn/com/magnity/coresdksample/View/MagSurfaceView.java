@@ -16,12 +16,15 @@ import android.view.SurfaceView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.CameraInfo;
+import cn.com.magnity.coresdk.types.CorrectionPara;
 import cn.com.magnity.coresdk.types.StatisticInfo;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.MyApplication;
@@ -115,6 +118,14 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         mNewFrameCond = mLock.newCondition();
 
         mDev = dev;
+        CorrectionPara correctionPara=new CorrectionPara();
+        Log.i(TAG, "getCorrectionPara: "+mDev.getFixPara(correctionPara));
+        Log.i(TAG, "fDistance: "+correctionPara.fDistance);
+        Log.i(TAG, "fTemp: "+correctionPara.fTemp);
+        Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
+        correctionPara.fTaoFilter=(float)0.85;
+        mDev.setFixPara(correctionPara);
+        Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
         mStatisticInfo = new StatisticInfo();
 
         mCameraInfo = new CameraInfo();
@@ -369,7 +380,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         try {
                    // 保存图片到SD卡上
             File file = new File(Environment.getExternalStorageDirectory(),
-                    SavaRootDirName+File.separator+System.currentTimeMillis()+ "Temp.png");
+                    SavaRootDirName+File.separator+TempThreshold+"_"+new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss:SSS").format(new Date()) + "Temp.png");
             if (file.exists()) {
                 file.delete();
             }

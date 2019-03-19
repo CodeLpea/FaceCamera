@@ -1,6 +1,8 @@
 package cn.com.magnity.coresdksample.utils;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.Surface;
@@ -42,4 +44,19 @@ public class Screenutil {
         camera.setDisplayOrientation(result);
         return result;
     }
+
+    /*
+     * 旋转图片
+     * @param angle
+     * @param bitmap
+     * @return Bitmap
+     */
+    public static Bitmap rotaingImageView(int angle , Bitmap bitmap) {
+        //旋转图片 动作
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        // 创建新的图片
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
 }
