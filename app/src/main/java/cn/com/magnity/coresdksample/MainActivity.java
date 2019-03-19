@@ -45,7 +45,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.com.magnity.coresdk.MagDevice;
@@ -58,6 +60,7 @@ import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.View.QiuView;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
+import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
@@ -310,7 +313,7 @@ private int count=0;
             message.what=MSG2;
             message.obj="网络不通，请检查";
             DelayStartHandler.sendMessageDelayed(message,1000);
-            lampUtil.setlamp(2,500,-1);
+            lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
             }
         }else if(!ip.equals(NoewIp)&&!ip.equals("0.0.0.0")){
             NoewIp=ip;
@@ -583,6 +586,7 @@ private int count=0;
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
                             Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+                            bmp= Screenutil.rotaingImageView(90,bmp);//旋转照片
                             saveBitmap(bmp);
                             stream.close();
                         }
@@ -599,7 +603,7 @@ private int count=0;
     public  void saveBitmap(Bitmap bitmap) {
         Log.e(TAG, "保存人脸图片");
         File f = new File(Environment.getExternalStorageDirectory(),
-                SavaRootDirName+File.separator+System.currentTimeMillis() + "Person.jpg");
+                SavaRootDirName+File.separator+new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss:SSS").format(new Date())+ "Person.jpg");
         if (f.exists()) {
             f.delete();
         }
