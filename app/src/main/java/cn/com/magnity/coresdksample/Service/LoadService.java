@@ -1,13 +1,10 @@
 package cn.com.magnity.coresdksample.Service;
-
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 import android.os.Environment;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,20 +13,30 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
 import cn.com.magnity.coresdksample.MainActivity;
-import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
-
+import static cn.com.magnity.coresdksample.utils.Config.DdnPropertiesPath;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
-import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
+import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
 
 /**
  * 开机后自动加载数据的服务
  */
 public class LoadService extends IntentService {
     private static final String TAG="LoadService";
+    /**
+     * 回调接口
+     */
+    private onLoadServiceListener listener;
+    public interface onLoadServiceListener{
+        void setExplore(int values);//提示
+    }
+    public void setOnLoadServiceListener(onLoadServiceListener Listener){
+        this.listener = Listener;//设置监听对象
+    }
+
     public LoadService() {
         super("LoadService");
     }
@@ -48,6 +55,9 @@ public class LoadService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        //读取设备信息
+        LoadDevice();
+
         //加载温度人脸框微调信息
         LoadFacePlace();
 
@@ -55,6 +65,15 @@ public class LoadService extends IntentService {
         LoadConfigFlie(intent);
 
 
+
+    }
+
+
+    private void LoadDevice() {
+       Config.DEVICENAME= AppUtils.getLocalMacAddressFromWifiInfo(this.getApplicationContext());//读取设备号
+       Config.VERSIONNAME=AppUtils.getVersionName(this.getApplicationContext());//读取版本号
+        Log.i(TAG, "LoadDevice.DEVICENAME "+ Config.DEVICENAME);
+        Log.i(TAG, "LoadDevice.VERSIONNAME "+ Config.VERSIONNAME);
 
     }
 
@@ -71,7 +90,7 @@ public class LoadService extends IntentService {
         Message message=Message.obtain();
         //进行加载任务
         Log.i(TAG, "--------------------------------进行加载数据----------------------------------");
-        if (intent != null&&isExistFlie()) {//如果文件夹存在才进行加载，否则为默认值
+        if (intent != null&&isExistFlie(DdnPropertiesPath)) {//如果文件夹存在才进行加载，否则为默认值
             try{
                 keyValueMap=readKeyValueTxtToMap();
                 Config.WifiName=keyValueMap.get("网络名称").toString();
@@ -81,6 +100,8 @@ public class LoadService extends IntentService {
                 Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
                 Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
                 Config.DefaultTempThreshold=Config.TempThreshold;
+
+
 
                 message.what=MSG4;
                 message.obj="读取配置文件成功";
@@ -103,32 +124,6 @@ public class LoadService extends IntentService {
         Log.i(TAG, "onDestroy: ");
     }
 
-    /**
-     * 检查是否存在文件
-     * */
-    private boolean isExistFlie(){
-        boolean turn=false;
-        //直接读取跟目录下面的配置文件Environment.getExternalStorageDirectory
-        File file = Environment.getExternalStorageDirectory();
-        if (null != file) {
-            file = new File(file, "DdnProperties.txt");
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                    Log.i(TAG, "isExistFlie: ----------------------不存在DdnProperties.txt，正在创建-------------------");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.i(TAG, "isExistFlie: ----------------------创建不存在DdnProperties.txt失败-------------------");
-                }
-
-                turn=false;
-            }else {
-                Log.i(TAG, "isExistFlie:------------------------ 存在DdnProperties-----------------------------");
-                turn=true;
-            }
-        }
-    return turn;
-    }
 
 /**
  * 读取本地txt
@@ -141,12 +136,12 @@ public class LoadService extends IntentService {
         while (true) {
             try {
                // final InputStream open = this.getAssets().open("key_value.txt");
-                File f=new File(Environment.getExternalStorageDirectory().getPath()+"/"+Config.DdnProperties);
+                File f=new File(DdnPropertiesPath);
                 final InputStream open =new FileInputStream(f);
                 final byte[] readArray = new byte[open.available()];
                 open.read(readArray);
                 open.close();
-                final StringTokenizer allLine = new StringTokenizer(new String(readArray, "GBK"), "\r\n");//以"\r\n"作为key=value的分解标志
+                final StringTokenizer allLine = new StringTokenizer(new String(readArray, "UTF-8"), "\r\n");//以"\r\n"作为key=value的分解标志
                 while (allLine.hasMoreTokens()) {
                     final StringTokenizer oneLine = new StringTokenizer(allLine.nextToken(), "=");//以"="作为分解标志
                     final String leftKey = oneLine.nextToken();//读取第一个字符串key
@@ -182,7 +177,7 @@ public class LoadService extends IntentService {
                 Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
         * */
         try {
-        isExistFlie();
+        isExistFlie(DdnPropertiesPath);
         String strContent=
                 "网络名称"+"="+Config.WifiName+ "\r\n"
                 +"网络密码"+"="+Config.WifiPassWord+ "\r\n"
@@ -192,7 +187,7 @@ public class LoadService extends IntentService {
                 +"温度阈值"+"="+Config.TempThreshold+ "\r\n";
         strContent.getBytes();
         strContent=new String(strContent.getBytes(),"GBK");
-            File file = new File(Environment.getExternalStorageDirectory().getPath()+"/"+Config.DdnProperties);
+            File file =new File(DdnPropertiesPath);
             RandomAccessFile raf = new RandomAccessFile(file, "rwd");
             raf.seek(file.length());
             raf.write(strContent.getBytes());
@@ -212,7 +207,8 @@ public class LoadService extends IntentService {
             e.printStackTrace();
         }
 
-
     }
+
+
 
 }

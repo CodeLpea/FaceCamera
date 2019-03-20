@@ -23,7 +23,6 @@ import android.os.Message;
 
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -62,7 +61,6 @@ import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
-import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
 import cn.com.magnity.coresdksample.utils.lampUtil;
@@ -71,7 +69,6 @@ import cn.com.magnity.coresdksample.utils.lampUtil;
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 //import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
-import static cn.com.magnity.coresdksample.MyApplication.istaken;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiName;
@@ -90,7 +87,7 @@ import static cn.com.magnity.coresdksample.utils.Config.WifiPassWord;
 import static cn.com.magnity.coresdksample.utils.Config.iftaken;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,LoadService.onLoadServiceListener {
     private static final String TAG="MainActivity";
     //const
     private static final int START_TIMER_ID = 0;
@@ -182,6 +179,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void initLoadService() {
         Log.i(TAG, "initLoadService: 开启加载数据服务");
         LoadService loadService=new LoadService();
+        loadService.setOnLoadServiceListener(this);//开启监听
         Intent toLoadService=new Intent(this,loadService.getClass());
         startService(toLoadService);
     }
@@ -554,6 +552,8 @@ private int count=0;
             mCamera.setParameters(params);
             //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
             //mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
+
+
         } catch (Exception e) {
             e.printStackTrace();
             closeCamera();
@@ -716,7 +716,6 @@ private int count=0;
                         continue;
                     }
                     if (face != null) {
-                        isGetFace=true;
                         //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
                         //否则同一个人不会反复拍摄同样温度的照片
                         if(TimeUitl.timeInterval(100)){
@@ -730,6 +729,7 @@ private int count=0;
                             }
                             //绘制人脸检测的区域
                             DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, frontCamera);
+                            isGetFace=true;//开启拍照
                         }
                     } else {
                         Log.e(TAG, "没有检测出人脸");
@@ -766,5 +766,18 @@ private int count=0;
         super.onRestart();
     }
 
-
+    /**
+     *设置曝光参数
+     * 参考值-3至3最有效
+     * */
+    @Override
+    public void setExplore(int values) {
+        Camera.Parameters parameters = mCamera.getParameters();
+        Log.e(TAG, "ExposureBefore++: "+parameters.getExposureCompensation());
+        parameters.setAutoExposureLock(false);
+        parameters.setExposureCompensation(values);
+        mCamera.setParameters(parameters);
+        parameters = mCamera.getParameters();
+        Log.e(TAG, "ExposureNow: "+parameters.getExposureCompensation() );
+    }
 }

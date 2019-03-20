@@ -435,15 +435,16 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                  int XFPA = inf[4] - YFPA * cameraInfo.fpaWidth;
 
 
-                      if(inf[1]*0.001f>TempThreshold){
-                          iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
+                      if(inf[1]*0.001f>TempThreshold&&!MyApplication.getInstance().ttsUtil.isSpeaking()){
+                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+String.valueOf(TempThreshold), Config.heightTempVoiceVolume);
                           TempThreshold=inf[1]*0.001f;//超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
+                          iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
+                          lampUtil.setlamp(2,500,3000);
                           String maxTmp2=String.valueOf(TempThreshold);
                           if(String.valueOf(inf[1]*0.001f).length()>=4){//最多保留4位
                               maxTmp2=maxTmp2.substring(0,4);
                           }
-                          MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp2, Config.heightTempVoiceVolume);
-                          lampUtil.setlamp(2,500,3000);
+
                           Canvas saveBmpCanvas=new Canvas(bmp);
                           float x2=XFPA;
                           float y2=120-YFPA;

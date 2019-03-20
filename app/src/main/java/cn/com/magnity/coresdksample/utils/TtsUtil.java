@@ -70,6 +70,14 @@ public class TtsUtil {
 
     }
     /**
+     * 判断是否正在播报，如果正在播报，则不进行保存照片的操作
+     * */
+    public boolean isSpeaking(){
+
+        return textToSpeech.isSpeaking();
+    }
+
+    /**
      * 打断当前语音，直接播放
      * 设置语音大小 0-15
      * */

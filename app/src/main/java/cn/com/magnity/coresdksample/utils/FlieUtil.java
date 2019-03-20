@@ -1,8 +1,14 @@
 package cn.com.magnity.coresdksample.utils;
 
 import android.os.Environment;
+import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.CharArrayWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class FlieUtil {
     /**
@@ -18,7 +24,24 @@ public class FlieUtil {
             }
         }
         }
+    /**
+     * 检查是否存在文件
+     * */
+    public static  boolean isExistFlie(String path){
+        boolean turn=false;
+            File file = new File(path);
+            if (!file.exists()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                }
+                turn=false;//没有，自动创建
+            }else {
+                turn=true;//有
+            }
 
+        return turn;
+    }
 /**
  * 检查，生成文件
  * */
@@ -35,4 +58,38 @@ public class FlieUtil {
         }
         return file;
     }
+    /*
+     替换文本文件中的 非法字符串
+ * @param path
+ * @throws IOException
+ */
+    public static  void replacTextContent(String path,String srcStr,String replaceStr) throws IOException {
+        //原有的内容srcStr
+        //要替换的内容replaceStr
+        // 读
+        File file = new File(path);
+        FileReader in = new FileReader(file);
+        BufferedReader bufIn = new BufferedReader(in);
+        // 内存流, 作为临时流
+        CharArrayWriter tempStream = new CharArrayWriter();
+        // 替换
+        String line = null;
+        while ( (line = bufIn.readLine()) != null) {
+            // 替换每行中, 符合条件的字符串
+            line = line.replaceAll(srcStr, replaceStr);
+            // 将该行写入内存
+            tempStream.write(line);
+            // 添加换行符
+            tempStream.append(System.getProperty("line.separator"));
+        }
+        // 关闭 输入流
+        bufIn.close();
+        // 将内存中的流 写入 文件
+        FileWriter out = new FileWriter(file);
+        tempStream.writeTo(out);
+        out.close();
+        System.out.println("====path:"+path);
+
+    }
+
 }

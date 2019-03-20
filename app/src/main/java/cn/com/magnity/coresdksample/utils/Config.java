@@ -1,5 +1,7 @@
 package cn.com.magnity.coresdksample.utils;
 
+import android.os.Environment;
+
 /**
  * 配置信息*/
 public class Config {
@@ -19,11 +21,14 @@ public class Config {
 
     /*文件保存目录*/
     public static String SavaRootDirName="DdnTemp";
+    public static String DdnPropertiesPath= Environment.getExternalStorageDirectory().getPath()+"/"+Config.DdnProperties;//配置文件路径
     public static String SavaTestDirName="Test";
 
     /*系统运行状态标记，用来显示灯光*/
     public static int LAMP=1;//1:绿色，2:红色
     public static int TIME=1000;
+    public static String DEVICENAME="didnao";
+    public static String VERSIONNAME="1.3.2";
 
 
 
