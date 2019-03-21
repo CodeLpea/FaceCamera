@@ -58,6 +58,29 @@ public class FlieUtil {
         }
         return file;
     }
+    /**
+   * 清空文件内容
+    * @param fileName
+    */
+        public static boolean clearInfoForFile(String fileName) {
+            File file =new File(fileName);
+            try {
+
+                if(!file.exists()) {
+                    file.createNewFile();
+                }
+                FileWriter fileWriter =new FileWriter(file);
+                fileWriter.write("");
+                fileWriter.flush();
+                fileWriter.close();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+
     /*
      替换文本文件中的 非法字符串
  * @param path

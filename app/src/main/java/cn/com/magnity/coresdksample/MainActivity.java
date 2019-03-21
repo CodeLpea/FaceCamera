@@ -73,12 +73,16 @@ import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiName;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiPassWord;
+import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.MSG0;
 import static cn.com.magnity.coresdksample.utils.Config.MSG1;
 import static cn.com.magnity.coresdksample.utils.Config.MSG2;
 import static cn.com.magnity.coresdksample.utils.Config.MSG3;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
 import static cn.com.magnity.coresdksample.utils.Config.MSG5;
+import static cn.com.magnity.coresdksample.utils.Config.MSG6;
+import static cn.com.magnity.coresdksample.utils.Config.MSG7;
+import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
 import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
@@ -87,7 +91,7 @@ import static cn.com.magnity.coresdksample.utils.Config.WifiPassWord;
 import static cn.com.magnity.coresdksample.utils.Config.iftaken;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener,LoadService.onLoadServiceListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG="MainActivity";
     //const
     private static final int START_TIMER_ID = 0;
@@ -136,6 +140,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,L
     private Handler WifiScanHandler;
     private String  NoewIp="0.0.0.0";
     public static Handler DelayStartHandler;
+    public static Handler ReloadServiceHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,6 +173,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,L
         //启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
         initLoadService();
 
+
         //初始化ftp
        // initFtp();
 
@@ -175,13 +181,49 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,L
     }
 /**
  * 启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
+ * 反复加载配置文件
  * */
     private void initLoadService() {
         Log.i(TAG, "initLoadService: 开启加载数据服务");
         LoadService loadService=new LoadService();
-        loadService.setOnLoadServiceListener(this);//开启监听
         Intent toLoadService=new Intent(this,loadService.getClass());
+        toLoadService.setAction(InitLoadServieAction);
         startService(toLoadService);
+        ReloadServiceHandler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case MSG6://反复加载配置服务
+                        ReloadServiceHandler.removeMessages(MSG6);
+                        Intent intent= (Intent) msg.obj;
+                        intent.setAction(ReLoadServieAction);
+                        startService(intent);
+                        Message message=Message.obtain();
+                        message.what=MSG6;
+                        message.obj=msg.obj;
+                        ReloadServiceHandler.sendMessageDelayed(message,1000*30);//每隔三十秒加载一次
+                        break;
+                    case MSG7:
+                        if(mCamera!=null){
+                            Camera.Parameters parameters = mCamera.getParameters();
+                            Log.e(TAG, "ExposureBefore++: "+parameters.getExposureCompensation());
+                            parameters.setAutoExposureLock(false);
+                            parameters.setExposureCompensation(Config.ExploreValue);
+                            mCamera.setParameters(parameters);
+                            parameters = mCamera.getParameters();
+                            Log.e(TAG, "ExposureNow: "+parameters.getExposureCompensation() );
+                        }
+                        break;
+                }
+
+            }
+        };
+        Message message=Message.obtain();
+        message.what=MSG6;
+        message.obj=toLoadService;
+        ReloadServiceHandler.sendMessageDelayed(message,1000*30);//每隔三十秒加载一次
+
     }
 
 
@@ -514,6 +556,8 @@ private int count=0;
         WifiScanHandler=null;
         DelayStartHandler.removeCallbacksAndMessages(null);
         WifiScanHandler=null;
+        ReloadServiceHandler.removeCallbacksAndMessages(null);
+        ReloadServiceHandler=null;
         /* disconnect camera when app exited */
         if (mDev.isProcessingImage()) {
             mDev.stopProcessImage();
@@ -602,10 +646,13 @@ private int count=0;
 
     public  void saveBitmap(Bitmap bitmap) {
         Log.e(TAG, "保存人脸图片");
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+        SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
         String formatStr =formatter.format(new Date());
-        File f = new File(Environment.getExternalStorageDirectory(),
-                SavaRootDirName+File.separator+String.valueOf(TempThreshold)+"_"+formatStr+ "Person.jpg");
+        String maxTmp=String.valueOf(TempThreshold);
+        if(String.valueOf(maxTmp).length()>=4){//最多保留4位
+            maxTmp=maxTmp.substring(0,4);
+        }
+        File f =  new File(Environment.getExternalStorageDirectory(), SavaRootDirName+File.separator+formatStr+"_"+maxTmp+  "Person.jpg");
         if (f.exists()) {
             f.delete();
         }
@@ -766,18 +813,5 @@ private int count=0;
         super.onRestart();
     }
 
-    /**
-     *设置曝光参数
-     * 参考值-3至3最有效
-     * */
-    @Override
-    public void setExplore(int values) {
-        Camera.Parameters parameters = mCamera.getParameters();
-        Log.e(TAG, "ExposureBefore++: "+parameters.getExposureCompensation());
-        parameters.setAutoExposureLock(false);
-        parameters.setExposureCompensation(values);
-        mCamera.setParameters(parameters);
-        parameters = mCamera.getParameters();
-        Log.e(TAG, "ExposureNow: "+parameters.getExposureCompensation() );
-    }
+
 }

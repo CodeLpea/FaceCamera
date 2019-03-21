@@ -11,14 +11,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import cn.com.magnity.coresdksample.MainActivity;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 import static cn.com.magnity.coresdksample.utils.Config.DdnPropertiesPath;
+import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
+import static cn.com.magnity.coresdksample.utils.Config.MSG7;
+import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
+import static cn.com.magnity.coresdksample.utils.FlieUtil.clearInfoForFile;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
 
 /**
@@ -26,15 +34,28 @@ import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
  */
 public class LoadService extends IntentService {
     private static final String TAG="LoadService";
+
+
+    private String [] MyPropertiesList=new String[]{"WifiName",
+            "WifiPassWord",
+            "CurrtentVoiceVolume",
+            "NormolTempVoiceVolume",
+            "HeightTempVoiceVolume",
+            "TempThreshold",
+            "ExploreValue",
+            "DeviceName",
+            "VersionName"
+    };
+    private List MyProperties_List = Arrays.asList(MyPropertiesList);//转换为List
+    private  List<String> getPropertiesList=new ArrayList<>();
+    private  List<String> RetainProperties;
+
+
     /**
      * 回调接口
      */
-    private onLoadServiceListener listener;
     public interface onLoadServiceListener{
         void setExplore(int values);//提示
-    }
-    public void setOnLoadServiceListener(onLoadServiceListener Listener){
-        this.listener = Listener;//设置监听对象
     }
 
     public LoadService() {
@@ -55,14 +76,24 @@ public class LoadService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        //读取设备信息
-        LoadDevice();
+        switch (intent.getAction()){
+            case InitLoadServieAction://第一次初始化时候，会全部进行
+                Log.i(TAG, "第一次初始化: ");
+                //读取设备信息
+                LoadDevice();
 
-        //加载温度人脸框微调信息
-        LoadFacePlace();
+                //加载温度人脸框微调信息
+                LoadFacePlace();
 
-        //加载配置文件的数据
-        LoadConfigFlie(intent);
+                //加载配置文件的数据
+                LoadConfigFlie(intent);
+                break;
+            case ReLoadServieAction://反复加载的时候，只读配置文件的变化
+                Log.i(TAG, "反复加载配置文件: ");
+                //加载配置文件的数据
+                LoadConfigFlie(intent);
+                break;
+        }
 
 
 
@@ -92,25 +123,23 @@ public class LoadService extends IntentService {
         Log.i(TAG, "--------------------------------进行加载数据----------------------------------");
         if (intent != null&&isExistFlie(DdnPropertiesPath)) {//如果文件夹存在才进行加载，否则为默认值
             try{
-                keyValueMap=readKeyValueTxtToMap();
-                Config.WifiName=keyValueMap.get("网络名称").toString();
-                Config.WifiPassWord=keyValueMap.get("网络密码").toString();
-                Config.currtentVoiceVolume=Integer.parseInt(keyValueMap.get("默认播报音量").toString());
-                Config.normolTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温正常播报音量").toString());
-                Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
-                Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
-                Config.DefaultTempThreshold=Config.TempThreshold;
-
-
-
+                keyValueMap=readKeyValueTxtToMap();//先读出配置文件
+                if(Compare(keyValueMap))//比对一下配置文件是否正。
+                {
+                if(!intent.getAction().equals(ReLoadServieAction)){//反复加载数据的时候不播报语音
                 message.what=MSG4;
                 message.obj="读取配置文件成功";
                 MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+                }
+                }else{//配置文件读取失败，自动修复，提醒用户重填
+                    message.what=MSG4;
+                    message.obj="配置文件读取失败，已经自动修复，请检查";
+                    MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+                }
             }catch (Exception e){
                 e.printStackTrace();
                 message.what=MSG4;
-                message.obj="读取配置文件失败";
-                //writeTxtToFile();
+                message.obj="读取配置文件失败,请检查";
                 MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
                 //MyApplication.getInstance().ttsUtil.SpeechFlush("读取配置文件失败",8);
             }
@@ -118,11 +147,6 @@ public class LoadService extends IntentService {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "onDestroy: ");
-    }
 
 
 /**
@@ -151,6 +175,7 @@ public class LoadService extends IntentService {
                     final String rightValue = oneLine.nextToken();//读取第二个字符串value
                     keyValueMap.put(leftKey, rightValue);
                     Log.i(TAG, "Key:    "+leftKey);
+                    getPropertiesList.add(leftKey);//添加到读取的配置文件集合中，准备比对，是否缺省或者错误
                     Log.i(TAG, "Value:  --------------------------"+rightValue);
                 }
                 return keyValueMap;
@@ -164,27 +189,105 @@ public class LoadService extends IntentService {
 
 
     /**
+     * 对比读取到的配置文件键的值，是否正确
+     * 判断读取到的配置文件格式和个数是否正确
+     * 如有错误，清空文件，并将缓存的配置写入，进行修复
+     * @param keyValueMap
+     */
+    private boolean Compare(HashMap keyValueMap){
+        boolean flag=false;
+        boolean isSame=true;
+
+    // 求差集：结果
+    Collection MyPropertiesCollection = new ArrayList(MyProperties_List);//默认配置key的集合
+
+    Collection getPropertiesCollectionretainAll = new ArrayList(getPropertiesList);//读取到的key转化为Collection准备求交集。
+
+    Collection getPropertiesCollectionRemoveAll = new ArrayList(getPropertiesList);//读取到的key转化为Collection准备求差集。
+
+    // 求交集
+    MyPropertiesCollection.retainAll(getPropertiesCollectionretainAll);
+    RetainProperties= (List<String>) MyPropertiesCollection;//将交集转换为List集合，方便读取
+    System.out.println("交集结果：" + RetainProperties.size());//如果交集等于默认配置参数个数，则表示配置文件成功读取到所有key。
+        for(String propertiesKey :RetainProperties){
+            switch (propertiesKey){
+                case  "WifiName" :
+                    Config.WifiName=keyValueMap.get(propertiesKey).toString();
+                    Log.i(TAG, "WifiName: "+  Config.WifiName);
+                    break;
+                case  "WifiPassWord" :
+                    Config.WifiPassWord=keyValueMap.get(propertiesKey).toString();
+                    Log.i(TAG, "WifiPassWord: "+  Config.WifiPassWord);
+                    break;
+                case  "CurrtentVoiceVolume" :
+                    Config.currtentVoiceVolume= Integer.parseInt(keyValueMap.get(propertiesKey).toString());
+                    Log.i(TAG, "currtentVoiceVolume: "+  Config.currtentVoiceVolume);
+                    break;
+                 case  "NormolTempVoiceVolume" :
+                    Config.normolTempVoiceVolume= Integer.parseInt(keyValueMap.get(propertiesKey).toString());
+                     Log.i(TAG, "normolTempVoiceVolume: "+  Config.normolTempVoiceVolume);
+                    break;
+                  case  "HeightTempVoiceVolume" :
+                    Config.heightTempVoiceVolume= Integer.parseInt(keyValueMap.get(propertiesKey).toString());
+                      Log.i(TAG, "heightTempVoiceVolume: "+  Config.heightTempVoiceVolume);
+                    break;
+                case  "TempThreshold" :
+                    Config.TempThreshold= Float.parseFloat(keyValueMap.get(propertiesKey).toString());
+                    Config.DefaultTempThreshold=Config.TempThreshold;
+                    Log.i(TAG, "TempThreshold: "+  Config.TempThreshold);
+                    break;
+                case  "ExploreValue" :
+                    Config.ExploreValue= Integer.parseInt(keyValueMap.get(propertiesKey).toString());
+                    MainActivity.ReloadServiceHandler.sendEmptyMessage(MSG7);//进行亮度设置。
+                    Log.i(TAG, "ExploreValue: "+  Config.ExploreValue);
+                    break;
+                case  "DeviceName" :
+                    isSame=Config.DEVICENAME.equals(keyValueMap.get(propertiesKey).toString());//如果读取到的设备号与缓存的设备号不同，则需要修复
+                    Log.i(TAG, "DeviceName: "+  Config.DEVICENAME);
+                    break;
+                case  "VersionName" :
+                    isSame=Config.VERSIONNAME.equals(keyValueMap.get(propertiesKey).toString());//如果读取到的版本号与缓存的版本号不同，则需要修复
+                    Log.i(TAG, "DeviceName: "+  Config.DEVICENAME);
+                    break;
+            }
+        }
+
+   /* //求差集
+    getPropertiesCollectionRemoveAll.removeAll(MyPropertiesCollection);
+    System.out.println("差集结果：" + getPropertiesCollectionRemoveAll);*/
+    if(RetainProperties.size()!=MyProperties_List.size()||getPropertiesList.size()!=MyProperties_List.size()||!isSame){
+        //如果交集个数不匹配，或者读出来的配置文件key个数与默认的不符合，或者设备号或者版本号被人为修改
+        // 则清空配置文件，并重新填入读取到的正确的配置文件的缓存值。
+        if(clearInfoForFile(DdnPropertiesPath)){   //清空文件
+            writeTxtToFile();
+        }
+    }else {//完全符合,则返回ture，进行正常播报
+        flag=true;
+    }
+
+    return flag;
+}
+
+
+    /**
      *
      * 将字符串写入到文本文件中
-     * */
+     * 追加
+     * 每次修复只能调用一次，避免重复调用
+     */
     private void writeTxtToFile() {
-        /*
-        *     Config.WifiName=keyValueMap.get("网络名称").toString();
-                Config.WifiPassWord=keyValueMap.get("网络密码").toString();
-                Config.currtentVoiceVolume=Integer.parseInt(keyValueMap.get("默认播报音量").toString());
-                Config.normolTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温正常播报音量").toString());
-                Config.heightTempVoiceVolume=Integer.parseInt(keyValueMap.get("体温偏高播报音量").toString());
-                Config.TempThreshold=Float.parseFloat((keyValueMap.get("温度阈值").toString()));
-        * */
         try {
         isExistFlie(DdnPropertiesPath);
         String strContent=
-                "网络名称"+"="+Config.WifiName+ "\r\n"
-                +"网络密码"+"="+Config.WifiPassWord+ "\r\n"
-                +"默认播报音量"+"="+Config.currtentVoiceVolume+ "\r\n"
-                +"体温正常播报音量"+"="+Config.normolTempVoiceVolume+ "\r\n"
-                +"体温偏高播报音量"+"="+Config.heightTempVoiceVolume+ "\r\n"
-                +"温度阈值"+"="+Config.TempThreshold+ "\r\n";
+                "WifiName"+"="+Config.WifiName+ "\r\n"
+                +"WifiPassWord"+"="+Config.WifiPassWord+ "\r\n"
+                +"CurrtentVoiceVolume"+"="+Config.currtentVoiceVolume+ "\r\n"
+                +"NormolTempVoiceVolume"+"="+Config.normolTempVoiceVolume+ "\r\n"
+                +"HeightTempVoiceVolume"+"="+Config.heightTempVoiceVolume+ "\r\n"
+                +"TempThreshold"+"="+Config.TempThreshold+ "\r\n"
+                +"ExploreValue"+"="+Config.ExploreValue+ "\r\n"
+                +"DeviceName"+"="+Config.DEVICENAME+ "\r\n"
+                +"VersionName"+"="+Config.VERSIONNAME+ "\r\n";
         strContent.getBytes();
         strContent=new String(strContent.getBytes(),"GBK");
             File file =new File(DdnPropertiesPath);
@@ -196,19 +299,13 @@ public class LoadService extends IntentService {
             Log.e("TestFile", "Error on write File:" + e);
         }
     }
-    private void change(String plain){
-        plain = "你好";
-        byte[] bytes = new byte[0];
-        try {
-            bytes = plain.getBytes("utf-8");
-        byte[] bytes2 = new String(bytes, "utf-8").getBytes("gbk");
-        plain=new String(bytes2, "gbk");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy: ");
     }
-
 
 
 }
