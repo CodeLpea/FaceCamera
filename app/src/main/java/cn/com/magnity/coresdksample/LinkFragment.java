@@ -268,6 +268,7 @@ private int conut=1;
         if (mDev.startProcessImage(mVideoFragment, 0, 0)) {
             Log.i(TAG, "传输成功 startDrawingThread: ");
             mVideoFragment.startDrawingThread(mDev);
+
         }else {
            /* 传输失败 */mDev.dislinkCamera();
             Log.i(TAG, "传输失败 dislinkCamera: ");
@@ -278,10 +279,39 @@ private int conut=1;
             mVideoFragment.stopDrawingThread();
             mDegree = 0;
             updateButtons();
+            TransformThread transformThread=new TransformThread();
+            Thread t1=new Thread(transformThread);
+            t1.start();
         }
         isplay=true;
+       /* if(isplay==true){
+        mDev.stopProcessImage();
+        mVideoFragment.stopDrawingThread();
+        mDev.setImageTransform(0, 1);//在设置旋转方向之前要停止预览和标记操作
+        mDev.startProcessImage(mVideoFragment, 0, 0);
+        mVideoFragment.startDrawingThread(mDev);
+        }*/
 
     }
+    class TransformThread implements Runnable{
+
+        @Override
+        public void run() {
+            try{
+                Thread.sleep(5000);
+                if(isplay==true){
+                    Log.i(TAG, "旋转巨哥画面");
+                    mDev.stopProcessImage();
+                    mVideoFragment.stopDrawingThread();
+                    mDev.setImageTransform(0, 1);//在设置旋转方向之前要停止预览和标记操作
+                    play();
+                }
+            }catch (Exception e){
+                e.getMessage();
+            }
+        }
+    }
+
     public void stop() {
         /* 停止传输 */
         mDev.stopProcessImage();

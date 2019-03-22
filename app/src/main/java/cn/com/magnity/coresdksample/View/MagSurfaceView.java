@@ -204,8 +204,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         }
         int drawL=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
         int drawR=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-        int drawU=120-(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
-        int drawD=120-(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
+        int drawU=160-(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
+        int drawD=160-(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
      /*   int drawL = MyApplication.getInstance().faceRect.bound.left/4-len;
         int drawR = MyApplication.getInstance().faceRect.bound.right/4+len;
         int drawD = MyApplication.getInstance().faceRect.bound.top/4-len;
@@ -416,8 +416,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
              private  void GetRectTemperature(CameraInfo cameraInfo){
                   int x0=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
                   int x1=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-                  int y1=120-(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
-                  int y0=120-(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
+                  int y1=160-(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
+                  int y0=160-(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
                   if(x0<0){
                       x0=0;
                   }
@@ -448,7 +448,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                           MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp2, Config.heightTempVoiceVolume);
                           Canvas saveBmpCanvas=new Canvas(bmp);
                           float x2=XFPA;
-                          float y2=120-YFPA;
+                          float y2=160-YFPA;
                           float xStart=x2-4f;
                           float xStop=x2+4f;
                           float yStart=y2-4f;
@@ -463,10 +463,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                           final int pad2 = 6;
                           x2 += pad2;
                           y2 += cy2 + pad2;
-                          if (x2 > 160-cx2) {
+                          if (x2 > 120-cx2) {
                               x2 -= pad2 * 2 + cx2;
                           }
-                          if (y2 >120) {
+                          if (y2 >160) {
                               y2 -= pad2 * 2 + cy2 * 2;
                           }
                           saveBmpCanvas.drawText(maxTmp2, x2, y2, textPaint);

@@ -247,7 +247,7 @@ public class LoadService extends IntentService {
                     break;
                 case  "VersionName" :
                     isSame=Config.VERSIONNAME.equals(keyValueMap.get(propertiesKey).toString());//如果读取到的版本号与缓存的版本号不同，则需要修复
-                    Log.i(TAG, "DeviceName: "+  Config.DEVICENAME);
+                    Log.i(TAG, "VERSIONNAME: "+  Config.VERSIONNAME);
                     break;
             }
         }

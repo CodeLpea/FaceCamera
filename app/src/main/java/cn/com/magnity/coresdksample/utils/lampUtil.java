@@ -79,13 +79,11 @@ private class lampThread  extends Thread{
                     ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
                     ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
                     try{
-                        Thread.sleep(time);
-                    }catch (Exception e){
+                        Thread.sleep(time);//保持暗time
 
-                    }
                     ShellUtils.execCommand("echo 1 > /sys/class/backlight/rk28_bl/blue", false);
-                    try{
-                        Thread.sleep(time);
+
+                        Thread.sleep(time);//保持亮time
                     }catch (Exception e){
 
                     }
