@@ -17,7 +17,8 @@ public class Config {
 
     /*文件保存目录*/
     public static String SavaRootDirName="DdnTemp";
-    public static String DdnPropertiesPath=Environment.getExternalStorageDirectory().getPath()+"/"+Config.DdnProperties;//配置文件路径
+    public static String DdnPropertiesPath=Environment.getExternalStorageDirectory().getPath()+"/"+"DdnProperties.txt";//配置文件路径
+    public static String DdnUpdateApkPath=Environment.getExternalStorageDirectory().getPath()+"/"+"DdnTemp.apk";//配置文件路径
     public static String SavaTestDirName="Test";
 
     /*系统运行状态标记，用来显示灯光*/
@@ -57,6 +58,7 @@ public class Config {
     public static final int MSG5 = MSG4+1;//温度摄像头语音
     public static final int MSG6 = MSG5+1;//反复加载配置服务
     public static final int MSG7 = MSG6+1;//亮度设置
+    public static final int MSG8 = MSG7+1;//更新播报
 
 
  /*   public static String SavaPersonDirName=SavaRootDirName+"/"+"Person"+"/";

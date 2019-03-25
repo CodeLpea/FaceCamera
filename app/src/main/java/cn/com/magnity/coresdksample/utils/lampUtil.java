@@ -52,7 +52,7 @@ public class lampUtil {
         this.time = time;
         new lampThread().start();
     }
-
+int count=1;
 private class lampThread  extends Thread{
     public lampThread() { }
     @Override
@@ -79,11 +79,13 @@ private class lampThread  extends Thread{
                     ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
                     ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
                     try{
-                        Thread.sleep(time);//保持暗time
+                        Thread.sleep(time);
+                    }catch (Exception e){
 
+                    }
                     ShellUtils.execCommand("echo 1 > /sys/class/backlight/rk28_bl/blue", false);
-
-                        Thread.sleep(time);//保持亮time
+                    try{
+                        Thread.sleep(time);
                     }catch (Exception e){
 
                     }
@@ -95,3 +97,27 @@ private class lampThread  extends Thread{
     }
 }
 }
+
+/*
+*
+*   try{
+                     count++;
+                        Log.i(TAG, "count "+count);
+                    if(count<=time){
+                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
+                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
+                    Thread.sleep(1);//保持暗time
+                    }else if(time<count&&count<(2*time)){
+                        if(count % 2== 0){
+                            ShellUtils.execCommand("echo 1 > /sys/class/backlight/rk28_bl/blue", false);
+                        }else {
+                            ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
+                        }
+                        Thread.sleep(1);//保持暗time
+                    }else if(count>=2*time){
+                        count=1;
+                    }
+                    }catch (Exception e){
+
+                    }
+* */

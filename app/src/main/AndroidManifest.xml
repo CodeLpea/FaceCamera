@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cn.com.magnity.coresdksample">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
 
     <permission android:name="android.permission.WRITE_SETTINGS" />
 
@@ -28,6 +30,14 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- 允许使用PowerManager的 WakeLocks保持进程在休眠时从屏幕消失 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- 静默安装 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name= "android.permission.RESTART_PACKAGES" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
+
 
     <application
         android:name=".MyApplication"
@@ -63,7 +73,14 @@
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".Broadcast.UpdateRestartReceiver"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                <data android:scheme="package"/>
+            </intent-filter>
 
+        </receiver>
         <service
             android:name=".Service.LoadService"
             android:exported="false"></service>

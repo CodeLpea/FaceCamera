@@ -57,6 +57,7 @@ import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.View.QiuView;
+import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.Screenutil;
@@ -82,6 +83,7 @@ import static cn.com.magnity.coresdksample.utils.Config.MSG4;
 import static cn.com.magnity.coresdksample.utils.Config.MSG5;
 import static cn.com.magnity.coresdksample.utils.Config.MSG6;
 import static cn.com.magnity.coresdksample.utils.Config.MSG7;
+import static cn.com.magnity.coresdksample.utils.Config.MSG8;
 import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
 import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
@@ -257,6 +259,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         MyApplication.getInstance().getTtsUtil().SpeechAdd(voice5, Config.currtentVoiceVolume);
                         Log.i(TAG, "延时播放温度摄像头语音: "+voice5);
                         break;
+                    case MSG8://延时播放温度摄像头语音
+                        String voice8=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice8, Config.currtentVoiceVolume);
+                        Log.i(TAG, "升级语音播报: "+voice8);
+                        break;
                 }
             }
         };
@@ -390,7 +397,7 @@ private int count=0;
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.bt_linkSet://连接设置跳转到LINKFragemnt
-                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
+               // MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(loactionFragment);
@@ -400,7 +407,7 @@ private int count=0;
                 transaction.commit();
                 break;
             case R.id.bt_locateSet://连接设置跳转到LocationFragemnt
-                MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
+              //  MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(linkFragment);

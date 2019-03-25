@@ -18,13 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import cn.com.magnity.coresdksample.MainActivity;
+import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 import static cn.com.magnity.coresdksample.utils.Config.DdnPropertiesPath;
+import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
 import static cn.com.magnity.coresdksample.utils.Config.MSG7;
+import static cn.com.magnity.coresdksample.utils.Config.MSG8;
 import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.clearInfoForFile;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
@@ -92,11 +95,21 @@ public class LoadService extends IntentService {
                 Log.i(TAG, "反复加载配置文件: ");
                 //加载配置文件的数据
                 LoadConfigFlie(intent);
+                UpadateApk();
                 break;
         }
 
 
 
+    }
+
+    private void UpadateApk() {
+        Log.i(TAG, "UpadateApkStart: ");
+        File file = new File(DdnUpdateApkPath);
+        if(file.exists()){//如果存在apk，则执行升级操作
+            AppUtils.install(DdnUpdateApkPath);
+            Log.i(TAG, "UpadateApkSuccess！！！！！！！！！ ");
+        }
     }
 
 
@@ -197,6 +210,7 @@ public class LoadService extends IntentService {
     private boolean Compare(HashMap keyValueMap){
         boolean flag=false;
         boolean isSame=true;
+        boolean isUpdate=true;
 
     // 求差集：结果
     Collection MyPropertiesCollection = new ArrayList(MyProperties_List);//默认配置key的集合
@@ -246,7 +260,13 @@ public class LoadService extends IntentService {
                     Log.i(TAG, "DeviceName: "+  Config.DEVICENAME);
                     break;
                 case  "VersionName" :
-                    isSame=Config.VERSIONNAME.equals(keyValueMap.get(propertiesKey).toString());//如果读取到的版本号与缓存的版本号不同，则需要修复
+                    isUpdate=Config.VERSIONNAME.equals(keyValueMap.get(propertiesKey).toString());//如果读取到的版本号与缓存的版本号不同，则表明已经升级
+                    if(!isUpdate){//
+                        Message message=Message.obtain();
+                        message.what=MSG8;
+                        message.obj="已升级到新版本";
+                        MainActivity.DelayStartHandler.sendMessageDelayed(message,2000);
+                    }
                     Log.i(TAG, "VERSIONNAME: "+  Config.VERSIONNAME);
                     break;
             }
@@ -262,6 +282,12 @@ public class LoadService extends IntentService {
             writeTxtToFile();
         }
     }else {//完全符合,则返回ture，进行正常播报
+        if(!isUpdate){//读取到新版本就应该更新配置文件
+            if(clearInfoForFile(DdnPropertiesPath)){   //清空文件
+                Log.i(TAG, "读取到新版本，更新配置文件: ");
+                writeTxtToFile();
+            }
+        }
         flag=true;
     }
 
