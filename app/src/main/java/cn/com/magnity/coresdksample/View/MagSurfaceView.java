@@ -475,7 +475,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
                       }
                       else {
-                          if(TempThreshold!=DefaultTempThreshold){//当前温度阈值与默认温度阈值不同的时播报异常
+                          if(TempThreshold>DefaultTempThreshold){//当前温度阈值与默认温度阈值不同的时播报异常
                               MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   ", Config.heightTempVoiceVolume);
                               lampUtil.setlamp(2,500,3000);
                           }

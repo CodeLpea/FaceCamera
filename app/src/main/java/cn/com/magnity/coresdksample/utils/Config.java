@@ -9,8 +9,6 @@ public class Config {
     public static  boolean iftaken; //拍照状态按钮
 
 
-
-
     /*x方向校准参数，y方向校准参数*/
     public static int XPalce=1;
     public static int YPalce=1;

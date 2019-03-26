@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.util.Log;
 
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.utils.Config;
 
 public class DrawFaceRect {
     /**
@@ -18,6 +19,7 @@ public class DrawFaceRect {
      * @param width       原图宽
      * @param frontCamera 是否为前置摄像头，如为前置摄像头需左右对称
      */
+    private static final  String  TAG="DrawFaceRect";
      public static void drawFaceRect(Canvas canvas, FaceRect face, int width, boolean frontCamera) {
         if (canvas == null) {
             return;
@@ -73,6 +75,38 @@ public class DrawFaceRect {
                 }
                 canvas.drawPoint(p.x, p.y, paint);
             }
+
+          /**
+           * face.point[20]右下角嘴巴
+           * face.point[19]左下角嘴巴
+           * face.point[18]鼻尖
+           * face.point[17]右眼中间
+           * face.point[16]左眼中间
+           * face.point[15]下嘴唇中间
+           * face.point[14]中间嘴唇
+           * face.point[13]上嘴唇中间
+           * 换算比例
+           * (float)（下嘴唇-上嘴唇）/（右嘴唇-左边嘴唇）
+           *
+           *  Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
+           Log.i(TAG, "上嘴唇face.point[13].y: "+face.point[13].y);
+           Log.i(TAG, "右嘴角face.point[20].x: "+face.point[20].x);
+           Log.i(TAG, "左嘴角face.point[19].x: "+face.point[19].x);
+           int Ver=face.point[15].y-face.point[13].y;
+           int Hor=face.point[20].x-face.point[19].x;
+           float proportion=(float)((float)Ver/(float) Hor);
+
+           Log.i(TAG, "嘴唇开口比例: "+proportion);
+           * */
+         /*   for(int i=0;i<face.point.length;i++){
+                Point p=face.point[i];
+                if(i>12){
+                    if (frontCamera) {
+                        p.y = width - p.y;
+                    }
+                    canvas.drawPoint(p.x, p.y, paint);
+                }
+            }*/
         }
     }
 
@@ -103,4 +137,25 @@ public class DrawFaceRect {
         p.y = x;
         return p;
     }
+
+    public  static boolean MouthDetection(FaceRect face){
+         boolean result=false;
+        Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
+        Log.i(TAG, "上嘴唇face.point[13].y: "+face.point[13].y);
+        Log.i(TAG, "右嘴角face.point[20].x: "+face.point[20].x);
+        Log.i(TAG, "左嘴角face.point[19].x: "+face.point[19].x);
+        int Ver=face.point[15].y-face.point[13].y;
+        int Hor=face.point[20].x-face.point[19].x;
+        float proportion=(float)((float)Ver/(float) Hor);
+        if(proportion>0.5){
+            result=true;
+            Log.i(TAG, "张嘴了！！！！:");
+        }else {
+            MyApplication.getInstance().ttsUtil.SpeechRepead("请张开嘴巴   ", Config.heightTempVoiceVolume);
+        }
+        Log.i(TAG, "嘴唇开口比例: "+proportion);
+
+         return result;
+    }
+
 }

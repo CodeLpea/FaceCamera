@@ -120,4 +120,24 @@ private class lampThread  extends Thread{
                     }catch (Exception e){
 
                     }
+
+
+java.util.Timer timer = new java.util.Timer(true);
+TimerTask task = new TimerTask() {
+   public void run() {
+   //每次需要执行的代码放到这里面。
+   }
+};
+//以下是几种调度task的方法：
+//time为Date类型：在指定时间执行一次。
+timer.schedule(task, time);
+
+//firstTime为Date类型,period为long，表示从firstTime时刻开始，每隔period毫秒执行一次。
+timer.schedule(task, firstTime, period);
+
+//delay 为long类型：从现在起过delay毫秒执行一次。
+timer.schedule(task, delay);
+
+//delay为long,period为long：从现在起过delay毫秒以后，每隔period毫秒执行一次。
+timer.schedule(task, delay, period);
 * */

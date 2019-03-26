@@ -203,7 +203,6 @@ private int conut=1;
                     play();
                     break;
                 case R.id.btnSavePic:
-                    MyApplication.istaken=true;
                     //takePhoto();
                     if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                         return;

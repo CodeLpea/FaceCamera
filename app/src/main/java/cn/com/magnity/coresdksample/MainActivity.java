@@ -772,7 +772,7 @@ private int count=0;
                     if (face != null) {
                         //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
                         //否则同一个人不会反复拍摄同样温度的照片
-                        if(TimeUitl.timeInterval(100)){
+                        if(TimeUitl.timeInterval(500)){
                             Log.i(TAG, "检测到不同人脸  ");
                             TempThreshold=DefaultTempThreshold;//超过间隔则表示第二个人，则回复默认的阈值
                         }
@@ -781,9 +781,12 @@ private int count=0;
                             for (int i = 0; i < face.point.length; i++) {
                                 face.point[i] = DrawFaceRect.RotateDeg90(face.point[i], PREVIEW_HEIGHT);
                             }
+                           //检测是否张嘴
+                            if(DrawFaceRect.MouthDetection(face)){//张嘴才进行问读检测
+                                isGetFace=true;//进行温度检测
+                            }
                             //绘制人脸检测的区域
                             DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, frontCamera);
-                            isGetFace=true;//开启拍照
                         }
                     } else {
                         Log.e(TAG, "没有检测出人脸");
