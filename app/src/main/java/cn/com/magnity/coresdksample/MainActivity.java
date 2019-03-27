@@ -781,9 +781,12 @@ private int count=0;
                             for (int i = 0; i < face.point.length; i++) {
                                 face.point[i] = DrawFaceRect.RotateDeg90(face.point[i], PREVIEW_HEIGHT);
                             }
-                           //检测是否张嘴
-                            if(DrawFaceRect.MouthDetection(face)){//张嘴才进行问读检测
-                                isGetFace=true;//进行温度检测
+                            //检测是否在有效区域
+                            if(DrawFaceRect.scopeDetection(face,PREVIEW_HEIGHT)){
+                                //检测是否张嘴
+                                if(DrawFaceRect.MouthDetection(face)){//张嘴才进行问读检测
+                                    isGetFace=true;//进行温度检测
+                                }
                             }
                             //绘制人脸检测的区域
                             DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, frontCamera);

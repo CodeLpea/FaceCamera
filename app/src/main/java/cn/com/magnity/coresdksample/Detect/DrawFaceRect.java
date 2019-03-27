@@ -140,22 +140,31 @@ public class DrawFaceRect {
 
     public  static boolean MouthDetection(FaceRect face){
          boolean result=false;
-        Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
+     /*   Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
         Log.i(TAG, "上嘴唇face.point[13].y: "+face.point[13].y);
         Log.i(TAG, "右嘴角face.point[20].x: "+face.point[20].x);
-        Log.i(TAG, "左嘴角face.point[19].x: "+face.point[19].x);
+        Log.i(TAG, "左嘴角face.point[19].x: "+face.point[19].x);*/
         int Ver=face.point[15].y-face.point[13].y;
         int Hor=face.point[20].x-face.point[19].x;
         float proportion=(float)((float)Ver/(float) Hor);
         if(proportion>0.5){
             result=true;
-            Log.i(TAG, "张嘴了！！！！:");
+            //Log.i(TAG, "张嘴了！！！！:");
         }else {
             MyApplication.getInstance().ttsUtil.SpeechRepead("请张开嘴巴   ", Config.heightTempVoiceVolume);
         }
-        Log.i(TAG, "嘴唇开口比例: "+proportion);
-
+       // Log.i(TAG, "嘴唇开口比例: "+proportion);
          return result;
+    }
+    public  static boolean scopeDetection(FaceRect face,int PREVIEW_HEIGHT){
+        boolean result=false;
+        int xPlace=face.point[19].x;//鼻尖的x轴位置
+        int interval=PREVIEW_HEIGHT/5;
+
+        if(interval<=xPlace&&xPlace<=PREVIEW_HEIGHT-interval){//横向分为五段，取其中三段为有效位置
+            result=true;
+        }
+        return result;
     }
 
 }
