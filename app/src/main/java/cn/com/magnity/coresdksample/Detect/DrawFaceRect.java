@@ -173,8 +173,8 @@ public class DrawFaceRect {
         canvas.drawLine(intervalX,0,intervalX,PREVIEW_HEIGHT,paint);
         //画右侧竖的一条线
         canvas.drawLine(PREVIEW__WIDTH-intervalX,0,PREVIEW__WIDTH-intervalX,PREVIEW_HEIGHT,paint);
-        Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
-        Log.i(TAG, "xPlace: "+xPlace);
+       /* Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
+        Log.i(TAG, "xPlace: "+xPlace);*/
         if(intervalX<=xPlace&&xPlace<=(PREVIEW__WIDTH-intervalX)&&(PREVIEW_HEIGHT-intervalY)>=yPlace){
             //横向分为五段，取其中三段为有效位置
             //竖向分为五段，取上方四段为有效位置

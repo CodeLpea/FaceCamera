@@ -652,6 +652,11 @@ private int count=0;
     }
 
     public  void saveBitmap(Bitmap bitmap) {
+        File fileexists = Environment.getExternalStorageDirectory();
+        fileexists = new File(fileexists, SavaRootDirName);
+        if (!fileexists.exists()) {
+            fileexists.mkdirs();
+        }
         Log.e(TAG, "保存人脸图片");
         SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
         String formatStr =formatter.format(new Date());

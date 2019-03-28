@@ -302,7 +302,7 @@ private int conut=1;
                     Log.i(TAG, "旋转巨哥画面");
                     mDev.stopProcessImage();
                     mVideoFragment.stopDrawingThread();
-                    mDev.setImageTransform(0, 1);//在设置旋转方向之前要停止预览和标记操作
+                    mDev.setImageTransform(0, 3);//在设置旋转方向之前要停止预览和标记操作
                     play();
                 }
             }catch (Exception e){

@@ -122,8 +122,8 @@ public class LoadService extends IntentService {
     }
 
     private void LoadFacePlace() {
-        Config.XPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyXplace,1);
-        Config.YPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyYplace,1);
+        Config.XPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyXplace,-18);
+        Config.YPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyYplace,6);
         Log.i(TAG, "LoadFacePlace: X  = "+Config.XPalce);
         Log.i(TAG, "LoadFacePlace: Y  = "+Config.YPalce);
 
