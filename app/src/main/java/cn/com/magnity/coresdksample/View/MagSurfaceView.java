@@ -133,11 +133,11 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
         /* 4 : 3 is default, but not always because of rotate */
         if (mCameraInfo.bmpWidth * 3 == mCameraInfo.bmpHeight * 4) {
-            mDstRect = new Rect(0, 0, getWidth(), getHeight());
+            mDstRect = new Rect(0, 0, getWidth(), getHeight());//getWidth()，getHeight()
         } else {
-            int h = getHeight();
+            int h = getHeight();//getHeight()
             int w = h * mCameraInfo.bmpWidth / mCameraInfo.bmpHeight;
-            int dx = (getWidth() - w) / 2;
+            int dx = (getWidth() - w) / 2;//getWidth()-w
             mDstRect.set(dx, 0, dx + w, h);
         }
 

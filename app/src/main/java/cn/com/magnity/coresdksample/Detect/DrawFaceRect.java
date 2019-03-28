@@ -85,7 +85,7 @@ public class DrawFaceRect {
            * face.point[15]下嘴唇中间
            * face.point[14]中间嘴唇
            * face.point[13]上嘴唇中间
-           * 换算比例
+           * 换算比例7
            * (float)（下嘴唇-上嘴唇）/（右嘴唇-左边嘴唇）
            *
            *  Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
@@ -156,12 +156,28 @@ public class DrawFaceRect {
        // Log.i(TAG, "嘴唇开口比例: "+proportion);
          return result;
     }
-    public  static boolean scopeDetection(FaceRect face,int PREVIEW_HEIGHT){
+    public  static boolean scopeDetection(FaceRect face,int PREVIEW__WIDTH,int PREVIEW_HEIGHT,Canvas canvas){//这个宽和高是反的。
         boolean result=false;
         int xPlace=face.point[19].x;//鼻尖的x轴位置
-        int interval=PREVIEW_HEIGHT/5;
+        int yPlace=face.point[19].y;//鼻尖的x轴位置
+        int intervalX=PREVIEW__WIDTH/5;
+        int intervalY=PREVIEW_HEIGHT/5;
 
-        if(interval<=xPlace&&xPlace<=PREVIEW_HEIGHT-interval){//横向分为五段，取其中三段为有效位置
+        Paint paint = new Paint(); //创建画笔对象
+        paint.setColor(Color.RED);//设置画笔的颜色
+        paint.setStrokeWidth(3);//设置画笔的粗度
+
+        //画横向的一条线
+        canvas.drawLine(0,PREVIEW_HEIGHT-intervalY,PREVIEW__WIDTH,PREVIEW_HEIGHT-intervalY,paint);
+        //画左侧竖的一条线
+        canvas.drawLine(intervalX,0,intervalX,PREVIEW_HEIGHT,paint);
+        //画右侧竖的一条线
+        canvas.drawLine(PREVIEW__WIDTH-intervalX,0,PREVIEW__WIDTH-intervalX,PREVIEW_HEIGHT,paint);
+        Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
+        Log.i(TAG, "xPlace: "+xPlace);
+        if(intervalX<=xPlace&&xPlace<=(PREVIEW__WIDTH-intervalX)&&(PREVIEW_HEIGHT-intervalY)>=yPlace){
+            //横向分为五段，取其中三段为有效位置
+            //竖向分为五段，取上方四段为有效位置
             result=true;
         }
         return result;

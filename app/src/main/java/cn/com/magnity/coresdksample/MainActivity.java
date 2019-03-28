@@ -782,7 +782,7 @@ private int count=0;
                                 face.point[i] = DrawFaceRect.RotateDeg90(face.point[i], PREVIEW_HEIGHT);
                             }
                             //检测是否在有效区域
-                            if(DrawFaceRect.scopeDetection(face,PREVIEW_HEIGHT)){
+                            if(DrawFaceRect.scopeDetection(face,PREVIEW_HEIGHT,PREVIEW_WIDTH,canvas)){
                                 //检测是否张嘴
                                 if(DrawFaceRect.MouthDetection(face)){//张嘴才进行问读检测
                                     isGetFace=true;//进行温度检测
