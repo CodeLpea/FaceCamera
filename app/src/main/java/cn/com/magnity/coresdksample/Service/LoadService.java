@@ -22,6 +22,9 @@ import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
+import cn.com.magnity.coresdksample.utils.lampUtil;
+
+import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.utils.Config.DdnPropertiesPath;
 import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
@@ -96,11 +99,23 @@ public class LoadService extends IntentService {
                 //加载配置文件的数据
                 LoadConfigFlie(intent);
                 UpadateApk();
+                checkJuGe();
                 break;
         }
 
 
 
+    }
+//测试巨哥摄像头是否连接
+    private void checkJuGe() {
+        if(isplay!=true){
+            Log.e(TAG, "温度摄像头没有连接： " );
+            lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+            Message message=Message.obtain();
+            message.what=MSG4;
+            message.obj="温度摄像头没有连接";
+            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+        }
     }
 
     private void UpadateApk() {

@@ -11,6 +11,7 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
 import cn.com.magnity.coresdksample.utils.Config;
+import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.ShellUtils;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.lampUtil;
@@ -43,6 +44,7 @@ public class MyApplication extends Application {
         faceRect=new FaceRect();
         ttsUtil=new TtsUtil(this);//初始化全局语音播放工具
         new lampUtil(Config.LAMP,Config.TIME);
+        LogcatHelper.getInstance(this).start();
     }
 }
 /*测试用例
