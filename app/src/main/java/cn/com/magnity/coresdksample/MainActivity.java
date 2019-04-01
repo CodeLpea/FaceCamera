@@ -59,6 +59,7 @@ import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.View.QiuView;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
+import cn.com.magnity.coresdksample.utils.EthernetUtil;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
@@ -284,7 +285,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
                         wifiAdmin.openWifi();
                         //执行搜索
-                        if(!wifiAdmin.getSSID().equals("\"" +WifiName + "\"")&&!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")){//连接的wifi与设置的wifi不同。
+                        if(!wifiAdmin.getSSID().equals("\"" +WifiName + "\"")&&!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")&&!isEthernet){
+                            //连接的wifi与设置的wifi不同。而且没有连接以太网。
                             //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
                             wifiAdmin.startScan();
                             List<ScanResult> scanResultList;
@@ -308,7 +310,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
                         wifiAdmin.openWifi();
                         //执行搜索
-                        if(!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")){//连接的wifi与设置的wifi不同。
+                        if(!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")&&!isEthernet){//连接的wifi与设置的wifi不同。而且没有连接以太网。
                             //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
                             wifiAdmin.startScan();
                             List<ScanResult> scanResultList;
@@ -346,12 +348,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
  * 初始化ftp
  * */
 private int count=0;
+private boolean isEthernet=false;//是否正在用以太网
+private String currentNetName="";
     private void initFtp() {
         Message message=Message.obtain();
         WifiUtil wifiUtil=new WifiUtil();
-        String ip = wifiUtil.getIp(this);
+        String wifiip = wifiUtil.getIp(this);
+        String Ethernetip=EthernetUtil.getEthernetIp();
+        wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
+        currentNetName=wifiAdmin.getSSID();
+        if(wifiip.equals(Ethernetip)){
+            Ethernetip="127.0.0.1";
+        }
         wifiUtil=null;
-        if(ip.equals("0.0.0.0")){//每隔30个周期
+        if(wifiip.equals("0.0.0.0")&&Ethernetip.equals("127.0.0.1")){//每隔30个周期，判断wifi和以太网是否连接
+            isEthernet=false;
             count++;
             Log.i(TAG, "count++: "+count);
             if(count>=10){
@@ -361,16 +372,31 @@ private int count=0;
             message.obj="网络不通，请检查";
             DelayStartHandler.sendMessageDelayed(message,1000);
             lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+
             }
-        }else if(!ip.equals(NoewIp)&&!ip.equals("0.0.0.0")){
-            NoewIp=ip;
+        }else if(!wifiip.equals(NoewIp)&&!wifiip.equals("0.0.0.0")&&Ethernetip.equals("127.0.0.1")){//wifi有ip且与之前的不同，而且以太网没有连接
+            NoewIp=wifiip;
             String str = "请在IE浏览器上输入网址访问FTP服务\n" +
-                    "ftp://"+ip+":2221\n" +
+                    "ftp://"+wifiip+":2221\n" +
                     "账号:didano\n" +
                     "密码:12345678";
             Log.i(TAG,str);
             message.what=MSG2;
-            message.obj="当前 i p 为"+ip;
+            message.obj="连接到网络"+currentNetName+"，当前 i p 为"+wifiip;
+            DelayStartHandler.sendMessageDelayed(message,5000);
+            startService(new Intent(this, FtpService.class));
+            lampUtil.setlamp(1,500,-1);
+        }else if(!Ethernetip.equals(NoewIp)&&wifiip.equals("0.0.0.0")&&!Ethernetip.equals("127.0.0.1")){//wifi没有连接，而且以太网wifi和之前的不相同
+            isEthernet=true;
+            NoewIp=EthernetUtil.getEthernetIp();
+            Log.i(TAG, "NoewIp: "+NoewIp);
+            String str = "请在IE浏览器上输入网址访问FTP服务\n" +
+                    "ftp://"+NoewIp+":2221\n" +
+                    "账号:didano\n" +
+                    "密码:12345678";
+            Log.i(TAG,str);
+            message.what=MSG2;
+            message.obj="连接以太网，当前 i p 为"+NoewIp;
             DelayStartHandler.sendMessageDelayed(message,5000);
             startService(new Intent(this, FtpService.class));
             lampUtil.setlamp(1,500,-1);
