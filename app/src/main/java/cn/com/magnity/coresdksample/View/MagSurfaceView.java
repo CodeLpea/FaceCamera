@@ -34,10 +34,9 @@ import cn.com.magnity.coresdksample.utils.lampUtil;
 import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
-import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
-import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
 import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.iftaken;
+import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 
 public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private volatile boolean mIsDrawing;
@@ -378,11 +377,6 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
      */
    protected void saveBitmap(Bitmap baseBitmap) {
         try {
-            File fileexists = Environment.getExternalStorageDirectory();
-            fileexists = new File(fileexists, SavaRootDirName);
-            if (!fileexists.exists()) {
-                fileexists.mkdirs();
-            }
                    // 保存图片到SD卡上
             SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
             String formatStr =formatter.format(new Date());
@@ -390,7 +384,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             if(String.valueOf(maxTmp).length()>=4){//最多保留4位
                 maxTmp=maxTmp.substring(0,4);
             }
-            File file = new File(Environment.getExternalStorageDirectory(), SavaRootDirName+File.separator+formatStr+"_"+maxTmp+  "Temp.png");
+            File file = new File(getFolderPathToday(),formatStr+"_"+maxTmp+  "Temp.png");
             if (file.exists()) {
                 file.delete();
             }

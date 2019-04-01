@@ -110,11 +110,11 @@ public class LoadService extends IntentService {
     private void checkJuGe() {
         if(isplay!=true){
             Log.e(TAG, "温度摄像头没有连接： " );
-            lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+            //lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
             Message message=Message.obtain();
             message.what=MSG4;
             message.obj="温度摄像头没有连接";
-            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+            MainActivity.DelayStartHandler.sendMessageDelayed(message,500);
         }
     }
 
@@ -155,9 +155,9 @@ public class LoadService extends IntentService {
                 if(Compare(keyValueMap))//比对一下配置文件是否正。
                 {
                 if(!intent.getAction().equals(ReLoadServieAction)){//反复加载数据的时候不播报语音
-                message.what=MSG4;
+              /*  message.what=MSG4;
                 message.obj="读取配置文件成功";
-                MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+                MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);*/
                 }
                 }else{//配置文件读取失败，自动修复，提醒用户重填
                     message.what=MSG4;

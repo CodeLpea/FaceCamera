@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by elena on 2017/9/4.
+ *日志保存工具
  */
 
 public class LogcatHelper {
@@ -156,7 +156,7 @@ public class LogcatHelper {
     }
 
     public String getFileName() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         String date = format.format(new Date(System.currentTimeMillis()));
         return date;// 2012年10月03日 23:41:31
     }

@@ -3,6 +3,7 @@ package cn.com.magnity.coresdksample;
 import android.app.Application;
 import android.util.Log;
 
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,13 +39,13 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         myApplication = this;
-        Log.i(TAG, "onCreate: ");
+        Log.i(TAG, "程序启动完成: ");
         mDev =new MagDevice();//初始化全局MagDevice
         juGeFaceRect=new JuGeFaceRect();//初始化全局标记框
         faceRect=new FaceRect();
         ttsUtil=new TtsUtil(this);//初始化全局语音播放工具
         new lampUtil(Config.LAMP,Config.TIME);
-        LogcatHelper.getInstance(this).start();
+        LogcatHelper.getInstance(this).start();//启动日志
     }
 }
 /*测试用例

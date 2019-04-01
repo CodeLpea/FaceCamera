@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirPath;
 
 public class FlieUtil {
     /**
@@ -113,6 +117,23 @@ public class FlieUtil {
         out.close();
         System.out.println("====path:"+path);
 
+    }
+    public static String getFileName() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String date = format.format(new Date(System.currentTimeMillis()));
+        return date;// 2012年10月03日 23:41:31
+    }
+
+    /**
+     * @return 文件夹（按照天自动创建文件夹）
+     */
+    public static String getFolderPathToday() {
+        String folderpath = SavaRootDirPath+ File.separator + getFileName(); // 根目录:sd/ddnet/img/当天时间
+        File storeFolder = new File(folderpath);
+        if (!storeFolder.exists()) {
+            storeFolder.mkdirs();
+        }
+        return folderpath;
     }
 
 }

@@ -85,12 +85,11 @@ import static cn.com.magnity.coresdksample.utils.Config.MSG6;
 import static cn.com.magnity.coresdksample.utils.Config.MSG7;
 import static cn.com.magnity.coresdksample.utils.Config.MSG8;
 import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
-import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
-import static cn.com.magnity.coresdksample.utils.Config.SavaTestDirName;
 import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.WifiName;
 import static cn.com.magnity.coresdksample.utils.Config.WifiPassWord;
 import static cn.com.magnity.coresdksample.utils.Config.iftaken;
+import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -169,8 +168,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initPersonCamera();
 
        //检查文件夹
-        FlieUtil.initFile(SavaRootDirName);//初始化文件夹
-        FlieUtil.initFile(SavaTestDirName);//初始化文件夹
+      /*  FlieUtil.initFile(SavaRootDirName);//初始化文件夹
+        FlieUtil.initFile(SavaTestDirName);//初始化文件夹*/
+        FlieUtil.initFile(getFolderPathToday());//初始化文件夹
 
         //启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
         initLoadService();
@@ -370,7 +370,7 @@ private int count=0;
                     "密码:12345678";
             Log.i(TAG,str);
             message.what=MSG2;
-            message.obj="正在开启ftp服务器，当前 i p 为"+ip;
+            message.obj="当前 i p 为"+ip;
             DelayStartHandler.sendMessageDelayed(message,5000);
             startService(new Intent(this, FtpService.class));
             lampUtil.setlamp(1,500,-1);
@@ -617,10 +617,10 @@ private int count=0;
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
             mCamera.startPreview();
-            Message message=Message.obtain();
+          /*  Message message=Message.obtain();
             message.what=MSG3;
             message.obj="人脸摄像头开启成功";
-            DelayStartHandler.sendMessageDelayed(message,6000);
+            DelayStartHandler.sendMessageDelayed(message,6000);*/
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -652,11 +652,6 @@ private int count=0;
     }
 
     public  void saveBitmap(Bitmap bitmap) {
-        File fileexists = Environment.getExternalStorageDirectory();
-        fileexists = new File(fileexists, SavaRootDirName);
-        if (!fileexists.exists()) {
-            fileexists.mkdirs();
-        }
         Log.e(TAG, "保存人脸图片");
         SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
         String formatStr =formatter.format(new Date());
@@ -664,7 +659,7 @@ private int count=0;
         if(String.valueOf(maxTmp).length()>=4){//最多保留4位
             maxTmp=maxTmp.substring(0,4);
         }
-        File f =  new File(Environment.getExternalStorageDirectory(), SavaRootDirName+File.separator+formatStr+"_"+maxTmp+  "Person.jpg");
+        File f =  new File(getFolderPathToday(),formatStr+"_"+maxTmp+  "Person.jpg");
         if (f.exists()) {
             f.delete();
         }

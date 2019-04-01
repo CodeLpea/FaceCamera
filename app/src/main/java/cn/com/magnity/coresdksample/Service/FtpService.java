@@ -52,10 +52,10 @@ public class FtpService extends Service {
         rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         try {
             init();
-            Toast.makeText(this, "启动ftp服务成功", Toast.LENGTH_SHORT).show();
+         /*   Toast.makeText(this, "启动ftp服务成功", Toast.LENGTH_SHORT).show();
             message.what=MSG2;
             message.obj="启动ftp服务成功";
-            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
+            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);*/
 
             Log.i(TAG, "启动ftp服务成功: ");
         } catch (FtpException e) {

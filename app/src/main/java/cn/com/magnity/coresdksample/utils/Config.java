@@ -2,6 +2,8 @@ package cn.com.magnity.coresdksample.utils;
 
 import android.os.Environment;
 
+import java.io.File;
+
 /**
  * 配置信息*/
 public class Config {
@@ -15,6 +17,7 @@ public class Config {
 
     /*文件保存目录*/
     public static String SavaRootDirName="DdnTemp";
+    public static String SavaRootDirPath=Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "DdnTempImg";
     public static String DdnPropertiesPath=Environment.getExternalStorageDirectory().getPath()+"/"+"DdnProperties.txt";//配置文件路径
     public static String DdnUpdateApkPath=Environment.getExternalStorageDirectory().getPath()+"/"+"DdnTemp.apk";//配置文件路径
     public static String SavaTestDirName="Test";
@@ -52,7 +55,7 @@ public class Config {
     public static final int MSG0 = 0;//自动连接指定的wifi
     public static final int MSG2 =MSG1+1 ;//ftp语音，包括wifi信息
     public static final int MSG3 = MSG2+1;//人脸摄像头
-    public static final int MSG4 = MSG3+1;//配置文件检查语音
+    public static final int MSG4 = MSG3+1;//配置文件检查语音/检测是否温度摄像头是否在线
     public static final int MSG5 = MSG4+1;//温度摄像头语音
     public static final int MSG6 = MSG5+1;//反复加载配置服务
     public static final int MSG7 = MSG6+1;//亮度设置

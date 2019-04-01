@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
+import cn.com.magnity.coresdksample.utils.lampUtil;
 
 import static cn.com.magnity.coresdksample.MyApplication.isQuest;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
@@ -243,6 +246,8 @@ private int conut=1;
                         } else if (result == MagDevice.CONN_DETACHED) {
                             /* 拔出*/
                             Log.i(TAG, "linkResult: 拔出");
+                            lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+                            MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
                             //stop();
                              isplay=false;
                             isQuest=false;//修改状态，方便下次进入连接流程
@@ -254,11 +259,13 @@ private int conut=1;
         if (r == MagDevice.CONN_SUCC) {
                     play();
                     Log.i(TAG, "linkResult: runOnUiThread 连接成功");
+                    lampUtil.setlamp(1,500,-1);//设置成正常灯光
+
                     isQuest=false;//修改状态，方便下次进入连接流程
         }
         if (r == MagDevice.CONN_DETACHED) {
             Log.i(TAG, "linkResult: 拔出");
-            //MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
+
         }
         updateButtons();
     }
@@ -274,32 +281,42 @@ private int conut=1;
         }
         if(!isplay){
             Log.i(TAG, "断开连接重新播放 ");
+            mDev.stopProcessImage();
             mDev.dislinkCamera();
             mVideoFragment.stopDrawingThread();
             mDegree = 0;
             updateButtons();
-            TransformThread transformThread=new TransformThread();
-            Thread t1=new Thread(transformThread);
-            t1.start();
+            TransformHandler.sendEmptyMessageDelayed(1,5000);
         }
         isplay=true;
-       /* if(isplay==true){
-        mDev.stopProcessImage();
-        mVideoFragment.stopDrawingThread();
-        mDev.setImageTransform(0, 1);//在设置旋转方向之前要停止预览和标记操作
-        mDev.startProcessImage(mVideoFragment, 0, 0);
-        mVideoFragment.startDrawingThread(mDev);
-        }*/
 
     }
+    private Handler TransformHandler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1:
+                    TransformHandler.removeMessages(1);
+                    if(mDev.isProcessingImage()){
+                        TransformThread transformThread=new TransformThread();
+                        Thread t1=new Thread(transformThread);
+                        t1.start();
+                    }else {
+                        TransformHandler.sendEmptyMessageDelayed(1,200);
+                    }
+                    break;
+            }
+        }
+    };
     class TransformThread implements Runnable{
 
         @Override
         public void run() {
             try{
-                Thread.sleep(5000);
-                if(isplay==true){
+                if(mDev.isProcessingImage()){
                     Log.i(TAG, "旋转巨哥画面");
+                   // MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已经连接",currtentVoiceVolume);
                     mDev.stopProcessImage();
                     mVideoFragment.stopDrawingThread();
                     mDev.setImageTransform(0, 3);//在设置旋转方向之前要停止预览和标记操作
