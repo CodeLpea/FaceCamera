@@ -84,6 +84,13 @@
             </intent-filter>
 
         </receiver>
+        <receiver android:name=".Broadcast.UsbReceiver"
+            >
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
+            </intent-filter>
+        </receiver>
         <service
             android:name=".Service.LoadService"
             android:exported="false"></service>

@@ -638,6 +638,7 @@ private String currentNetName="";
             message.what=MSG3;
             message.obj="人脸摄像头开启失败，请检查";
             DelayStartHandler.sendMessageDelayed(message,6000);
+            lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
             return;
         }
         try {
