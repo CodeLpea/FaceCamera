@@ -50,7 +50,9 @@ public class LoadService extends IntentService {
             "TempThreshold",
             "ExploreValue",
             "DeviceName",
-            "VersionName"
+            "VersionName",
+            "FDistance"
+
     };
     private List MyProperties_List = Arrays.asList(MyPropertiesList);//转换为List
     private  List<String> getPropertiesList=new ArrayList<>();
@@ -284,6 +286,10 @@ public class LoadService extends IntentService {
                     }
                     Log.i(TAG, "VERSIONNAME: "+  Config.VERSIONNAME);
                     break;
+                case  "FDistance" :
+                    Config.FDistance= Float.valueOf(keyValueMap.get(propertiesKey).toString());
+                    Log.i(TAG, "FDistance: "+  Config.FDistance);
+                    break;
             }
         }
 
@@ -328,7 +334,8 @@ public class LoadService extends IntentService {
                 +"TempThreshold"+"="+Config.TempThreshold+ "\r\n"
                 +"ExploreValue"+"="+Config.ExploreValue+ "\r\n"
                 +"DeviceName"+"="+Config.DEVICENAME+ "\r\n"
-                +"VersionName"+"="+Config.VERSIONNAME+ "\r\n";
+                +"VersionName"+"="+Config.VERSIONNAME+ "\r\n"
+                +"FDistance"+"="+Config.FDistance+ "\r\n";
         strContent.getBytes();
         strContent=new String(strContent.getBytes(),"GBK");
             File file =new File(DdnPropertiesPath);

@@ -23,6 +23,7 @@ public class MyApplication extends Application {
     public static  boolean isplay=false; //红外播放状态
     public static  boolean isQuest=false; //红外权限状态
     public static  boolean isGetFace=false; //红外权限状态
+    public static  boolean isInit=true;
     public static    int WhereFragmentID=1;//用来标记当前出于哪个Fragment，1为linkFragment，2为LocationFragment；
     public TtsUtil ttsUtil;
     public JuGeFaceRect juGeFaceRect;

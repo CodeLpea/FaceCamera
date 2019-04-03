@@ -120,11 +120,13 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         CorrectionPara correctionPara=new CorrectionPara();
         Log.i(TAG, "getCorrectionPara: "+mDev.getFixPara(correctionPara));
         Log.i(TAG, "fDistance: "+correctionPara.fDistance);
-        Log.i(TAG, "fTemp: "+correctionPara.fTemp);
+       // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
         Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
         correctionPara.fTaoFilter=(float)0.85;
+        correctionPara.fDistance=Config.FDistance;
         mDev.setFixPara(correctionPara);
         Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
+        Log.i(TAG, "fDistance: "+correctionPara.fDistance);
         mStatisticInfo = new StatisticInfo();
 
         mCameraInfo = new CameraInfo();

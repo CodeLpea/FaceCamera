@@ -36,6 +36,7 @@ public class Config {
     public static String WifiPassWord="XiaoNuo2018";
     public static String DefaultWifiName="didano";
     public static String DefaultWifiPassWord="12345678";
+    public static float FDistance= (float) 1.2;
     /*温度阀值*/
     //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
     //否则同一个人不会反复拍摄同样温度的照片

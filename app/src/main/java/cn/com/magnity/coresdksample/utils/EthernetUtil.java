@@ -29,7 +29,7 @@ public class EthernetUtil {
                 String ip = ia.getHostAddress();
                 if (!"127.0.0.1".equals(ip)) {
                     hostIp = ia.getHostAddress();
-                    Log.i("EthernetUtil", hostIp);
+                   // Log.i("EthernetUtil", hostIp);
                     break;
                 }else {
                     hostIp="127.0.0.1";

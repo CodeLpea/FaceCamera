@@ -10,6 +10,7 @@ import android.util.Log;
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 
+import static cn.com.magnity.coresdksample.MyApplication.isInit;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.utils.Config.currtentVoiceVolume;
 
@@ -17,12 +18,14 @@ public class UsbReceiver extends BroadcastReceiver {
     private static final String TAG="UsbReceiver";
     private static final String HDUSBCamera="HD USB Camera";//人脸摄像头名称
     private static final String ThermoCubeStream="ThermoCube stream";//热成像摄像头名称
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         UsbDevice usbDevice = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
         String deviceName = usbDevice.getDeviceName();
         Log.e(TAG,"--- 接收到广播， action: " + action);
+        Log.e(TAG,"--- 接收到广播， isInit: " + isInit);
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
          /*   Log.e(TAG, "USB device is AttacheddeviceName:        " + deviceName);
             Log.e(TAG, "USB device is Attached:getVendorId       " + usbDevice.getVendorId());
@@ -44,10 +47,13 @@ public class UsbReceiver extends BroadcastReceiver {
                 Log.i(TAG, "人脸摄像头已拔出: ");
                 lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
                 MyApplication.getInstance().ttsUtil.SpeechAdd("人脸摄像头已拔出",currtentVoiceVolume);
-            }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isplay==false){
+            }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isplay==false&&isInit==false){
                 Log.i(TAG, "热成像摄像头已拔出: ");
                 lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
                 MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
+            }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isInit==true){
+                Log.i(TAG, "完成热成像摄像头初始化: ");
+                isInit=false;//完成初始化
             }
         }
     }
