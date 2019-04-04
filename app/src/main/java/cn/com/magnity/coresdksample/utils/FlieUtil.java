@@ -29,7 +29,7 @@ public class FlieUtil {
         }
         }
     /**
-     * 检查是否存在文件
+     * 检查是否存在路径文件
      * */
     public static  boolean isExistFlie(String path){
         boolean turn=false;
@@ -43,6 +43,23 @@ public class FlieUtil {
             }else {
                 turn=true;//有
             }
+
+        return turn;
+    }
+    /**
+     * 检查是否存在文件
+     * */
+    public static  boolean isExistFlie(File file){
+        boolean turn=false;
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+            }
+            turn=false;//没有，自动创建
+        }else {
+            turn=true;//有
+        }
 
         return turn;
     }

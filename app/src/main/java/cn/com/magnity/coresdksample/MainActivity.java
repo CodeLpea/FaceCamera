@@ -72,6 +72,8 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 //import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
+import static cn.com.magnity.coresdksample.MyApplication.photoNameSave;
+import static cn.com.magnity.coresdksample.MyApplication.photoNameSave2;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiName;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiPassWord;
@@ -686,10 +688,15 @@ private String currentNetName="";
         if(String.valueOf(maxTmp).length()>=4){//最多保留4位
             maxTmp=maxTmp.substring(0,4);
         }
-        File f =  new File(getFolderPathToday(),formatStr+"_"+maxTmp+  "Person.jpg");
+        String fileName=formatStr+"_"+maxTmp+  "Person.jpg";
+        File f =  new File(getFolderPathToday(),fileName);
         if (f.exists()) {
             f.delete();
+        }else {
+            photoNameSave2.saveLog2("人脸照片",fileName+"\r\n");
         }
+
+
         try {
             FileOutputStream out = new FileOutputStream(f);
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);

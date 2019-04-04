@@ -33,6 +33,7 @@ import cn.com.magnity.coresdksample.utils.lampUtil;
 
 import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
+import static cn.com.magnity.coresdksample.MyApplication.photoNameSave;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.iftaken;
@@ -386,10 +387,15 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             if(String.valueOf(maxTmp).length()>=4){//最多保留4位
                 maxTmp=maxTmp.substring(0,4);
             }
-            File file = new File(getFolderPathToday(),formatStr+"_"+maxTmp+  "Temp.png");
+            String fileName=formatStr+"_"+maxTmp+  "Temp.png";
+            File file = new File(getFolderPathToday(),fileName);
             if (file.exists()) {
                 file.delete();
+            }else {
+                photoNameSave.saveLog("温度照片",fileName+"\r\n");
             }
+
+
             FileOutputStream stream = new FileOutputStream(file);
             baseBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             stream.flush();
@@ -432,9 +438,9 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                  }
                   int[] inf=new int[5];
                   mDev.getRectTemperatureInfo(x0,y0,x1,y1,inf);//获取规定区域内的温度信息
-                  /*Log.i(TAG, "GetRectTemperature:最高温度 "+inf[1]*0.001f);
-                  Log.i(TAG, "GetRectTemperature:最高温度位置 "+inf[4]);*/
-                  int maxTmp= (int) (inf[1]*0.001f);
+                  /* Log.i(TAG, "GetRectTemperature:最高温度 "+inf[1]*0.001f);
+                 Log.i(TAG, "GetRectTemperature:最高温度位置 "+inf[4]);*/
+                  float maxTmp= (inf[1]*0.001f);
                  int YFPA = inf[4] / cameraInfo.fpaWidth;
                  int XFPA = inf[4] - YFPA * cameraInfo.fpaWidth;
 
@@ -445,8 +451,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                           String maxTmp2=String.valueOf(TempThreshold);
                           if(String.valueOf(maxTmp).length()>=4){//最多保留4位
                               maxTmp2=maxTmp2.substring(0,4);
+                              Log.i(TAG, "maxTmp2: "+maxTmp2);
                           }
                           MyApplication.getInstance().ttsUtil.SpeechRepead("体温异常   "+maxTmp2, Config.heightTempVoiceVolume);
+                         // Log.i(TAG, "maxTmp2222: "+maxTmp2);
                           Canvas saveBmpCanvas=new Canvas(bmp);
                           float x2=XFPA;
                           float y2=160-YFPA;

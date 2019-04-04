@@ -16,6 +16,7 @@ import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.ShellUtils;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.lampUtil;
+import cn.com.magnity.coresdksample.utils.logSave;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
@@ -23,7 +24,7 @@ public class MyApplication extends Application {
     public static  boolean isplay=false; //红外播放状态
     public static  boolean isQuest=false; //红外权限状态
     public static  boolean isGetFace=false; //红外权限状态
-    public static  boolean isInit=true;
+    public static  boolean isInit=true;//启动标志
     public static    int WhereFragmentID=1;//用来标记当前出于哪个Fragment，1为linkFragment，2为LocationFragment；
     public TtsUtil ttsUtil;
     public JuGeFaceRect juGeFaceRect;
@@ -32,6 +33,8 @@ public class MyApplication extends Application {
     public TtsUtil getTtsUtil() {
         return ttsUtil;
     }
+    public static logSave photoNameSave;//全局照片名称保存对象
+    public static logSave photoNameSave2;//全局照片名称保存对象
     private static MyApplication myApplication = null;
     public static MyApplication getInstance() {
         return myApplication;
@@ -41,13 +44,23 @@ public class MyApplication extends Application {
         super.onCreate();
         myApplication = this;
         Log.i(TAG, "程序启动完成: ");
+        init();
+        photoNameSaveLog();
+    }
+    private void init() {
         mDev =new MagDevice();//初始化全局MagDevice
         juGeFaceRect=new JuGeFaceRect();//初始化全局标记框
         faceRect=new FaceRect();
         ttsUtil=new TtsUtil(this);//初始化全局语音播放工具
         new lampUtil(Config.LAMP,Config.TIME);
         LogcatHelper.getInstance(this).start();//启动日志
+
     }
+    private void   photoNameSaveLog() {
+        photoNameSave=new logSave();
+        photoNameSave2=new logSave();
+    }
+
 }
 /*测试用例
    //new lampUtil(Config.LAMP,Config.TIME);

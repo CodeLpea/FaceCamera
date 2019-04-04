@@ -1,5 +1,7 @@
 package cn.com.magnity.coresdksample.utils;
 
+import java.util.Calendar;
+
 public class TimeUitl {
     private  static long lastClickTime=0;//上次点击的时间
 
@@ -16,6 +18,18 @@ public class TimeUitl {
 
         }
 
+
+    /**
+     * 获取当前时间
+     */
+    public static String currentDayTime() {
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH) + 1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        String ret = year + "-" + month + "-" + day;
+        return ret;
+    }
     }
 
 
