@@ -16,10 +16,10 @@ public class Config {
     public static int YPalce=1;
 
     /*有效区域的划线*/
-    public static int AreaUp=128;
-    public static int AreaLeft=96;
-    public static int AreaRight=384;
-    public static int AreaBottom=512;
+    public static int AreaUp=45;
+    public static int AreaLeft=114;
+    public static int AreaRight=448;
+    public static int AreaBottom=576;
 
 
     /*文件保存目录*/

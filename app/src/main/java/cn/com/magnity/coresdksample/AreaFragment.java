@@ -140,22 +140,26 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.bt_area_left://左侧调整（只能用于左右的线条）
                 switch (WhichLine){
-                    case 2://1为左边方的线条
+                    case 2://2为左边方的线条
+                        Log.i(TAG, "AreaLeftBefore: "+AreaLeft);
                         if(AreaLeft>10){
                             AreaLeft=AreaLeft-10;//点击一下，就加1
+                            Log.i(TAG, "AreaLeftAfter: "+AreaLeft);
                         }else {
                             Toast.makeText(getActivity(),"已到达最左侧",Toast.LENGTH_SHORT).show();
                         }
-
                         break;
                     case 3://3为右方的线条
+                        Log.i(TAG, "AreaRightBefore: "+AreaRight);
                         if(AreaRight>10){
                             AreaRight=AreaRight-10;//点击一下，就加1
+                            Log.i(TAG, "AreaRightAfter: "+AreaRight);
                         }else {
                             Toast.makeText(getActivity(),"已到达最左侧",Toast.LENGTH_SHORT).show();
                         }
                         break;
                 }
+                break;
             case R.id.bt_area_right://右侧调整（只能用于左右的线条）
                 switch (WhichLine){
                     case 2://2为左边方的线条
