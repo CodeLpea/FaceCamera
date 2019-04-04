@@ -158,29 +158,44 @@ public class DrawFaceRect {
     }
     public  static boolean scopeDetection(FaceRect face,int PREVIEW__WIDTH,int PREVIEW_HEIGHT,Canvas canvas){//这个宽和高是反的。
         boolean result=false;
-        int xPlace=face.point[19].x;//鼻尖的x轴位置
-        int yPlace=face.point[19].y;//鼻尖的x轴位置
-        int intervalX=PREVIEW__WIDTH/5;
-        int intervalY=PREVIEW_HEIGHT/5;
-
-        Paint paint = new Paint(); //创建画笔对象
+        int xPlace=face.point[14].x;//中间嘴唇的x轴位置
+        int yPlace=face.point[14].y;//中间嘴唇的y轴位置
+      /*  Paint paint = new Paint(); //创建画笔对象
         paint.setColor(Color.RED);//设置画笔的颜色
         paint.setStrokeWidth(3);//设置画笔的粗度
 
-        //画横向的一条线
-        canvas.drawLine(0,PREVIEW_HEIGHT-intervalY,PREVIEW__WIDTH,PREVIEW_HEIGHT-intervalY,paint);
+        //画上方的一条线
+        canvas.drawLine(0,Config.AreaUp,PREVIEW__WIDTH,Config.AreaUp,paint);
         //画左侧竖的一条线
-        canvas.drawLine(intervalX,0,intervalX,PREVIEW_HEIGHT,paint);
+        canvas.drawLine(Config.AreaLeft,0,Config.AreaLeft,PREVIEW_HEIGHT,paint);
         //画右侧竖的一条线
-        canvas.drawLine(PREVIEW__WIDTH-intervalX,0,PREVIEW__WIDTH-intervalX,PREVIEW_HEIGHT,paint);
+        canvas.drawLine(Config.AreaRight,0,Config.AreaRight,PREVIEW_HEIGHT,paint);
+
+        //画下方的一条线
+        canvas.drawLine(0,Config.AreaBottom,PREVIEW__WIDTH,Config.AreaBottom,paint);*/
        /* Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
         Log.i(TAG, "xPlace: "+xPlace);*/
-        if(intervalX<=xPlace&&xPlace<=(PREVIEW__WIDTH-intervalX)&&(PREVIEW_HEIGHT-intervalY)>=yPlace){
-            //横向分为五段，取其中三段为有效位置
-            //竖向分为五段，取上方四段为有效位置
+        if(Config.AreaLeft<=xPlace&&xPlace<=Config.AreaRight&&Config.AreaBottom>=yPlace&&Config.AreaUp<=yPlace){
+           //左侧小于x
+           //右侧大于x
+           //上方小于x
+           //下方大于x
             result=true;
         }
         return result;
+    }
+    public  static void DrawScopeDetection(int PREVIEW__WIDTH,int PREVIEW_HEIGHT,Canvas canvas) {//这个宽和高是反的。
+        Paint paint = new Paint(); //创建画笔对象
+        paint.setColor(Color.RED);//设置画笔的颜色
+        paint.setStrokeWidth(3);//设置画笔的粗度
+        //画上方的一条线
+        canvas.drawLine(0,Config.AreaUp,PREVIEW__WIDTH,Config.AreaUp,paint);
+        //画左侧竖的一条线
+        canvas.drawLine(Config.AreaLeft,0,Config.AreaLeft,PREVIEW_HEIGHT,paint);
+        //画右侧竖的一条线
+        canvas.drawLine(Config.AreaRight,0,Config.AreaRight,PREVIEW_HEIGHT,paint);
+        //画下方的一条线
+        canvas.drawLine(0,Config.AreaBottom,PREVIEW__WIDTH,Config.AreaBottom,paint);
     }
 
 }

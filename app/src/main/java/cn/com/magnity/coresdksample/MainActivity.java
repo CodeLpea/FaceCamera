@@ -135,10 +135,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private FragmentTransaction transaction;//定义用于加载连接和设置界面
     private LinkFragment linkFragment;
     private LoactionFragment loactionFragment;
+    private AreaFragment areaFragment;
     //校准相关控件
     private TextView Tvlocation1,Tvlocation2,Tvpoint1,Tvpoint2;
     private QiuView QiuView1,QiuView2;
-    private Button BtLocate,BtLink;
+    private Button BtLocate,BtLink,BtArea;
     //wifi管理
     WifiAdmin wifiAdmin ;
     private Handler WifiScanHandler;
@@ -418,8 +419,10 @@ private String currentNetName="";
         QiuView2= (QiuView)findViewById(R.id.view2);
         BtLink= (Button) findViewById(R.id.bt_linkSet);
         BtLocate= (Button) findViewById(R.id.bt_locateSet);
+        BtArea= (Button) findViewById(R.id.bt_areaSet);
         BtLink.setOnClickListener(this);
         BtLocate.setOnClickListener(this);
+        BtArea.setOnClickListener(this);
     }
     @Override
     public void onClick(View view) {
@@ -429,6 +432,7 @@ private String currentNetName="";
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(loactionFragment);
+                transaction.hide(areaFragment);
                 transaction.show(linkFragment);//连接LinkFragment隐藏locationFragment
                 WhereFragmentID=1;
                 showLocationView(false);//隐藏LocationFragment中需要用到的mainActivity的控件
@@ -439,8 +443,20 @@ private String currentNetName="";
                 transaction=getFragmentManager().beginTransaction();
                 //初始化transaction
                 transaction.hide(linkFragment);
+                transaction.hide(areaFragment);
                 transaction.show(loactionFragment);//默认进入locationFragment隐藏LinkFragment
                 WhereFragmentID=2;
+                showLocationView(true);//展示出LocationFragment中需要用到的mainActivity的控件
+                transaction.commit();
+                break;
+            case R.id.bt_areaSet://连接设置跳转到LocationFragemnt
+                //  MyApplication.getInstance().getTtsUtil().SpeechAdd("连接设置跳转到LINKFragemnt",Config.currtentVoiceVolume);
+                transaction=getFragmentManager().beginTransaction();
+                //初始化transaction
+                transaction.hide(linkFragment);
+                transaction.hide(loactionFragment);
+                transaction.show(areaFragment);//默认进入locationFragment隐藏LinkFragment
+                WhereFragmentID=3;
                 showLocationView(true);//展示出LocationFragment中需要用到的mainActivity的控件
                 transaction.commit();
                 break;
@@ -474,11 +490,14 @@ private String currentNetName="";
     private void initFragment(){
         linkFragment=new LinkFragment();
         loactionFragment=new LoactionFragment();
+        areaFragment=new AreaFragment();
         transaction=getFragmentManager().beginTransaction();
         //初始化transaction
         transaction.add(R.id.frame_layout,linkFragment);
         transaction.add(R.id.frame_layout,loactionFragment);
+        transaction.add(R.id.frame_layout,areaFragment);
         transaction.hide(loactionFragment);
+        transaction.hide(areaFragment);
         transaction.show(linkFragment);//默认进入linkFragment隐藏locationFragment
         transaction.commit();
     }
@@ -803,6 +822,7 @@ private String currentNetName="";
                         mSurfaceHolder.unlockCanvasAndPost(canvas);
                         continue;
                     }
+                    DrawFaceRect.DrawScopeDetection(PREVIEW_HEIGHT,PREVIEW_WIDTH,canvas);
                     if (face != null) {
                         //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
                         //否则同一个人不会反复拍摄同样温度的照片

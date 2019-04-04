@@ -12,8 +12,15 @@ public class Config {
 
 
     /*x方向校准参数，y方向校准参数*/
-    public static int XPalce=1;
+    public static int XPalce=1;//
     public static int YPalce=1;
+
+    /*有效区域的划线*/
+    public static int AreaUp=128;
+    public static int AreaLeft=96;
+    public static int AreaRight=384;
+    public static int AreaBottom=512;
+
 
     /*文件保存目录*/
     public static String SavaRootDirName="DdnTemp";
@@ -50,6 +57,13 @@ public class Config {
     public  static String DdnProperties="DdnProperties.txt";
     public  static String KeyXplace="KeyXplace";
     public  static String KeyYplace="KeyYplace";
+    public  static String KeyAreaLineUp="KeyAreaLineUp";//区域线的位置key
+    public  static String KeyAreaLineLeft="KeyAreaLineLeft";//区域线的位置key
+    public  static String KeyAreaLineRight="KeyAreaLineRight";//区域线的位置key
+    public  static String KeyAreaLineBottom="KeyAreaLineBottom";//区域线的位置key
+
+
+
 
     /*静态语音延迟播放Hanlder的MSG*/
     public static final int MSG1 = 100;//自动连接指定的wifi
