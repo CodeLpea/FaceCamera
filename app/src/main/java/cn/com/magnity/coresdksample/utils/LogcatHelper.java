@@ -120,8 +120,11 @@ public class LogcatHelper {
                     if (line.length() == 0) {
                         continue;
                     }
+
                     if (out != null && line.contains(mPID)) {
-                        out.write((line + "\n").getBytes());
+                        SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+                        String formatStr =formatter.format(new Date());
+                        out.write((formatStr+":"+line + "\n").getBytes());
                     }
                 }
 

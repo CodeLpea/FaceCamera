@@ -287,6 +287,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         WifiScanHandler.removeMessages(MSG1);
                         wifiAdmin= new WifiAdmin(getApplicationContext());//刷新wifiAdmin
                         wifiAdmin.openWifi();
+                        countWifiRssi++;
+                        if(countWifiRssi>=20){
+                            countWifiRssi=0;
+                            Log.i(TAG, "当前网络名称: "+wifiAdmin.getSSID()+"当前信号强度"+ wifiAdmin.getWifRssi());
+                        }
                         //执行搜索
                         if(!wifiAdmin.getSSID().equals("\"" +WifiName + "\"")&&!wifiAdmin.getSSID().equals("\"" +DefaultWifiName + "\"")&&!isEthernet){
                             //连接的wifi与设置的wifi不同。而且没有连接以太网。
@@ -296,7 +301,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             scanResultList= wifiAdmin.getWifiList();
                             //Log.i(TAG, "scanResultList.size(): "+scanResultList.size());
                             for(int i=0;i<scanResultList.size();i++){
-                                // Log.i(TAG, "scanResultList.SSID(): "+scanResultList.get(i).SSID);
+                                 Log.i(TAG, "scanResultList.SSID(): "+scanResultList.get(i).SSID);
                                 if (scanResultList.get(i).SSID.equals(WifiName)){//搜索到wifi名称相同
                                     Log.i(TAG, "找到指定wifi： "+WifiName+"  准备连接: ");
                                     wifiAdmin.addNetwork(
@@ -351,6 +356,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
  * 初始化ftp
  * */
 private int count=0;
+private int countWifiRssi=0;
 private boolean isEthernet=false;//是否正在用以太网
 private String currentNetName="";
     private void initFtp() {

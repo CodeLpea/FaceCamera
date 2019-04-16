@@ -138,8 +138,12 @@ public class WifiAdmin {
     // 得到WifiInfo的所有信息包  
     public String getWifiInfo() {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.toString(); 
-    } 
- 
+    }
+    // 得到WifiInfo的所有信息包
+    public String getWifRssi() {
+        return (mWifiInfo == null) ? "NULL" : String.valueOf(mWifiInfo.getRssi());
+    }
+
     // 添加一个网络并连接  
     public void addNetwork(WifiConfiguration wcg) {
 	 int wcgID = mWifiManager.addNetwork(wcg); 

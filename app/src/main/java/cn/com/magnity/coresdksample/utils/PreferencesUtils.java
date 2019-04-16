@@ -25,7 +25,9 @@ public class PreferencesUtils {
 
 	/**
 	 * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法
-	 * 
+	 * SharedPreferences pref = context.getSharedPreferences(
+	 SHAREPREFERENCE_NAME, Context.MODE_PRIVATE |Context.MODE_MULTI_PROCESS);
+
 	 * @param context
 	 * @param key
 	 * @param object
@@ -34,7 +36,7 @@ public class PreferencesUtils {
 	public static void put(Context context, String key, Object object) {
 
 		if (object != null) {
-			SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+			SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE |Context.MODE_MULTI_PROCESS);
 			SharedPreferences.Editor editor = sp.edit();
 			if (object instanceof String) {
 				editor.putString(key, (String) object);
