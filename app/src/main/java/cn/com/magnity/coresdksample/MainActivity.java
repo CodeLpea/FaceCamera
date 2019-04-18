@@ -17,7 +17,6 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.net.wifi.ScanResult;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
@@ -56,11 +55,13 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.Service.LoadService;
+import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.View.QiuView;
-import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.EthernetUtil;
+import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
+import cn.com.magnity.coresdksample.Temp.SaveTemps;
 import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
@@ -72,14 +73,15 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 //import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
-import static cn.com.magnity.coresdksample.MyApplication.photoNameSave;
 import static cn.com.magnity.coresdksample.MyApplication.photoNameSave2;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultTempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiName;
 import static cn.com.magnity.coresdksample.utils.Config.DefaultWifiPassWord;
+import static cn.com.magnity.coresdksample.utils.Config.FFCTemps;
 import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.MSG0;
 import static cn.com.magnity.coresdksample.utils.Config.MSG1;
+import static cn.com.magnity.coresdksample.utils.Config.MSG10;
 import static cn.com.magnity.coresdksample.utils.Config.MSG2;
 import static cn.com.magnity.coresdksample.utils.Config.MSG3;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
@@ -87,6 +89,7 @@ import static cn.com.magnity.coresdksample.utils.Config.MSG5;
 import static cn.com.magnity.coresdksample.utils.Config.MSG6;
 import static cn.com.magnity.coresdksample.utils.Config.MSG7;
 import static cn.com.magnity.coresdksample.utils.Config.MSG8;
+import static cn.com.magnity.coresdksample.utils.Config.MSG9;
 import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.Config.WifiName;
@@ -267,6 +270,56 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         String voice8=msg.obj.toString();
                         MyApplication.getInstance().getTtsUtil().SpeechAdd(voice8, Config.currtentVoiceVolume);
                         Log.i(TAG, "升级语音播报: "+voice8);
+                        break;
+                    case MSG9://延时播放温度摄像头语音
+                        String voice9=msg.obj.toString();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice9, Config.currtentVoiceVolume);
+                        Log.i(TAG, "FFC校准语音播报: "+voice9);
+
+                        if(msg.obj.toString().equals("FFC校准成功")){//校准成功后再保存校准后的数据
+                            int[] temps = new int[160*120];
+                            mDev.lock();
+                            mDev.getTemperatureData(temps,true,true);
+                            mDev.unlock();
+
+                            int []readeFfcs=FFCUtil.readFfc();
+                            for(int i=0;i<readeFfcs.length;i++){
+                                temps[i]=temps[i]-readeFfcs[i];
+                            }
+                            SaveTemps.saveIntTemps(temps,"After");
+                        }
+                        break;
+                    case MSG10://延时播放温度摄像头语音
+                        FFCHolder ffcHolder= (FFCHolder) msg.obj;
+                        String voice10=ffcHolder.getSpeechString();
+                        float targetTemp=ffcHolder.getTemp();
+                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice10, Config.currtentVoiceVolume);
+                        Log.i(TAG, "FFC校准: "+voice10);
+
+                        int[] temps = new int[160*120];
+                        mDev.lock();
+                        mDev.getTemperatureData(temps,true,true);
+                        mDev.unlock();
+
+                        SaveTemps.saveIntTemps(temps,"Origin");//保存原始数据
+
+                        if(targetTemp==1){//如果目标值为1，则表示使用平均值来校准
+                            FFCTemps=FFCUtil.getFFC(temps);
+                        }else {
+                            FFCTemps=FFCUtil.getFFC(temps,(int)targetTemp*1000);
+                        }
+
+                        FFCUtil.saveIntFfc(FFCTemps);//保存校准图
+
+                        SaveTemps.saveIntTemps(FFCTemps,"FFC");
+
+                        Message message=Message.obtain();
+                        message.what=MSG9;
+                        message.obj="FFC校准成功";
+                        MainActivity.DelayStartHandler.sendMessageDelayed(message,2000);
+
+
+
                         break;
                 }
             }

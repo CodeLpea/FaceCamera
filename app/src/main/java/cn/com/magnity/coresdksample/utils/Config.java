@@ -44,6 +44,7 @@ public class Config {
     public static String DefaultWifiName="didano";
     public static String DefaultWifiPassWord="12345678";
     public static float FDistance= (float) 1.2;
+    public static String IsFFC="0";
     /*温度阀值*/
     //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
     //否则同一个人不会反复拍摄同样温度的照片
@@ -51,6 +52,10 @@ public class Config {
     public static float DefaultTempThreshold=30;
     public static int ExploreValue=1; //-3 ---3
     public static int Lithgt=5;
+
+    public static int []FFCTemps;
+
+
 
 
     /*存储键值对的key*/
@@ -75,6 +80,8 @@ public class Config {
     public static final int MSG6 = MSG5+1;//反复加载配置服务
     public static final int MSG7 = MSG6+1;//亮度设置
     public static final int MSG8 = MSG7+1;//更新播报
+    public static final int MSG9 = MSG8+1;//FFC校准播报
+    public static final int MSG10 = MSG9+1;//FFC校准
 
 
  /*   public static String SavaPersonDirName=SavaRootDirName+"/"+"Person"+"/";

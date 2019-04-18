@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import cn.com.magnity.coresdksample.MainActivity;
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
@@ -28,9 +29,12 @@ import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.utils.Config.DdnPropertiesPath;
 import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
+import static cn.com.magnity.coresdksample.utils.Config.IsFFC;
+import static cn.com.magnity.coresdksample.utils.Config.MSG10;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
 import static cn.com.magnity.coresdksample.utils.Config.MSG7;
 import static cn.com.magnity.coresdksample.utils.Config.MSG8;
+import static cn.com.magnity.coresdksample.utils.Config.MSG9;
 import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.clearInfoForFile;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
@@ -51,7 +55,8 @@ public class LoadService extends IntentService {
             "ExploreValue",
             "DeviceName",
             "VersionName",
-            "FDistance"
+            "FDistance",
+            "IsFFC"
 
     };
     private List MyProperties_List = Arrays.asList(MyPropertiesList);//转换为List
@@ -238,6 +243,7 @@ public class LoadService extends IntentService {
         boolean flag=false;
         boolean isSame=true;
         boolean isUpdate=true;
+        boolean isFFC=false;
 
     // 求差集：结果
     Collection MyPropertiesCollection = new ArrayList(MyProperties_List);//默认配置key的集合
@@ -300,6 +306,32 @@ public class LoadService extends IntentService {
                     Config.FDistance= Float.valueOf(keyValueMap.get(propertiesKey).toString());
                     Log.i(TAG, "FDistance: "+  Config.FDistance);
                     break;
+                case  "IsFFC" :
+                    Config.IsFFC= keyValueMap.get(propertiesKey).toString();
+                    Log.i(TAG, "IsFFC: "+  Config.IsFFC);
+                    if(!Config.IsFFC.equals("0")){//如果读到不为0
+
+                        float temp=Float.parseFloat(Config.IsFFC);
+                        FFCHolder myHolder=new FFCHolder();
+                        myHolder.setTemp(temp);
+                        myHolder.setSpeechString("开始校准");
+                        Config.IsFFC="0";
+                        if(clearInfoForFile(DdnPropertiesPath)){   //清空文件
+                            writeTxtToFile();
+                        }//必须在最后，不然会冲掉前面的
+                        Message message=Message.obtain();
+                        message.what=MSG9;
+                        message.obj="10秒钟后开始校准FFC";
+                        MainActivity.DelayStartHandler.sendMessageDelayed(message,2000);
+
+                        Message FFCmessage=Message.obtain();
+                        FFCmessage.what=MSG10;
+                        FFCmessage.obj=myHolder;
+                        MainActivity.DelayStartHandler.sendMessageDelayed(FFCmessage,12000);
+
+                    }
+
+                    break;
             }
         }
 
@@ -326,6 +358,7 @@ public class LoadService extends IntentService {
 }
 
 
+
     /**
      *
      * 将字符串写入到文本文件中
@@ -345,7 +378,8 @@ public class LoadService extends IntentService {
                 +"ExploreValue"+"="+Config.ExploreValue+ "\r\n"
                 +"DeviceName"+"="+Config.DEVICENAME+ "\r\n"
                 +"VersionName"+"="+Config.VERSIONNAME+ "\r\n"
-                +"FDistance"+"="+Config.FDistance+ "\r\n";
+                +"FDistance"+"="+Config.FDistance+ "\r\n"
+                +"IsFFC"+"="+Config.IsFFC+ "\r\n";
         strContent.getBytes();
         strContent=new String(strContent.getBytes(),"GBK");
             File file =new File(DdnPropertiesPath);
