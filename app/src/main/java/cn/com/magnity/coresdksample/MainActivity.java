@@ -448,7 +448,7 @@ private String currentNetName="";
             DelayStartHandler.sendMessageDelayed(message,5000);
             startService(new Intent(this, FtpService.class));
             lampUtil.setlamp(1,500,-1);
-        }else if(!Ethernetip.equals(NoewIp)&&wifiip.equals("0.0.0.0")&&!Ethernetip.equals("127.0.0.1")){//wifi没有连接，而且以太网wifi和之前的不相同
+        }else if(!Ethernetip.equals(NoewIp)&&wifiip.equals("0.0.0.0")&&!Ethernetip.equals("127.0.0.1")&&currentNetName.equals("0x")){//wifi没有连接，而且以太网wifi和之前的不相同
             isEthernet=true;
             NoewIp=EthernetUtil.getEthernetIp();
             Log.i(TAG, "NoewIp: "+NoewIp);
