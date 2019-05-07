@@ -9,62 +9,6 @@
     android:layout_width="match_parent"
     android:layout_weight="1"
     android:layout_height="0dp">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/tv_choose_line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="选择线条："
-            android:textSize="50dp"
-            android:textColor="#dc1a1a"
-            />
-        <Button
-            android:id="@+id/bt_area_up_line"
-            android:textColor="#dc1a1a"
-            android:text="上方线条"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            />
-        <Button
-            android:text="左侧线条"
-            android:textColor="#dc1a1a"
-            android:id="@+id/bt_area_left_line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="50dp"
-            android:layout_marginLeft="50dp"
-            />
-        <Button
-            android:text="右侧线条"
-            android:textColor="#dc1a1a"
-            android:id="@+id/bt_area_right_line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="50dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
-            />
-        <Button
-            android:text="下方线条"
-            android:textColor="#dc1a1a"
-            android:id="@+id/bt_area_bottom_line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="50dp"
-            />
-
-
-
-
-    </RelativeLayout>
 
 </LinearLayout>
     <LinearLayout
@@ -134,8 +78,61 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tv_choose_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择线条："
+            android:textColor="#dc1a1a"
+            android:textSize="50dp" />
+
+        <Button
+            android:id="@+id/bt_area_up_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:text="上方线条"
+            android:textColor="#dc1a1a" />
+
+        <Button
+            android:id="@+id/bt_area_left_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="50dp"
+            android:text="左侧线条"
+            android:textColor="#dc1a1a" />
+
+        <Button
+            android:id="@+id/bt_area_right_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="50dp"
+            android:text="右侧线条"
+            android:textColor="#dc1a1a" />
+
+        <Button
+            android:id="@+id/bt_area_bottom_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="50dp"
+            android:text="下方线条"
+            android:textColor="#dc1a1a" />
 
 
+    </RelativeLayout>
 
 
 </LinearLayout>
