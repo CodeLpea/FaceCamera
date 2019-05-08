@@ -57,6 +57,7 @@ import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.Temp.FFCHolder;
+import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.View.QiuView;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.EthernetUtil;
@@ -273,12 +274,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         MyApplication.getInstance().getTtsUtil().SpeechAdd(voice8, Config.currtentVoiceVolume);
                         Log.i(TAG, "升级语音播报: "+voice8);
                         break;
-                    case MSG9://延时播放温度摄像头语音
+                    case MSG9://延时播放温度摄像头语音，FFC校准成功的播报和测试
                         String voice9=msg.obj.toString();
-                        MyApplication.getInstance().getTtsUtil().SpeechAdd(voice9, Config.currtentVoiceVolume);
-                        Log.i(TAG, "FFC校准语音播报: "+voice9);
-
-                        if(msg.obj.toString().equals("FFC校准成功")){//校准成功后再保存校准后的数据
+                        if(voice9.equals("10秒钟后开始校准FFC")){
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd(voice9, Config.currtentVoiceVolume);
+                            Log.i(TAG, "10秒钟后开始校准FFC: "+voice9);
+                        }
+                        if(voice9.equals("FFC校准成功")){//校准成功后再保存校准后的数据
                             int[] temps = new int[160*120];
                             mDev.lock();
                             mDev.getTemperatureData(temps,true,true);
@@ -298,10 +300,40 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             correctionPara.fTaoFilter=(float)0.85;
                             correctionPara.fDistance=Config.FDistance;
                             mDev.setFixPara(correctionPara);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd(voice9+"    请重新遮挡温度摄像头，五秒后开始测试FFC效果", Config.currtentVoiceVolume);
+                            Log.i(TAG, "FFC校准语音播报: "+voice9);
 
+                            Message message=Message.obtain();
+                            message.what=MSG9;
+                            message.obj="FFC校准后测试";
+                            MainActivity.DelayStartHandler.sendMessageDelayed(message,15000);
+                        }
+                        if(voice9.equals("FFC校准后测试")){
+                            int[] temps=new int[120*160];
+                            mDev.lock();
+                            mDev.getTemperatureData(temps,true,true);
+                            mDev.unlock();
+                            int []AfterTemps=new int[temps.length];
+                            if(FFCTemps.length>10){//本地读取到有效的FFC
+                                for(int i=0;i<AfterTemps.length;i++){
+                                    AfterTemps[i]=temps[i]- FFCTemps[i];
+                                } //将原始数据通过FFc数据处理
+                            }
+                            int[] maxAndmin=TempUtil.MaxMinTemp(AfterTemps);
+                            int cha=maxAndmin[0]-maxAndmin[1];
+                            int max=maxAndmin[0];
+                            int min=maxAndmin[1];
+                            int avg=maxAndmin[2];
+                            int TDEV= TempUtil.DDNgetTdevTemperatureInfo(AfterTemps);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd("TDEV为：    "+String.valueOf(TDEV*0.001f).substring(0,4), Config.currtentVoiceVolume);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd("最大温度为： "+String.valueOf(max*0.001f).substring(0,4), Config.currtentVoiceVolume);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd("最小温度为： "+String.valueOf(min*0.001f).substring(0,4), Config.currtentVoiceVolume);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd("温度极差为： "+String.valueOf(cha*0.001f).substring(0,4), Config.currtentVoiceVolume);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd("平均温度为： "+String.valueOf(avg*0.001f).substring(0,4), Config.currtentVoiceVolume);
+                            MyApplication.getInstance().getTtsUtil().SpeechAdd("测试结束", Config.currtentVoiceVolume);
                         }
                         break;
-                    case MSG10://延时播放温度摄像头语音
+                    case MSG10://延时播放温度摄像头语音，进行多帧率FFC
                         FFCHolder ffcHolder= (FFCHolder) msg.obj;
                         String voice10=ffcHolder.getSpeechString();
                         float targetTemp=ffcHolder.getTemp();
@@ -313,102 +345,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         MuiltFFC(targetTemp);//进入多帧率FFC
 
 
-
-
-                       /* int[] temps = new int[160*120];
-                        mDev.lock();
-                        mDev.getTemperatureData(temps,true,true);
-                        mDev.unlock();
-
-                        SaveTemps.saveIntTemps(temps,"Origin");//保存原始数据
-
-                        if(targetTemp==1){//如果目标值为1，则表示使用平均值来校准
-                            FFCTemps=FFCUtil.getFFC(temps);
-                        }else {
-                            FFCTemps=FFCUtil.getFFC(temps,(int)targetTemp*1000);
-                        }
-
-                        FFCUtil.saveIntFfc(FFCTemps);//保存校准图
-
-                        SaveTemps.saveIntTemps(FFCTemps,"FFC");
-
-                        Message message=Message.obtain();
-                        message.what=MSG9;
-                        message.obj="FFC校准成功";
-                        MainActivity.DelayStartHandler.sendMessageDelayed(message,2000);*/
-
-
-
                         break;
                 }
             }
         };
         //DelayStartHandler.sendEmptyMessageDelayed(MSG2,5000);
     }
-    private int[] FFCZhenTemps=new int[120*160];
-    private int[] FFCZhenTempsALL=new int[120*160];
-    public int zhenCount=10;//间隔多少帧数
-    private int FFCCount=0;//计数
 
-    private void MuiltFFC(float targetTemp){
-    MainActivity.DelayStartHandler.removeMessages(MSG10);
-    FFCCount++;
-    FFCZhenTemps=null;
-    FFCZhenTemps=new int[120*160];
-        /*设置距离为0，避免使用时干扰*/
-        CorrectionPara correctionPara=new CorrectionPara();
-        Log.i(TAG, "getCorrectionPara: "+mDev.getFixPara(correctionPara));
-        Log.i(TAG, "fDistance: "+correctionPara.fDistance);
-        // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
-        Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
-        correctionPara.fTaoFilter=(float)0.85;
-        correctionPara.fDistance=0;
-        mDev.setFixPara(correctionPara);
-
-    mDev.lock();
-    mDev.getTemperatureData(FFCZhenTemps,true,true);
-    mDev.unlock();
-    for(int i=0;i<FFCZhenTemps.length;i++){
-        FFCZhenTempsALL[i]=FFCZhenTemps[i]+FFCZhenTempsALL[i];
-    }
-    if(FFCCount==zhenCount){
-        FFCCount=0;
-        int[] ffctemps=new int[120*160];
-        for(int i=0;i<FFCZhenTemps.length;i++){
-            ffctemps[i]=FFCZhenTempsALL[i]/zhenCount;
-        }
-
-        if(targetTemp==1){//如果目标值为1，则表示使用平均值来校准
-            FFCTemps=FFCUtil.getFFC(ffctemps);
-        }else {
-            FFCTemps=FFCUtil.getFFC(ffctemps,(int)targetTemp*1000);
-        }
-
-        FFCUtil.saveIntFfc(FFCTemps);//保存校准图
-        SaveTemps.saveIntTemps(FFCTemps,"FFC");
-
-        Message message=Message.obtain();
-        message.what=MSG9;
-        message.obj="FFC校准成功";
-
-        FFCZhenTempsALL=null;
-        FFCZhenTempsALL=new int[120*160];//清空总数据，避免下次校准叠加
-
-        MainActivity.DelayStartHandler.sendMessageDelayed(message,2000);
-    }else {
-        FFCHolder myHolder=new FFCHolder();
-        myHolder.setSpeechString("多帧率FFC");
-        myHolder.setTemp(targetTemp);
-
-        Message FFCmessage=Message.obtain();
-        FFCmessage.what=MSG10;
-        FFCmessage.obj=myHolder;
-
-
-
-        MainActivity.DelayStartHandler.sendMessageDelayed(FFCmessage, 70);
-    }
-}
     /**
      * 连接指定的wifi
      * */
@@ -1020,6 +963,67 @@ private String currentNetName="";
         Log.i(TAG, "onRestart: ");
         super.onRestart();
     }
+    private int[] FFCZhenTemps=new int[120*160];
+    private int[] FFCZhenTempsALL=new int[120*160];
+    public int zhenCount=10;//间隔多少帧数
+    private int FFCCount=0;//计数
+/**
+ * 多帧率FFC校准
+ * */
+    private void MuiltFFC(float targetTemp){
+        MainActivity.DelayStartHandler.removeMessages(MSG10);
+        FFCCount++;
+        FFCZhenTemps=null;
+        FFCZhenTemps=new int[120*160];
+        /*设置距离为0，避免使用时干扰*/
+        CorrectionPara correctionPara=new CorrectionPara();
+        Log.i(TAG, "getCorrectionPara: "+mDev.getFixPara(correctionPara));
+        Log.i(TAG, "fDistance: "+correctionPara.fDistance);
+        // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
+        Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
+        correctionPara.fTaoFilter=(float)0.85;
+        correctionPara.fDistance=0;
+        mDev.setFixPara(correctionPara);
 
+        mDev.lock();
+        mDev.getTemperatureData(FFCZhenTemps,true,true);
+        mDev.unlock();
+        for(int i=0;i<FFCZhenTemps.length;i++){
+            FFCZhenTempsALL[i]=FFCZhenTemps[i]+FFCZhenTempsALL[i];
+        }
+        if(FFCCount==zhenCount){
+            FFCCount=0;
+            int[] ffctemps=new int[120*160];
+            for(int i=0;i<FFCZhenTemps.length;i++){
+                ffctemps[i]=FFCZhenTempsALL[i]/zhenCount;
+            }
+
+            if(targetTemp==1){//如果目标值为1，则表示使用平均值来校准
+                FFCTemps=FFCUtil.getFFC(ffctemps);
+            }else {
+                FFCTemps=FFCUtil.getFFC(ffctemps,(int)targetTemp*1000);
+            }
+
+            FFCUtil.saveIntFfc(FFCTemps);//保存校准图
+            SaveTemps.saveIntTemps(FFCTemps,"FFC");
+
+            Message message=Message.obtain();
+            message.what=MSG9;
+            message.obj="FFC校准成功";
+
+            FFCZhenTempsALL=null;
+            FFCZhenTempsALL=new int[120*160];//清空总数据，避免下次校准叠加
+
+            MainActivity.DelayStartHandler.sendMessageDelayed(message,2000);
+        }else {
+            FFCHolder myHolder=new FFCHolder();
+            myHolder.setSpeechString("多帧率FFC");
+            myHolder.setTemp(targetTemp);
+            Message FFCmessage=Message.obtain();
+            FFCmessage.what=MSG10;
+            FFCmessage.obj=myHolder;
+            MainActivity.DelayStartHandler.sendMessageDelayed(FFCmessage, 100);
+        }
+    }
 
 }
