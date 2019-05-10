@@ -30,8 +30,8 @@ public class TempUtil {
 
         Bitmap bmp = null;
         //找到数组中的最大值和最小值
-        int l_data_max = 37000;
-        int l_data_min = 0;
+        int l_data_max = max;
+        int l_data_min = min;
         // Log.i(TAG, "l_data_max : " + (int)l_data_max + " l_data_min : " + (int)l_data_min);
         //根据红外照片值换算成对应的颜色值
         int[] imageColors = new int[m_FrameHeight * m_FrameWidth];

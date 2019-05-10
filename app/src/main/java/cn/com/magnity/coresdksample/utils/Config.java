@@ -45,13 +45,15 @@ public class Config {
     public static String DefaultWifiPassWord="12345678";
     public static float FDistance= (float) 1.2;
     public static String IsFFC="0";
+    public static float FFCcompensation =0;
+
     /*温度阀值*/
     //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
     //否则同一个人不会反复拍摄同样温度的照片
     public static float TempThreshold=30;
     public static float DefaultTempThreshold=30;
     public static int ExploreValue=1; //-3 ---3
-    public static int Lithgt=5;
+    public static boolean ifBlackfFFC =false;
 
     public static int []FFCTemps;
 

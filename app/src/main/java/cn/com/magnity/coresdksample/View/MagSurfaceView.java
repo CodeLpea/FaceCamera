@@ -223,9 +223,9 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             AfterTemps=temps;
         }
 
-
+        int []maxAndmin=TempUtil.MaxMinTemp(AfterTemps);
         final Bitmap bitmap;
-        bitmap= TempUtil.CovertToBitMap(AfterTemps,0,100);//转换为图
+        bitmap= TempUtil.CovertToBitMap(AfterTemps,maxAndmin[1],maxAndmin[0]);//转换为图
 
         Bitmap bitmap1=bitmap.copy(Bitmap.Config.ARGB_8888, true);//复制图，以便编辑
 
@@ -402,7 +402,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
                   int []maxTemp=TempUtil.DDNgetRectTemperatureInfo(temps,area[0],area[1],area[2],area[3]);//获取指定矩形区域中最大的值
 
-                  float maxTmp= (maxTemp[0]*0.001f);
+                  float maxTmp= (maxTemp[0]*0.001f+Config.FFCcompensation);//减去黑体补偿
 
                       if(maxTmp>TempThreshold&&!MyApplication.getInstance().ttsUtil.isSpeaking()){
                           iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片

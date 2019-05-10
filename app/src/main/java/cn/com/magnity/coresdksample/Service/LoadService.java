@@ -36,6 +36,7 @@ import static cn.com.magnity.coresdksample.utils.Config.MSG7;
 import static cn.com.magnity.coresdksample.utils.Config.MSG8;
 import static cn.com.magnity.coresdksample.utils.Config.MSG9;
 import static cn.com.magnity.coresdksample.utils.Config.ReLoadServieAction;
+import static cn.com.magnity.coresdksample.utils.Config.ifBlackfFFC;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.clearInfoForFile;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
 
@@ -56,7 +57,8 @@ public class LoadService extends IntentService {
             "DeviceName",
             "VersionName",
             "FDistance",
-            "IsFFC"
+            "IsFFC",
+            "FFCcompensation"
 
     };
     private List MyProperties_List = Arrays.asList(MyPropertiesList);//转换为List
@@ -328,9 +330,13 @@ public class LoadService extends IntentService {
                         FFCmessage.what=MSG10;
                         FFCmessage.obj=myHolder;
                         MainActivity.DelayStartHandler.sendMessageDelayed(FFCmessage,12000);
-
                     }
-
+                    break;
+                case  "FFCcompensation" :
+                    if(!ifBlackfFFC){//当没有开启黑体校准ffc时候，FFC黑体补偿，随着配置文件而改变
+                        Config.FFCcompensation= Float.valueOf(keyValueMap.get(propertiesKey).toString());
+                    }
+                    Log.i(TAG, "FFCcompensation: "+  Config.FFCcompensation);
                     break;
             }
         }
@@ -338,11 +344,12 @@ public class LoadService extends IntentService {
    /* //求差集
     getPropertiesCollectionRemoveAll.removeAll(MyPropertiesCollection);
     System.out.println("差集结果：" + getPropertiesCollectionRemoveAll);*/
-    if(RetainProperties.size()!=MyProperties_List.size()||getPropertiesList.size()!=MyProperties_List.size()||!isSame){
-        //如果交集个数不匹配，或者读出来的配置文件key个数与默认的不符合，或者设备号或者版本号被人为修改
+    if(RetainProperties.size()!=MyProperties_List.size()||getPropertiesList.size()!=MyProperties_List.size()||!isSame||ifBlackfFFC){
+        //如果交集个数不匹配，或者读出来的配置文件key个数与默认的不符合，或者设备号或者版本号被人为修改,或者进行了黑体校准，需要更新黑体的配置文件。
         // 则清空配置文件，并重新填入读取到的正确的配置文件的缓存值。
         if(clearInfoForFile(DdnPropertiesPath)){   //清空文件
             writeTxtToFile();
+            ifBlackfFFC=false;//回归状态
         }
     }else {//完全符合,则返回ture，进行正常播报
         if(!isUpdate){//读取到新版本就应该更新配置文件
@@ -379,7 +386,8 @@ public class LoadService extends IntentService {
                 +"DeviceName"+"="+Config.DEVICENAME+ "\r\n"
                 +"VersionName"+"="+Config.VERSIONNAME+ "\r\n"
                 +"FDistance"+"="+Config.FDistance+ "\r\n"
-                +"IsFFC"+"="+Config.IsFFC+ "\r\n";
+                +"IsFFC"+"="+Config.IsFFC+ "\r\n"
+                +"FFCcompensation"+"="+Config.FFCcompensation+ "\r\n";
         strContent.getBytes();
         strContent=new String(strContent.getBytes(),"GBK");
             File file =new File(DdnPropertiesPath);
