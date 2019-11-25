@@ -1,5 +1,7 @@
 package cn.com.magnity.coresdksample.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class TimeUitl {
@@ -17,8 +19,29 @@ public class TimeUitl {
             return isAllowClick;
 
         }
+    /**
+     * 延时
+     *
+     * @param ms 毫秒
+     */
+    public static void delayMs(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (Exception e) {
+        }
+    }
 
-
+    /**
+     * 获取格式化后的时间
+     *
+     * @return 2019:11:19:11:22:33
+     */
+    public static String getNowDate() {
+        DateFormat df = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        String dateName = df.format(calendar.getTime());
+        return dateName;
+    }
     /**
      * 获取当前时间
      */

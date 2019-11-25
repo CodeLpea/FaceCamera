@@ -69,6 +69,7 @@ import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
 import cn.com.magnity.coresdksample.utils.WifiUtil;
 import cn.com.magnity.coresdksample.utils.lampUtil;
+import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
@@ -745,6 +746,9 @@ private String currentNetName="";
             Message message=Message.obtain();
             message.what=MSG3;
             message.obj="人脸摄像头开启失败，请检查";
+            RunningInfo runningInfo=new RunningInfo();
+            runningInfo.setCameraStatus("人脸摄像头开启失败，请检查");
+            runningInfo.upload();
             DelayStartHandler.sendMessageDelayed(message,6000);
             lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
             return;

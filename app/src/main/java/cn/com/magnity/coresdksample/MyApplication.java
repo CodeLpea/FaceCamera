@@ -1,6 +1,8 @@
 package cn.com.magnity.coresdksample;
 
 import android.app.Application;
+import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.File;
@@ -10,13 +12,18 @@ import java.util.TimerTask;
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
+import cn.com.magnity.coresdksample.Service.update.SoftWareUpgradeService;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
+import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.ShellUtils;
+import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.TtsUtil;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.logSave;
+import cn.com.magnity.coresdksample.websocket.bean.SoftWareVersionsInfo;
+import cn.com.magnity.coresdksample.websocket.service.WebSocketService;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
@@ -46,7 +53,13 @@ public class MyApplication extends Application {
         Log.i(TAG, "程序启动完成: ");
         init();
         photoNameSaveLog();
+        SoftWareVersionsInfo();
+
+        startService();
     }
+
+
+
     private void init() {
         mDev =new MagDevice();//初始化全局MagDevice
         juGeFaceRect=new JuGeFaceRect();//初始化全局标记框
@@ -60,45 +73,27 @@ public class MyApplication extends Application {
         photoNameSave=new logSave();
         photoNameSave2=new logSave();
     }
+//软件版本信息采集
+    private void SoftWareVersionsInfo(){
+        SoftWareVersionsInfo info = new SoftWareVersionsInfo();
+        //获取app版本号
+        info.setSoftware(AppUtils.getAppVersion(this));
+        //获取android系统版本号
+        info.setSystem(Build.VERSION.RELEASE);
+        info.setTime(TimeUitl.getNowDate());
+        info.setHardWareVersion(Build.DEVICE);
+        //获取内核版本号
+        info.upload();
+        Log.i(TAG,
+                "---------------------SoftWareVersionsInfo: " +
+                        "\n" + info.toString());
+    }
+
+    private void startService() {
+       startService(new Intent(this,WebSocketService.class));
+       startService(new Intent(this,SoftWareUpgradeService.class));
+
+    }
 
 }
-/*测试用例
-   //new lampUtil(Config.LAMP,Config.TIME);
-        Timer timer = new Timer(true);
-//delay为long,period为long：从现在起过delay毫秒以后，每隔period毫秒执行一次。
-        timer.schedule(task1, 10,1000);
-//time为Date类型：在指定时间执行一次。
-        // timer.schedule(task, time);
-//firstTime为Date类型,period为long，表示从firstTime时刻开始，每隔period毫秒执行一次。
-        //  timer.schedule(task, firstTime, period);
-//delay为long,period为long：从现在起过delay毫秒以后，每隔period毫秒执行一次。
-        // timer.schedule(task, delay, period);
-    }
-    final  int[] count = {1};
-    TimerTask task1 = new TimerTask() {
-        public void run() {
-            Log.i(TAG, "   count[0]++: "+count[0]);
-            count[0]++;
-            //每次需要执行的代码放到这里面。
-                if(count[0] % 4== 0){
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
-                    ShellUtils.execCommand("echo 1 > /sys/class/backlight/rk28_bl/blue", false);//蓝灯亮
-                }else if(count[0] % 4== 1) {
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
-                }else if(count[0] % 4== 2) {
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
-                    ShellUtils.execCommand("echo 1 > /sys/class/backlight/rk28_bl/red", false);//红灯亮
-                }
-                else if(count[0] % 4== 3) {
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/blue", false);
-                    ShellUtils.execCommand("echo 0 > /sys/class/backlight/rk28_bl/red", false);
-                }
-           if(count[0]>100){
-                count[0]=1;
-            }
-        }
-    };
-* */
+

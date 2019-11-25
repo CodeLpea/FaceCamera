@@ -8,6 +8,8 @@ import android.util.Log;
 import cn.com.magnity.coresdksample.MainActivity;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 
+import static cn.com.magnity.coresdksample.utils.Config.DdnDownLoadApkPath;
+
 /**
  * 更新后自启动
  * */
@@ -22,6 +24,7 @@ public class UpdateRestartReceiver extends BroadcastReceiver {
             intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent2);
             AppUtils.rmoveApk();//移除apk
+            AppUtils.getRemoveFile(DdnDownLoadApkPath);
 
         }
     }

@@ -94,6 +94,12 @@
         <service
             android:name=".Service.LoadService"
             android:exported="false"></service>
+        <service
+            android:name=".Service.update.SoftWareUpgradeService"
+            android:exported="false"></service>
+        <service
+            android:name=".websocket.service.WebSocketService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

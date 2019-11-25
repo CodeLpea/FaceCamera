@@ -16,15 +16,18 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.NetworkInterface;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
 
+import static cn.com.magnity.coresdksample.utils.Config.DdnDownLoadApkPath;
 import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 
 //跟App相关的辅助类
@@ -45,7 +48,24 @@ public class AppUtils {
         }
         return null;
     }
-
+    /**
+     * 返回当前程序版本
+     */
+    public static String getAppVersion(Context context) {
+        String versionName = "";
+        try {
+            // ---get the package info---
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            //versioncode = pi.versionCode;
+            if (versionName == null || versionName.length() <= 0) {
+                return "";
+            }
+        } catch (Exception e) {
+        }
+        return versionName;
+    }
     /**
      * [获取应用程序版本名称信息]
      * @param context
@@ -232,6 +252,32 @@ public static void rmoveApk(){
         Log.i(TAG, "rmoveApk: ");
     }
 }
+
+    /**
+     * 获取下载的升级包包名
+     * @return
+     */
+    public static void getRemoveFile(String Rootpath){
+        List<File> packages = new ArrayList<>();
+        FlieUtil.getFiles(new File(Rootpath), packages, new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if(file.getName().contains(".apk")){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+        });
+
+        if(!packages.isEmpty()){
+            for (File aPackage : packages) {
+                Log.i(TAG, "getRemoveFile: "+aPackage.getName().trim());
+                aPackage.delete();
+            }
+        }
+
+    }
 
 
 }

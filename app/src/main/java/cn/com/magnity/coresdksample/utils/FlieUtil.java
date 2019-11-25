@@ -6,11 +6,13 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.CharArrayWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirPath;
 
@@ -152,5 +154,20 @@ public class FlieUtil {
         }
         return folderpath;
     }
-
+    /**
+     * 获取指定文件夹下的所有文件包括子目录下的文件
+     * @param file  指定文件夹的File对象
+     * @param fileList 保存指定文件夹下的所有文件File对象
+     */
+    public static void getFiles(File file, List<File> fileList, FileFilter fileFilter){
+        if(file.isDirectory()) {
+            File[] files = file.listFiles(fileFilter);
+            for (File f:
+                    files) {
+                getFiles(f, fileList, fileFilter);
+            }
+        }else{
+            fileList.add(file);
+        }
+    }
 }
