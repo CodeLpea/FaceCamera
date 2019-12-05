@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
+import cn.com.magnity.coresdksample.MyApplication;
+
 /**
  * 对SharedPreference的使用做了建议的封装，
  * 对外公布出put，get，remove，clear等等方法；
@@ -22,22 +24,20 @@ public class PreferencesUtils {
 	 * 保存在手机里面的文件名
 	 */
 	public static final String FILE_NAME = "Hand_Detect";
-
+	public static SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE |Context.MODE_MULTI_PROCESS);
+	public static SharedPreferences.Editor editor = sp.edit();
 	/**
 	 * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法
 	 * SharedPreferences pref = context.getSharedPreferences(
 	 SHAREPREFERENCE_NAME, Context.MODE_PRIVATE |Context.MODE_MULTI_PROCESS);
-
-	 * @param context
 	 * @param key
 	 * @param object
 	 */
 	@SuppressWarnings("unchecked")
-	public static void put(Context context, String key, Object object) {
+	public static void put(String key, Object object) {
 
 		if (object != null) {
-			SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE |Context.MODE_MULTI_PROCESS);
-			SharedPreferences.Editor editor = sp.edit();
+
 			if (object instanceof String) {
 				editor.putString(key, (String) object);
 			} else if (object instanceof Integer) {
@@ -60,13 +60,11 @@ public class PreferencesUtils {
 	/**
 	 * 得到保存数据的方法，我们根据默认值得到保存的数据的具体类型，然后调用相对于的方法获取值
 	 * 
-	 * @param context
 	 * @param key
 	 * @param defaultObject
 	 * @return
 	 */
-	public static Object get(Context context, String key, Object defaultObject) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static Object get(String key, Object defaultObject) {
 		if (defaultObject instanceof String) {
 			return sp.getString(key, (String) defaultObject);
 		} else if (defaultObject instanceof Integer) {
@@ -81,52 +79,41 @@ public class PreferencesUtils {
 		return null;
 	}
 
-	public static Boolean getBoolean(Context context, String key, Boolean defaultValue) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static Boolean getBoolean(String key, Boolean defaultValue) {
 		return sp.getBoolean(key, defaultValue);
 	}
 
-	public static String getString(Context context, String key, String defaultValue) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static String getString( String key, String defaultValue) {
 		return sp.getString(key, defaultValue);
 	}
 
-	public static Integer getInt(Context context, String key, int defaultValue) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static Integer getInt(String key, int defaultValue) {
+
 		return sp.getInt(key, defaultValue);
 	}
 
-	public static Float getFloat(Context context, String key, float defaultValue) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static Float getFloat( String key, float defaultValue) {
 		return sp.getFloat(key, defaultValue);
 	}
 
-	public static Long getLong(Context context, String key, long defaultValue) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static Long getLong(String key, long defaultValue) {
 		return sp.getLong(key, defaultValue);
 	}
 
 	/**
 	 * 移除某个key值已经对应的值
-	 * 
-	 * @param context
 	 * @param key
 	 */
-	public static void remove(Context context, String key) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sp.edit();
+	public static void remove(String key) {
 		editor.remove(key);
 		SharedPreferencesCompat.apply(editor);
 	}
 
 	/**
 	 * 清除所有数据
-	 * 
-	 * @param context
+	 *
 	 */
-	public static void clear(Context context) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sp.edit();
+	public static void clear() {
 		editor.clear();
 		editor.commit();
 		SharedPreferencesCompat.apply(editor);
@@ -134,24 +121,20 @@ public class PreferencesUtils {
 
 	/**
 	 * 查询某个key是否已经存在
-	 * 
-	 * @param context
+	 *
 	 * @param key
 	 * @return
 	 */
-	public static boolean contains(Context context, String key) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static boolean contains(String key) {
 		return sp.contains(key);
 	}
 
 	/**
 	 * 返回所有的键值对
-	 * 
-	 * @param context
+	 *
 	 * @return
 	 */
-	public static Map<String, ?> getAll(Context context) {
-		SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+	public static Map<String, ?> getAll() {
 		return sp.getAll();
 	}
 

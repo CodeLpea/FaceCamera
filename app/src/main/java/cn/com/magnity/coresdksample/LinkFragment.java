@@ -247,7 +247,7 @@ private int conut=1;
                             /* 拔出*/
                            /* Log.i(TAG, "linkResult: 拔出");
                             lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
-                            MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);*/
+                            MyApplication.getInstance().ttsSpeak.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);*/
                             //stop();
                              isplay=false;
                             isQuest=false;//修改状态，方便下次进入连接流程
@@ -316,7 +316,7 @@ private int conut=1;
             try{
                 if(mDev.isProcessingImage()){
                     Log.i(TAG, "旋转巨哥画面");
-                   // MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已经连接",currtentVoiceVolume);
+                   // MyApplication.getInstance().ttsSpeak.SpeechAdd("热成像摄像头已经连接",currtentVoiceVolume);
                     mDev.stopProcessImage();
                     mVideoFragment.stopDrawingThread();
                     mDev.setImageTransform(0, 3);//在设置旋转方向之前要停止预览和标记操作

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.lampUtil;
+import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 import static cn.com.magnity.coresdksample.MyApplication.isInit;
@@ -38,7 +39,7 @@ public class UsbReceiver extends BroadcastReceiver {
                 Log.i(TAG, "人脸摄像头已连接，请重新开关机: ");
                 runningInfo.setCameraStatus("人脸摄像头已连接，请重新开关机: ");
                 lampUtil.setlamp(1,500,-1);//设置默认的故障灯光
-                MyApplication.getInstance().ttsUtil.SpeechAdd("人脸摄像头已连接，请重新开关机",currtentVoiceVolume);
+                TtsSpeak.getInstance().SpeechAdd("人脸摄像头已连接，请重新开关机",currtentVoiceVolume);
             }
         } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
         /*    Log.e(TAG, "USB device is Detached:deviceName:       " + deviceName);
@@ -50,12 +51,12 @@ public class UsbReceiver extends BroadcastReceiver {
                 Log.i(TAG, "人脸摄像头已拔出: ");
                 runningInfo.setCameraStatus("人脸摄像头已拔出: ");
                 lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
-                MyApplication.getInstance().ttsUtil.SpeechAdd("人脸摄像头已拔出",currtentVoiceVolume);
+                TtsSpeak.getInstance().SpeechAdd("人脸摄像头已拔出",currtentVoiceVolume);
             }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isplay==false&&isInit==false){
                 Log.i(TAG, "热成像摄像头已拔出: ");
                 runningInfo.setInfrared_camera_status("热成像摄像头已拔出: ");
                 lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
-                MyApplication.getInstance().ttsUtil.SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
+                TtsSpeak.getInstance().SpeechAdd("热成像摄像头已拔出",currtentVoiceVolume);
             }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isInit==true){
                 Log.i(TAG, "完成热成像摄像头初始化: ");
                 runningInfo.setInfrared_camera_status("完成热成像摄像头初始化: ");

@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -32,7 +33,8 @@ import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 
 //跟App相关的辅助类
 public class AppUtils {
-    private static final  String  TAG="AppUtils";
+    private static final String TAG = "AppUtils";
+
     /**
      * 获取应用程序名称
      */
@@ -48,6 +50,7 @@ public class AppUtils {
         }
         return null;
     }
+
     /**
      * 返回当前程序版本
      */
@@ -66,8 +69,10 @@ public class AppUtils {
         }
         return versionName;
     }
+
     /**
      * [获取应用程序版本名称信息]
+     *
      * @param context
      * @return 当前应用的版本名称
      */
@@ -86,6 +91,7 @@ public class AppUtils {
 
     /**
      * [获取应用程序版本名称信息]
+     *
      * @param context
      * @return 当前应用的版本名称
      */
@@ -104,6 +110,7 @@ public class AppUtils {
 
     /**
      * [获取应用程序版本名称信息]
+     *
      * @param context
      * @return 当前应用的版本名称
      */
@@ -122,6 +129,7 @@ public class AppUtils {
 
     /**
      * 获取图标 bitmap
+     *
      * @param context
      */
     public static synchronized Bitmap getBitmap(Context context) {
@@ -140,6 +148,7 @@ public class AppUtils {
         Bitmap bm = bd.getBitmap();
         return bm;
     }
+
     /**
      * 根据wifi信息获取本地mac
      *
@@ -150,11 +159,19 @@ public class AppUtils {
         WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo winfo = wifi.getConnectionInfo();
         String mac = winfo.getMacAddress();
+        //6.0以上获取mac地址
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mac = getMacFromHardware();
+        }
+        //不保留冒号
+        mac = mac.replace(":", "");
         return mac;
     }
+
     /**
      * 根据wifi信息获取本地mac
-     *7.0权限
+     * 7.0权限
+     *
      * @param
      * @return
      */
@@ -184,10 +201,11 @@ public class AppUtils {
         }
         return "02:00:00:00:00:00";
     }
+
     /**
      * 执行具体的静默安装逻辑，需要手机ROOT。
-     * @param apkPath
-     *          要安装的apk文件的路径
+     *
+     * @param apkPath 要安装的apk文件的路径
      * @return 安装成功返回true，安装失败返回false。
      */
     public static boolean install(String apkPath) {
@@ -219,7 +237,7 @@ public class AppUtils {
                 //安装成功后的操作
 
                 //静态注册自启动广播
-                Intent intent=new Intent();
+                Intent intent = new Intent();
                 //与清单文件的receiver的anction对应
                 intent.setAction("android.intent.action.PACKAGE_REPLACED");
                 //发送广播
@@ -241,38 +259,40 @@ public class AppUtils {
         }
         return result;
     }
-/***
- * 删除已经安装的apk
- * */
-public static void rmoveApk(){
 
-    File outputFile = new File(DdnUpdateApkPath);
-    if(outputFile.exists()){
-        outputFile.delete();
-        Log.i(TAG, "rmoveApk: ");
+    /***
+     * 删除已经安装的apk
+     * */
+    public static void rmoveApk() {
+
+        File outputFile = new File(DdnUpdateApkPath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+            Log.i(TAG, "rmoveApk: ");
+        }
     }
-}
 
     /**
      * 获取下载的升级包包名
+     *
      * @return
      */
-    public static void getRemoveFile(String Rootpath){
+    public static void getRemoveFile(String Rootpath) {
         List<File> packages = new ArrayList<>();
         FlieUtil.getFiles(new File(Rootpath), packages, new FileFilter() {
             @Override
             public boolean accept(File file) {
-                if(file.getName().contains(".apk")){
+                if (file.getName().contains(".apk")) {
                     return true;
-                }else {
+                } else {
                     return false;
                 }
             }
         });
 
-        if(!packages.isEmpty()){
+        if (!packages.isEmpty()) {
             for (File aPackage : packages) {
-                Log.i(TAG, "getRemoveFile: "+aPackage.getName().trim());
+                Log.i(TAG, "getRemoveFile: " + aPackage.getName().trim());
                 aPackage.delete();
             }
         }

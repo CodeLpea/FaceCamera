@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample.utils;
+package cn.com.magnity.coresdksample.utils.voice;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -9,17 +9,26 @@ import com.iflytek.thirdparty.E;
 
 import java.util.Locale;
 
+import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
-public class TtsUtil {
-    private static final String TAG="TtsUtil";
+public class TtsSpeak {
+    private static final String TAG="TtsSpeak";
     private Context context;
     public TextToSpeech textToSpeech;
      //定义AudioManager，控制播放音量
     private AudioManager mgr;
     private int maxVolume;
     private int currentVolume;
-    public TtsUtil(Context context) {
+    // 单例模式中获取唯一的TtsSpeek实例
+    private static TtsSpeak instance;
+    public static TtsSpeak getInstance() {
+        if (instance == null) {
+            instance = new TtsSpeak(MyApplication.getInstance());
+        }
+        return instance;
+    }
+    public TtsSpeak(Context context) {
         this.context=context;
         //实例化
         mgr = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
@@ -35,8 +44,8 @@ public class TtsUtil {
             public void onInit(int status) {
                 if (status == textToSpeech.SUCCESS) {
                     int result = textToSpeech.setLanguage(Locale.CHINA);//安卓自带的Pico TTS，并不支持中文。所以需要安装 科大讯飞 tts1.0语音包。需要手动完成。
-                    Log.i(TAG, "TtsUtil:status "+status);
-                    Log.i(TAG, "TtsUtil:result "+result);
+                    Log.i(TAG, "TtsSpeak:status "+status);
+                    Log.i(TAG, "TtsSpeak:result "+result);
                     if (result == TextToSpeech.LANG_AVAILABLE){
                         Log.e(TAG, "onInit: 不支持当前语言");
                         setVoiceInfo("不支持中文语音包，需要手动安装科大讯飞tts");
@@ -69,10 +78,24 @@ public class TtsUtil {
        // Log.i(TAG, "SpeechAdd: result"+result);
       //  Log.i(TAG, "GetVoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
     }
+    /**
+     * 设置音量
+     * */
     public void SetVoiceVolume(int tempVolume){
             mgr.setStreamVolume(AudioManager.STREAM_MUSIC,tempVolume,0);//tempVolume:音量绝对值
            // Log.i(TAG, "当前音量VoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
     }
+
+    /**
+     * 设置语速
+     * 1.0位正常语速
+     * 线性变换
+     * 0.5为一般速度，2为两倍速
+     * */
+    public void setSpeed(float rate){
+        textToSpeech.setSpeechRate(rate);
+    }
+
     /**
      *
      * 如果当前有播报，则不播报

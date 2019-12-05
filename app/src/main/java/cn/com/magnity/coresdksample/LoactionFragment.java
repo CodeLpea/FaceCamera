@@ -2,8 +2,6 @@ package cn.com.magnity.coresdksample;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -91,8 +89,8 @@ public class LoactionFragment extends Fragment implements View.OnClickListener {
                 Log.i(TAG, "右移动: ");
                 break;
             case R.id.bt_location_save:
-                PreferencesUtils.put(getActivity(),Config.KeyXplace,Config.XPalce);
-                PreferencesUtils.put(getActivity(),Config.KeyYplace,Config.YPalce);
+                PreferencesUtils.put(Config.KeyXplace,Config.XPalce);
+                PreferencesUtils.put(Config.KeyYplace,Config.YPalce);
                 Log.i(TAG, "保存，成功");
                 break;
 

@@ -203,10 +203,10 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
 
                 //保存
             case R.id.bt_area_save:
-                PreferencesUtils.put(getActivity(),Config.KeyAreaLineUp,AreaUp);
-                PreferencesUtils.put(getActivity(),Config.KeyAreaLineLeft,AreaLeft);
-                PreferencesUtils.put(getActivity(),Config.KeyAreaLineRight,AreaRight);
-                PreferencesUtils.put(getActivity(),Config.KeyAreaLineBottom,AreaBottom);
+                PreferencesUtils.put(Config.KeyAreaLineUp,AreaUp);
+                PreferencesUtils.put(Config.KeyAreaLineLeft,AreaLeft);
+                PreferencesUtils.put(Config.KeyAreaLineRight,AreaRight);
+                PreferencesUtils.put(Config.KeyAreaLineBottom,AreaBottom);
                 Toast.makeText(getActivity(),"已经保存成功",Toast.LENGTH_SHORT).show();
                 break;
 

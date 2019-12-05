@@ -1,7 +1,6 @@
 package cn.com.magnity.coresdksample.Service;
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Environment;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -10,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,18 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import cn.com.magnity.coresdksample.MainActivity;
-import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
-import cn.com.magnity.coresdksample.utils.lampUtil;
 
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.utils.Config.DdnPropertiesPath;
 import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 import static cn.com.magnity.coresdksample.utils.Config.InitLoadServieAction;
-import static cn.com.magnity.coresdksample.utils.Config.IsFFC;
 import static cn.com.magnity.coresdksample.utils.Config.MSG10;
 import static cn.com.magnity.coresdksample.utils.Config.MSG4;
 import static cn.com.magnity.coresdksample.utils.Config.MSG7;
@@ -146,14 +141,14 @@ public class LoadService extends IntentService {
     }
 
     private void LoadFacePlace() {
-        Config.XPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyXplace,-18);
-        Config.YPalce=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyYplace,6);
+        Config.XPalce=(Integer) PreferencesUtils.get(Config.KeyXplace,-18);
+        Config.YPalce=(Integer) PreferencesUtils.get(Config.KeyYplace,6);
         Log.i(TAG, "LoadFacePlace: X  = "+Config.XPalce);
         Log.i(TAG, "LoadFacePlace: Y  = "+Config.YPalce);
-        Config.AreaUp=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyAreaLineUp,45);
-        Config.AreaLeft=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyAreaLineLeft,114);
-        Config.AreaRight=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyAreaLineRight,448);
-        Config.AreaBottom=(Integer) PreferencesUtils.get(getApplicationContext(),Config.KeyAreaLineBottom,576);
+        Config.AreaUp=(Integer) PreferencesUtils.get(Config.KeyAreaLineUp,45);
+        Config.AreaLeft=(Integer) PreferencesUtils.get(Config.KeyAreaLineLeft,114);
+        Config.AreaRight=(Integer) PreferencesUtils.get(Config.KeyAreaLineRight,448);
+        Config.AreaBottom=(Integer) PreferencesUtils.get(Config.KeyAreaLineBottom,576);
 
         Log.i(TAG, "LoadFacePlace: AreaUp:       "+ Config.AreaUp);
         Log.i(TAG, "LoadFacePlace: AreaLeft:     "+ Config.AreaLeft);
@@ -188,7 +183,7 @@ public class LoadService extends IntentService {
                 message.what=MSG4;
                 message.obj="读取配置文件失败,请检查";
                 MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
-                //MyApplication.getInstance().ttsUtil.SpeechFlush("读取配置文件失败",8);
+                //MyApplication.getInstance().ttsSpeak.SpeechFlush("读取配置文件失败",8);
             }
         }else {//装载为默认值
         }
