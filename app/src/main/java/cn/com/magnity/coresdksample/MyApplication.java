@@ -45,7 +45,7 @@ public class MyApplication extends Application {
         Log.i(TAG, "程序启动完成: ");
         init();
         photoNameSaveLog();
-        SoftWareVersionsInfo();
+
 
     }
 
@@ -66,21 +66,7 @@ public class MyApplication extends Application {
         photoNameSave=new logSave();
         photoNameSave2=new logSave();
     }
-//软件版本信息采集
-    private void SoftWareVersionsInfo(){
-        SoftWareVersionsInfo info = new SoftWareVersionsInfo();
-        //获取app版本号
-        info.setSoftware(AppUtils.getAppVersion(this));
-        //获取android系统版本号
-        info.setSystem(Build.VERSION.RELEASE);
-        info.setTime(TimeUitl.getNowDate());
-        info.setHardWareVersion(Build.DEVICE);
-        //获取内核版本号
-        info.upload();
-        Log.i(TAG,
-                "---------------------SoftWareVersionsInfo: " +
-                        "\n" + info.toString());
-    }
+
 
 
 }

@@ -87,6 +87,8 @@ public class Config {
     //区域线的位置key
     public static String KeyAreaLineBottom = "KeyAreaLineBottom";
 
+    public static String MAC_ADRESS = "MAC_ADRESS";
+
 
     /*静态语音延迟播放Hanlder的MSG*/
     public static final int MSG1 = 100;//自动连接指定的wifi

@@ -28,6 +28,7 @@ import java.util.List;
 import cn.com.magnity.coresdksample.MyApplication;
 
 import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
+import static cn.com.magnity.coresdksample.utils.Config.MAC_ADRESS;
 
 //跟App相关的辅助类
 public class AppUtils {
@@ -154,15 +155,31 @@ public class AppUtils {
      * @return
      */
     public static String getLocalMacAddressFromWifiInfo(Context context) {
+        String mac=null;
+        String mac_local_adress = PreferencesUtils.getString(MAC_ADRESS, "");
+        Log.i(TAG, "mac_local_adress: "+mac_local_adress);
+        //判断本地数据是否保存有，有的话就直接用
+        if(!mac_local_adress.equals("02000000000")&&!mac_local_adress.equals("")){
+            mac=PreferencesUtils.getString("MAC_ADRESS","");
+            Log.i(TAG, "直接用mac: "+mac);
+            return mac;
+        }
         WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        Log.i(TAG, "wifi: "+wifi.toString());
         WifiInfo winfo = wifi.getConnectionInfo();
-        String mac = winfo.getMacAddress();
+        Log.i(TAG, "winfo: "+winfo.toString());
+        mac = winfo.getMacAddress();
+        Log.i(TAG, "winfo.getMacAddress()"+winfo.getMacAddress());
+        Log.i(TAG, "mac: "+mac.toString());
         //6.0以上获取mac地址
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mac = getMacFromHardware();
         }
         //不保留冒号
-        mac = mac.replace(":", "");
+        if(mac.contains(":")){
+            mac = mac.replace(":", "");
+        }
+        PreferencesUtils.put(MAC_ADRESS,mac);
         return mac;
     }
 
