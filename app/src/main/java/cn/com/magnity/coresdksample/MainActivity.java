@@ -56,6 +56,7 @@ import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.Service.LoadService;
+import cn.com.magnity.coresdksample.Service.ServiceManager;
 import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.View.QiuView;
@@ -191,10 +192,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         //初始化ftp
         // initFtp();
-
+        startService();
 
     }
-
+    private void startService() {
+        ServiceManager.getInstance().startServices();
+    }
     /**
      * 启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
      * 反复加载配置文件
@@ -722,6 +725,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mDev = null;
 
         stopService(new Intent(this, FtpService.class));
+        //关闭所有通用服务
+        ServiceManager.getInstance().stopServices();
 
         super.onDestroy();
     }

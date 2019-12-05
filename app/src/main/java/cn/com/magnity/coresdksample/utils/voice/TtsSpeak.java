@@ -46,7 +46,7 @@ public class TtsSpeak {
                     int result = textToSpeech.setLanguage(Locale.CHINA);//安卓自带的Pico TTS，并不支持中文。所以需要安装 科大讯飞 tts1.0语音包。需要手动完成。
                     Log.i(TAG, "TtsSpeak:status "+status);
                     Log.i(TAG, "TtsSpeak:result "+result);
-                    if (result == TextToSpeech.LANG_AVAILABLE){
+                    if (result == TextToSpeech.LANG_NOT_SUPPORTED){
                         Log.e(TAG, "onInit: 不支持当前语言");
                         setVoiceInfo("不支持中文语音包，需要手动安装科大讯飞tts");
 

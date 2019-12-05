@@ -1,7 +1,5 @@
 package cn.com.magnity.coresdksample.utils;
 
-import android.os.Environment;
-
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,7 +7,6 @@ import java.io.IOException;
 
 import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirPath;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFileName;
-import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 
 public class logSave {
     public logSave() {

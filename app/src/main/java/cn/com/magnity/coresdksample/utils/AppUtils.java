@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -28,7 +27,6 @@ import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
 
-import static cn.com.magnity.coresdksample.utils.Config.DdnDownLoadApkPath;
 import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
 
 //跟App相关的辅助类

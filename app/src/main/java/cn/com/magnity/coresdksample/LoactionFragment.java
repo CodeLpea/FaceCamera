@@ -74,23 +74,23 @@ public class LoactionFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.bt_location_up:
                 Log.i(TAG, "上移动: ");
-                Config.YPalce=Config.YPalce+1;
+                Config.YPalce= Config.YPalce+1;
                 break;
             case R.id.bt_location_bottom:
-                Config.YPalce=Config.YPalce-1;
+                Config.YPalce= Config.YPalce-1;
                 Log.i(TAG, "下移动: ");
                 break;
             case R.id.bt_location_left:
-                Config.XPalce=Config.XPalce-1;
+                Config.XPalce= Config.XPalce-1;
                 Log.i(TAG, "左移动: ");
                 break;
             case R.id.bt_location_right:
-                Config.XPalce=Config.XPalce+1;
+                Config.XPalce= Config.XPalce+1;
                 Log.i(TAG, "右移动: ");
                 break;
             case R.id.bt_location_save:
-                PreferencesUtils.put(Config.KeyXplace,Config.XPalce);
-                PreferencesUtils.put(Config.KeyYplace,Config.YPalce);
+                PreferencesUtils.put(Config.KeyXplace, Config.XPalce);
+                PreferencesUtils.put(Config.KeyYplace, Config.YPalce);
                 Log.i(TAG, "保存，成功");
                 break;
 

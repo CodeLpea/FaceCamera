@@ -215,7 +215,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         }
 
         int []AfterTemps=new int[temps.length];
-        if(FFCTemps.length>10){//本地读取到有效的FFC
+        //本地读取到有效的FFC
+        if(FFCTemps.length>10){
             for(int i=0;i<AfterTemps.length;i++){
                 AfterTemps[i]=temps[i]- FFCTemps[i];
             } //将原始数据通过FFc数据处理
@@ -260,10 +261,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         } else {
             paint.setStrokeWidth(2);//设置画笔的粗度
         }
-        int drawL=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
-        int drawR=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-        int drawU=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
-        int drawD=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
+        int drawL= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
+        int drawR= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
+        int drawU=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
+        int drawD=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ Config.YPalce;
 
         drawL=drawL * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
         drawR=drawR * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
@@ -395,10 +396,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                  * @param bitmap1*/
              private  void GetRectTemperature(CameraInfo cameraInfo, int[] temps, Bitmap bitmap1){
 
-                  int x0=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
-                  int x1=Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-                  int y0=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+Config.YPalce;
-                  int y1=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+Config.YPalce;
+                  int x0= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
+                  int x1= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
+                  int y0=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ Config.YPalce;
+                  int y1=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ Config.YPalce;
                   int area[]=AreaUtil.AreaLimit(x0,x1,y0,y1);
 
                   int []maxTemp=TempUtil.DDNgetRectTemperatureInfo(temps,area[0],area[1],area[2],area[3]);//获取指定矩形区域中最大的值

@@ -11,6 +11,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import static cn.com.magnity.coresdksample.utils.Config.Temp_DIR;
+
 /**
  *  获取到FFC
  *  存储FFC数据图
@@ -24,7 +26,7 @@ public class FFCUtil {
 
     private static BufferedWriter bufferedWriter;
     private static BufferedReader bufferedReader;
-    private static   String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Temp" + File.separator + "FFC.txt";
+    private static   String path = Temp_DIR + File.separator + "FFC.txt";
 
     public FFCUtil() {
     }
@@ -75,12 +77,10 @@ public class FFCUtil {
 
 
     public static void saveIntFfc(int[] a) {
-        File file1 = Environment.getExternalStorageDirectory();
-        file1 = new File(file1, "Temp/");
+        File file1 =new File(Temp_DIR);
         if (!file1.exists()) {
             file1.mkdirs();
         }
-
 
       /*  SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
         String formatStr = formatter.format(new Date());*/
@@ -114,8 +114,7 @@ public class FFCUtil {
 
 
     public static int[] readFfc(){
-        File file1 = Environment.getExternalStorageDirectory();
-        file1 = new File(file1, "Temp/");
+        File file1 =new File(Temp_DIR);
         if (!file1.exists()) {
             file1.mkdirs();
         }

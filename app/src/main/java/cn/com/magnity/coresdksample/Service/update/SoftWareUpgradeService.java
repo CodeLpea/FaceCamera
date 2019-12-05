@@ -7,7 +7,6 @@ import android.util.Log;
 
 
 import java.io.File;
-import java.sql.Time;
 
 import cn.com.magnity.coresdksample.Http.Model.UpgradePackageVersionInfoEntry;
 import cn.com.magnity.coresdksample.Http.RetrofitClient;

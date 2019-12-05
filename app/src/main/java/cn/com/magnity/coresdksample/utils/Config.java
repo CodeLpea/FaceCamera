@@ -8,28 +8,42 @@ import java.io.File;
  * 配置信息
  */
 public class Config {
-    /*拍照标记*/
-    public static boolean iftaken; //拍照状态按钮
+
+    /*文件保存目录*/
+
+    //程序数据存储的主路径
+    public static final String ROOT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "DdnTempCamera";
+    //程序运行日志存放路径
+    public static final String XLOG_DIR = ROOT_DIR + File.separator + "xlog";
+    //设备配置文件路径
+    public static final String CONFIG_DIR = ROOT_DIR + File.separator + "config";
+    //数据库存储路径
+    public static final String DB_DIR = ROOT_DIR + File.separator + "databases";
+    //缓存保存温度摄像头和摄像头的照片
+    public static final String TMP_CACHE_PIC_DIR = ROOT_DIR + File.separator + "tmp";
+    //照片保存路径
+    public static final String SavaRootDirPath = ROOT_DIR + File.separator + "Pictures";
+    //配置文件路径
+    public static final String DdnPropertiesPath = ROOT_DIR+ "/" + "DdnProperties.txt";
+    //ftp形式升级的apk文件目录
+    public static final String DdnUpdateApkPath = ROOT_DIR + "/" + "DdnTemp.apk";
+    //远程升级apk下载路径
+    public static final String DdnDownLoadApkPath = ROOT_DIR + File.separator +"download";
+    //温度摄像头校准参数保存
+    public static final String Temp_DIR=ROOT_DIR+ File.separator + "Temp";
 
 
     /*x方向校准参数，y方向校准参数*/
     public static int XPalce = 1;//
     public static int YPalce = 1;
-
     /*有效区域的划线*/
     public static int AreaUp = 45;
     public static int AreaLeft = 114;
     public static int AreaRight = 448;
     public static int AreaBottom = 576;
+    /*拍照标记*/
+    public static boolean iftaken; //拍照状态按钮
 
-
-    /*文件保存目录*/
-    public static String SavaRootDirName = "DdnTemp";
-    public static String SavaRootDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "DdnTempImg";
-    public static String DdnPropertiesPath = Environment.getExternalStorageDirectory().getPath() + "/" + "DdnProperties.txt";//配置文件路径
-    public static String DdnUpdateApkPath = Environment.getExternalStorageDirectory().getPath() + "/" + "DdnTemp.apk";//配置文件路径
-    public static String DdnDownLoadApkPath = Environment.getExternalStorageDirectory().getPath() + "/"+SavaRootDirName+"/"+"download";//配置文件路径
-    public static String SavaTestDirName = "Test";
 
     /*系统运行状态标记，用来显示灯光*/
     public static int LAMP = 1;//1:绿色，2:红色
@@ -57,17 +71,21 @@ public class Config {
     public static int ExploreValue = 1; //-3 ---3
     public static boolean ifBlackfFFC = false;
 
+    //FFC校准矩阵
     public static int[] FFCTemps;
 
 
     /*存储键值对的key*/
-    public static String DdnProperties = "DdnProperties.txt";
     public static String KeyXplace = "KeyXplace";
     public static String KeyYplace = "KeyYplace";
-    public static String KeyAreaLineUp = "KeyAreaLineUp";//区域线的位置key
-    public static String KeyAreaLineLeft = "KeyAreaLineLeft";//区域线的位置key
-    public static String KeyAreaLineRight = "KeyAreaLineRight";//区域线的位置key
-    public static String KeyAreaLineBottom = "KeyAreaLineBottom";//区域线的位置key
+    //区域线的位置key
+    public static String KeyAreaLineUp = "KeyAreaLineUp";
+    //区域线的位置key
+    public static String KeyAreaLineLeft = "KeyAreaLineLeft";
+    //区域线的位置key
+    public static String KeyAreaLineRight = "KeyAreaLineRight";
+    //区域线的位置key
+    public static String KeyAreaLineBottom = "KeyAreaLineBottom";
 
 
     /*静态语音延迟播放Hanlder的MSG*/
@@ -82,10 +100,6 @@ public class Config {
     public static final int MSG8 = MSG7 + 1;//更新播报
     public static final int MSG9 = MSG8 + 1;//FFC校准播报
     public static final int MSG10 = MSG9 + 1;//FFC校准
-
-
- /*   public static String SavaPersonDirName=SavaRootDirName+"/"+"Person"+"/";
-    public static String SavaJuGeDirName=SavaRootDirName+"/"+"JuGe"+"/";*/
 
 
     /*IntentAction*/

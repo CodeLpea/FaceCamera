@@ -1,24 +1,24 @@
 package cn.com.magnity.coresdksample;
 
 import android.app.Application;
-import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
-import cn.com.magnity.coresdksample.Service.update.SoftWareUpgradeService;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
+import cn.com.magnity.coresdksample.utils.SPUtil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.logSave;
 import cn.com.magnity.coresdksample.websocket.bean.SoftWareVersionsInfo;
-import cn.com.magnity.coresdksample.websocket.service.WebSocketService;
+
+import static cn.com.magnity.coresdksample.utils.Config.CONFIG_DIR;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
@@ -47,7 +47,6 @@ public class MyApplication extends Application {
         photoNameSaveLog();
         SoftWareVersionsInfo();
 
-        startService();
     }
 
 
@@ -59,6 +58,8 @@ public class MyApplication extends Application {
         TtsSpeak.getInstance();//初始化全局语音播放工具
         new lampUtil(Config.LAMP,Config.TIME);
         LogcatHelper.getInstance(this).start();//启动日志
+
+        SPUtil.assignDir(CONFIG_DIR);
 
     }
     private void   photoNameSaveLog() {
@@ -81,11 +82,6 @@ public class MyApplication extends Application {
                         "\n" + info.toString());
     }
 
-    private void startService() {
-       startService(new Intent(this,WebSocketService.class));
-       startService(new Intent(this,SoftWareUpgradeService.class));
-
-    }
 
 }
 

@@ -143,8 +143,8 @@ public class LoadService extends IntentService {
     private void LoadFacePlace() {
         Config.XPalce=(Integer) PreferencesUtils.get(Config.KeyXplace,-18);
         Config.YPalce=(Integer) PreferencesUtils.get(Config.KeyYplace,6);
-        Log.i(TAG, "LoadFacePlace: X  = "+Config.XPalce);
-        Log.i(TAG, "LoadFacePlace: Y  = "+Config.YPalce);
+        Log.i(TAG, "LoadFacePlace: X  = "+ Config.XPalce);
+        Log.i(TAG, "LoadFacePlace: Y  = "+ Config.YPalce);
         Config.AreaUp=(Integer) PreferencesUtils.get(Config.KeyAreaLineUp,45);
         Config.AreaLeft=(Integer) PreferencesUtils.get(Config.KeyAreaLineLeft,114);
         Config.AreaRight=(Integer) PreferencesUtils.get(Config.KeyAreaLineRight,448);

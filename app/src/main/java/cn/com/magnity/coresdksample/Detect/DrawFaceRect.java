@@ -175,7 +175,7 @@ public class DrawFaceRect {
         canvas.drawLine(0,Config.AreaBottom,PREVIEW__WIDTH,Config.AreaBottom,paint);*/
        /* Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
         Log.i(TAG, "xPlace: "+xPlace);*/
-        if(Config.AreaLeft<=xPlace&&xPlace<=Config.AreaRight&&Config.AreaBottom>=yPlace&&Config.AreaUp<=yPlace){
+        if(Config.AreaLeft<=xPlace&&xPlace<= Config.AreaRight&& Config.AreaBottom>=yPlace&& Config.AreaUp<=yPlace){
            //左侧小于x
            //右侧大于x
            //上方小于x
@@ -189,13 +189,13 @@ public class DrawFaceRect {
         paint.setColor(Color.RED);//设置画笔的颜色
         paint.setStrokeWidth(3);//设置画笔的粗度
         //画上方的一条线
-        canvas.drawLine(0,Config.AreaUp,PREVIEW__WIDTH,Config.AreaUp,paint);
+        canvas.drawLine(0, Config.AreaUp,PREVIEW__WIDTH, Config.AreaUp,paint);
         //画左侧竖的一条线
-        canvas.drawLine(Config.AreaLeft,0,Config.AreaLeft,PREVIEW_HEIGHT,paint);
+        canvas.drawLine(Config.AreaLeft,0, Config.AreaLeft,PREVIEW_HEIGHT,paint);
         //画右侧竖的一条线
-        canvas.drawLine(Config.AreaRight,0,Config.AreaRight,PREVIEW_HEIGHT,paint);
+        canvas.drawLine(Config.AreaRight,0, Config.AreaRight,PREVIEW_HEIGHT,paint);
         //画下方的一条线
-        canvas.drawLine(0,Config.AreaBottom,PREVIEW__WIDTH,Config.AreaBottom,paint);
+        canvas.drawLine(0, Config.AreaBottom,PREVIEW__WIDTH, Config.AreaBottom,paint);
     }
 
 }

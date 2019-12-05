@@ -10,18 +10,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameWidth;
+import static cn.com.magnity.coresdksample.utils.Config.ROOT_DIR;
+import static cn.com.magnity.coresdksample.utils.Config.Temp_DIR;
 
 public class SaveTemps {
     /*private static int m_FrameHeight=160;//高120
     private static int m_FrameWidth=120;//宽度160*/
     private static BufferedWriter bufferedWriter;
-    private static   String pathTemps = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Temp" + File.separator + "TempSave.txt";
+    private static   String pathTemps =null;
 
 
 
     public static void saveIntTemps(int[] a,String tempName) {
-        File file1 = Environment.getExternalStorageDirectory();
-        file1 = new File(file1, "Temp/");
+        File file1 = new File(Temp_DIR);
         if (!file1.exists()) {
             file1.mkdirs();
         }
@@ -30,7 +31,7 @@ public class SaveTemps {
         SimpleDateFormat pathName = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         String formatStr = formatter.format(new Date());
         String pathNames = pathName.format(new Date());
-        pathTemps=Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Temp" + File.separator + pathNames+"FFC校准数据.txt";
+        pathTemps=Temp_DIR+ File.separator + pathNames+"FFC校准数据.txt";
         String write = intToString(a);
         try {
             bufferedWriter = new BufferedWriter(new FileWriter(pathTemps,true));

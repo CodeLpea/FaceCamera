@@ -14,10 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +28,7 @@ import cn.com.magnity.coresdksample.utils.lampUtil;
 import static cn.com.magnity.coresdksample.MyApplication.isQuest;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
-import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirName;
-import static cn.com.magnity.coresdksample.utils.Config.currtentVoiceVolume;
+import static cn.com.magnity.coresdksample.utils.Config.ROOT_DIR;
 
 
 public class LinkFragment extends Fragment {
@@ -214,7 +210,7 @@ private int conut=1;
                     if (null == file) {
                         return;
                     }
-                    file = new File(file, SavaRootDirName);
+                    file = new File(file, ROOT_DIR);
                     if (!file.exists()) {
                         file.mkdirs();
                     }
