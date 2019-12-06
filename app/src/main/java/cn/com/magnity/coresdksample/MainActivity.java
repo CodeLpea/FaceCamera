@@ -742,6 +742,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mCamera = Camera.open(mCameraId);
             Toast.makeText(this, "摄像头已开启,请勿拔下摄像头", Toast.LENGTH_SHORT).show();
             this.degrees = setCameraDisplayOrientation(this, mCameraId, mCamera);//设置摄像头的预览方向
+            Log.i(TAG, "this.degrees: "+this.degrees);
             //获取摄像头参数对象
             Camera.Parameters params = mCamera.getParameters();
             //设置预览的格式
@@ -750,6 +751,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
             params.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
             params.setPreviewFrameRate(5);
+            params.setRotation(degrees);
             //给摄像头设置参数配置
             mCamera.setParameters(params);
             //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
