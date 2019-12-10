@@ -1,13 +1,22 @@
 package cn.com.magnity.coresdksample;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+
+import org.litepal.LitePal;
+
+import java.util.Random;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
+import cn.com.magnity.coresdksample.ddnwebserver.CoreService;
+import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
+import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
+import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
@@ -18,6 +27,8 @@ import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.logSave;
 import cn.com.magnity.coresdksample.websocket.bean.SoftWareVersionsInfo;
 
+import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.person_path;
+import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.temper_path;
 import static cn.com.magnity.coresdksample.utils.Config.CONFIG_DIR;
 
 public class MyApplication extends Application {
@@ -45,11 +56,31 @@ public class MyApplication extends Application {
         Log.i(TAG, "程序启动完成: ");
         init();
         photoNameSaveLog();
-
-
+        LitePal.initialize(this);//初始化LitePal数据库
+        //提前绑定服务，避免使用时才绑定崩溃
+        SetConfigServer.getInstance();
+        test();
+        putDataIntoDb();
     }
 
-
+    private void test() {
+        startService(new Intent(this, CoreService.class));
+    }
+    //放入测试数据
+    private void putDataIntoDb() {
+        LitePal.deleteAll(PhotoRecordDb.class);
+        for(int i=0;i<100;i++){
+            PhotoRecordDb photoRecordDb=new PhotoRecordDb();
+            photoRecordDb.setPersonPath(person_path);
+            photoRecordDb.setTemperPath(temper_path);
+            photoRecordDb.setDate(Long.valueOf(TimeUtils.randomDate("20191001101010",TimeUtils.getYMDHMSDate())));
+            Random random=new Random();
+            int temp=random.nextInt(20)+20;
+            photoRecordDb.setTemp(temp);
+            Log.i("放入测试数据", photoRecordDb.toString());
+            photoRecordDb.save();
+        }
+    }
 
     private void init() {
         mDev =new MagDevice();//初始化全局MagDevice

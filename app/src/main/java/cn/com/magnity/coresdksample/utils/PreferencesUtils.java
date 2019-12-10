@@ -23,7 +23,7 @@ public class PreferencesUtils {
 	/**
 	 * 保存在手机里面的文件名
 	 */
-	public static final String FILE_NAME = "Hand_Detect";
+	public static final String FILE_NAME = "Temp_Camera";
 	public static SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE |Context.MODE_MULTI_PROCESS);
 	public static SharedPreferences.Editor editor = sp.edit();
 	/**

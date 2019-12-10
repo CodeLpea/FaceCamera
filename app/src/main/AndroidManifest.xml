@@ -100,6 +100,7 @@
         <service
             android:name=".websocket.service.WebSocketService"
             android:exported="false"></service>
+        <service android:name=".ddnwebserver.CoreService"/>
     </application>
 
 </manifest>

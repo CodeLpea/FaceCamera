@@ -12,7 +12,9 @@ public class Config {
     /*文件保存目录*/
 
     //程序数据存储的主路径
-    public static final String ROOT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "DdnTempCamera";
+
+    public static final String ROOT_DIR_NAME = "DdnTempCamera";
+    public static final String ROOT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + ROOT_DIR_NAME;
     //程序运行日志存放路径
     public static final String XLOG_DIR = ROOT_DIR + File.separator + "xlog";
     //设备配置文件路径
