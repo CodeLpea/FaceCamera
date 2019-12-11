@@ -12,7 +12,6 @@ import cn.com.magnity.coresdksample.Http.Model.UpgradePackageVersionInfoEntry;
 import cn.com.magnity.coresdksample.Http.Model.UpgradePackageVersionInfoRequest;
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.AppUtils;
-import cn.com.magnity.coresdksample.utils.TimeUitl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -23,9 +22,9 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static cn.com.magnity.coresdksample.utils.Config.API_XIAONUO_BASE;
-import static cn.com.magnity.coresdksample.utils.Config.SOFTWARE_SYSTEM_TYTE;
-import static cn.com.magnity.coresdksample.utils.Config.VERSIONURL;
+import static cn.com.magnity.coresdksample.Config.API_XIAONUO_BASE;
+import static cn.com.magnity.coresdksample.Config.SOFTWARE_SYSTEM_TYTE;
+import static cn.com.magnity.coresdksample.Config.VERSIONURL;
 
 public class RetrofitClient {
     private static String TAG="RetrofitClient";

@@ -8,21 +8,22 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
  * 温度信息
  * */
 public class TemperatureData {
-    @JSONField(name = WebConfig.TEMPERATURE_THRESHOLD)
-    private String Temperature;
 
-    public String getTemperature() {
-        return Temperature;
+    @JSONField(name = WebConfig.TEMPERATURE_THRESHOLD)
+    private String temperature_threshold1;
+
+    public String getTemperature_threshold1() {
+        return temperature_threshold1;
     }
 
-    public void setTemperature(String temperature) {
-        Temperature = temperature;
+    public void setTemperature_threshold1(String temperature_threshold) {
+        this.temperature_threshold1 = temperature_threshold;
     }
 
     @Override
     public String toString() {
         return "TemperatureData{" +
-                "Temperature='" + Temperature + '\'' +
+                "temperature_threshold='" + temperature_threshold1 + '\'' +
                 '}';
     }
 }

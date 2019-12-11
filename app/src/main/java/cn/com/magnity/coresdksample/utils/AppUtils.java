@@ -27,8 +27,8 @@ import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
 
-import static cn.com.magnity.coresdksample.utils.Config.DdnUpdateApkPath;
-import static cn.com.magnity.coresdksample.utils.Config.MAC_ADRESS;
+import static cn.com.magnity.coresdksample.Config.DdnUpdateApkPath;
+import static cn.com.magnity.coresdksample.Config.MAC_ADRESS;
 
 //跟App相关的辅助类
 public class AppUtils {

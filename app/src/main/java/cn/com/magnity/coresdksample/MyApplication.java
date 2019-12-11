@@ -2,7 +2,6 @@ package cn.com.magnity.coresdksample;
 
 import android.app.Application;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
 
 import org.litepal.LitePal;
@@ -17,19 +16,15 @@ import cn.com.magnity.coresdksample.ddnwebserver.CoreService;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
 import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
-import cn.com.magnity.coresdksample.utils.AppUtils;
-import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.SPUtil;
-import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.logSave;
-import cn.com.magnity.coresdksample.websocket.bean.SoftWareVersionsInfo;
 
 import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.person_path;
 import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.temper_path;
-import static cn.com.magnity.coresdksample.utils.Config.CONFIG_DIR;
+import static cn.com.magnity.coresdksample.Config.CONFIG_DIR;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";

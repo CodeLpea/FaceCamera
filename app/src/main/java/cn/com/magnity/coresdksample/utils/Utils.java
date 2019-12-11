@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample;
+package cn.com.magnity.coresdksample.utils;
 
 
 import android.app.Activity;
@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+
+import cn.com.magnity.coresdksample.R;
 
 public class Utils {
     public static boolean requestRuntimePermission(final Context context, final String permissionType,

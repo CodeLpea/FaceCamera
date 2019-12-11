@@ -14,6 +14,7 @@ import org.litepal.LitePal;
 import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CalibratPositionData;
@@ -64,6 +65,10 @@ public class SetConfigServer {
      */
     public void setWifiData(WifiData wifiData) {
         /*SP操作，存入本地*/
+        PreferencesUtils.put(WebConfig.WIFI_NAME,wifiData.getWifi_name());
+        PreferencesUtils.put(WebConfig.WIFI_PASSWD,wifiData.getWifi_passwd());
+        //缓存更新一下
+        CurrentConfig.getInstance().updateSetting();
         /*启动wifi服务，发送*/
         if (myBinder != null) {
             myBinder.getBinderInfo();
@@ -89,6 +94,7 @@ public class SetConfigServer {
         PreferencesUtils.put(WebConfig.NORMAL_VOICE, voiceData.getNormal_voice());
         PreferencesUtils.put(WebConfig.SYSTEM_VOICE, voiceData.getSystem_voice());
         PreferencesUtils.put(WebConfig.ERROR_VOICE, voiceData.getError_voice());
+        CurrentConfig.getInstance().updateSetting();
         /*直接修改Tts配置*/
 
     }
@@ -101,7 +107,8 @@ public class SetConfigServer {
         /*存入SP*/
         /*直接修改配置*/
         Log.i(TAG, "setTemperatureData: " + temperatureData.toString());
-        PreferencesUtils.put(WebConfig.TEMPERATURE_THRESHOLD, temperatureData.getTemperature());
+        PreferencesUtils.put(WebConfig.TEMPERATURE_THRESHOLD, temperatureData.getTemperature_threshold1());
+        CurrentConfig.getInstance().updateSetting();
     }
 
     /**
@@ -113,6 +120,7 @@ public class SetConfigServer {
         /*直接修改配置*/
         Log.i(TAG, "setTemperatureCameraData: " + temperCameraData.toString());
         PreferencesUtils.put(WebConfig.DISTANCE, temperCameraData.getDistance());
+        CurrentConfig.getInstance().updateSetting();
     }
 
 
@@ -125,6 +133,7 @@ public class SetConfigServer {
         /*直接修改配置*/
         Log.i(TAG, "setCameraData: " + cameraData.toString());
         PreferencesUtils.put(WebConfig.CAMERA_EXPLORE, cameraData.getExplorer());
+        CurrentConfig.getInstance().updateSetting();
     }
 
     /**
@@ -149,6 +158,7 @@ public class SetConfigServer {
             Log.i(TAG, "FFC黑体校准参考值: " + ffcData.getCalibration());
             PreferencesUtils.put(WebConfig.FFC_CALIBRATION_PARAMETER, ffcData.getCalibration());
         }
+        CurrentConfig.getInstance().updateSetting();
     }
 
 
@@ -175,6 +185,7 @@ public class SetConfigServer {
         pictureData.setMoveX(PreferencesUtils.getString(WebConfig.MOVEX, "0"));
         pictureData.setMoveY(PreferencesUtils.getString(WebConfig.MOVEY, "0"));
         pictureData.setScale(PreferencesUtils.getFloat(WebConfig.SCALE, 1));
+
         return pictureData;
     }
 
@@ -188,6 +199,8 @@ public class SetConfigServer {
         PreferencesUtils.put(WebConfig.MOVEX, calibratPositionData.getMoveX());
         PreferencesUtils.put(WebConfig.MOVEY, calibratPositionData.getMoveY());
         PreferencesUtils.put(WebConfig.SCALE, calibratPositionData.getScale());
+
+        CurrentConfig.getInstance().updateSetting();
         Log.i(TAG, "setCalibratPosition: " + calibratPositionData.toString());
     }
 
@@ -211,6 +224,8 @@ public class SetConfigServer {
         PreferencesUtils.put(WebConfig.LINELEFT, validAreaData.getLineLeft());
         PreferencesUtils.put(WebConfig.LINEDWON, validAreaData.getLineDown());
         PreferencesUtils.put(WebConfig.LINERIGHT, validAreaData.getLineRight());
+
+        CurrentConfig.getInstance().updateSetting();
         Log.i(TAG, "setValidAreaData: " + validAreaData);
     }
 

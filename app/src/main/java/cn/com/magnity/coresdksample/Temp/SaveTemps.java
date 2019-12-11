@@ -1,7 +1,5 @@
 package cn.com.magnity.coresdksample.Temp;
 
-import android.os.Environment;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -10,8 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameWidth;
-import static cn.com.magnity.coresdksample.utils.Config.ROOT_DIR;
-import static cn.com.magnity.coresdksample.utils.Config.Temp_DIR;
+import static cn.com.magnity.coresdksample.Config.Temp_DIR;
 
 public class SaveTemps {
     /*private static int m_FrameHeight=160;//高120

@@ -10,7 +10,7 @@ import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.websocket.LocationDataCacher;
 
-import static cn.com.magnity.coresdksample.utils.Config.SOFTWARE_SYSTEM_TYTE;
+import static cn.com.magnity.coresdksample.Config.SOFTWARE_SYSTEM_TYTE;
 
 
 /**

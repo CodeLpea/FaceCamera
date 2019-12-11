@@ -2,6 +2,8 @@ package cn.com.magnity.coresdksample.utils;
 
 import android.util.Log;
 
+import cn.com.magnity.coresdksample.Config;
+
 /**
  * GPIO控制信号灯
  * */
@@ -30,7 +32,7 @@ public class lampUtil {
                     Thread.sleep(delay);
                 }catch (Exception e){
                 }
-                lampUtil.which=Config.LAMP;
+                lampUtil.which= Config.LAMP;
                 lampUtil.time=Config.TIME;
             }
         }).start();

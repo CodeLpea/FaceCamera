@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static cn.com.magnity.coresdksample.utils.Config.SavaRootDirPath;
+import static cn.com.magnity.coresdksample.Config.SavaRootDirPath;
 
 public class FlieUtil {
     /**

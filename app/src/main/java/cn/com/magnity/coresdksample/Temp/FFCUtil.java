@@ -1,6 +1,5 @@
 package cn.com.magnity.coresdksample.Temp;
 
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -11,7 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static cn.com.magnity.coresdksample.utils.Config.Temp_DIR;
+import static cn.com.magnity.coresdksample.Config.Temp_DIR;
 
 /**
  *  获取到FFC

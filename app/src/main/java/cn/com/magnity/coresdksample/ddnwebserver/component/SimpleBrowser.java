@@ -6,8 +6,6 @@ import android.util.Log;
 import com.yanzhenjie.andserver.annotation.Website;
 import com.yanzhenjie.andserver.framework.website.FileBrowser;
 
-import cn.com.magnity.coresdksample.utils.Config;
-
 /**
  * 设置一个目录作为本地存储文件夹
  * 所有文件路径都是基于更目录后的，不是绝对路径

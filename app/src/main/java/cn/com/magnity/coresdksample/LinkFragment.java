@@ -28,7 +28,7 @@ import cn.com.magnity.coresdksample.utils.lampUtil;
 import static cn.com.magnity.coresdksample.MyApplication.isQuest;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
-import static cn.com.magnity.coresdksample.utils.Config.ROOT_DIR;
+import static cn.com.magnity.coresdksample.Config.ROOT_DIR;
 
 
 public class LinkFragment extends Fragment {

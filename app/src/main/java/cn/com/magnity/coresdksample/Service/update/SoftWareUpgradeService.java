@@ -15,7 +15,7 @@ import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.NetUtil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 
-import static cn.com.magnity.coresdksample.utils.Config.DdnDownLoadApkPath;
+import static cn.com.magnity.coresdksample.Config.DdnDownLoadApkPath;
 /**
  * 远程软件升级
  * Created by Long on 2018/10/8.

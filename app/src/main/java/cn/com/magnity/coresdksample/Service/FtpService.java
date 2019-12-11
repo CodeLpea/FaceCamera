@@ -19,7 +19,7 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 import java.util.ArrayList;
 import java.util.List;
 import cn.com.magnity.coresdksample.MainActivity;
-import static cn.com.magnity.coresdksample.utils.Config.MSG2;
+import static cn.com.magnity.coresdksample.Config.MSG2;
 
 
 

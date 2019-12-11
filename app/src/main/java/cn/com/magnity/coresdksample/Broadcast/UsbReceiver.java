@@ -7,14 +7,13 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 import static cn.com.magnity.coresdksample.MyApplication.isInit;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;
-import static cn.com.magnity.coresdksample.utils.Config.currtentVoiceVolume;
+import static cn.com.magnity.coresdksample.Config.currtentVoiceVolume;
 
 public class UsbReceiver extends BroadcastReceiver {
     private static final String TAG="UsbReceiver";

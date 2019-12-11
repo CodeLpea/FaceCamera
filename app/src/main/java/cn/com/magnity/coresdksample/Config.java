@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample.utils;
+package cn.com.magnity.coresdksample;
 
 import android.os.Environment;
 

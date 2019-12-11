@@ -7,7 +7,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 
 import cn.com.magnity.coresdksample.MyApplication;
-import cn.com.magnity.coresdksample.utils.Config;
+import cn.com.magnity.coresdksample.Config;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 public class DrawFaceRect {

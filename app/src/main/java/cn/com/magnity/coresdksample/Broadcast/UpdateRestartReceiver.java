@@ -8,7 +8,7 @@ import android.util.Log;
 import cn.com.magnity.coresdksample.MainActivity;
 import cn.com.magnity.coresdksample.utils.AppUtils;
 
-import static cn.com.magnity.coresdksample.utils.Config.DdnDownLoadApkPath;
+import static cn.com.magnity.coresdksample.Config.DdnDownLoadApkPath;
 
 /**
  * 更新后自启动

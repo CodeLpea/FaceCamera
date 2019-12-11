@@ -43,9 +43,10 @@ import cn.com.magnity.coresdksample.ddnwebserver.model.TemperatureData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.ValidAreaData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.VoiceData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.WifiData;
-import cn.com.magnity.coresdksample.ddnwebserver.server.CurrentConfigServer;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
 import cn.com.magnity.coresdksample.ddnwebserver.util.JsonUtils;
+import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 /**
  * 设置界面控制器
@@ -62,7 +63,7 @@ public class SettingController {
      */
     @GetMapping(path = "/")
     public CurrentSettingData getSetting() {
-        return CurrentConfigServer.getInstance().getSetting();
+        return CurrentConfig.getInstance().updateSetting();
     }
 
     /**
@@ -71,7 +72,7 @@ public class SettingController {
      */
     @GetMapping(path = "/refresh/setting")
     public void getSetting2(HttpResponse response) {
-        CurrentSettingData currentSettingData = CurrentConfigServer.getInstance().getSetting();
+        CurrentSettingData currentSettingData = CurrentConfig.getInstance().updateSetting();
         String content = JsonUtils.successfulJson(currentSettingData);
         StringBody body = new StringBody(content);
         response.setBody(body);
@@ -91,6 +92,7 @@ public class SettingController {
         }
         WifiData wifiData = JSON.parseObject(content, WifiData.class);
         SetConfigServer.getInstance().setWifiData(wifiData);
+        TtsSpeak.getInstance().SpeechAdd("设置wifi信息成功",Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return wifiData;
 
 //HttpRequest request
@@ -115,6 +117,7 @@ public class SettingController {
         }
         VoiceData voiceData = JSON.parseObject(content, VoiceData.class);
         SetConfigServer.getInstance().setVoiceData(voiceData);
+        TtsSpeak.getInstance().SpeechAdd("设置语音信息成功",Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return voiceData;
 
     }
@@ -133,7 +136,8 @@ public class SettingController {
         }
         TemperatureData temperatureData = JSON.parseObject(content, TemperatureData.class);
         SetConfigServer.getInstance().setTemperatureData(temperatureData);
-
+        TtsSpeak.getInstance().SpeechAdd("设置温度阀值"+temperatureData.getTemperature_threshold1()+"成功",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return temperatureData;
 
     }
@@ -152,6 +156,8 @@ public class SettingController {
         }
         CameraData cameraData = JSON.parseObject(content, CameraData.class);
         SetConfigServer.getInstance().setCameraData(cameraData);
+        TtsSpeak.getInstance().SpeechAdd("设置曝光参数"+cameraData.getExplorer()+"成功",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return cameraData;
     }
 
@@ -170,6 +176,8 @@ public class SettingController {
         }
         FFCData ffcData = JSON.parseObject(content, FFCData.class);
         SetConfigServer.getInstance().setFFCData(ffcData);
+        TtsSpeak.getInstance().SpeechAdd("设置FFC补偿参数"+ffcData.getCompensation()+"成功",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return ffcData;
     }
 
@@ -188,6 +196,8 @@ public class SettingController {
         }
         FFCData ffcData = JSON.parseObject(content, FFCData.class);
         SetConfigServer.getInstance().setFFCData(ffcData);
+        TtsSpeak.getInstance().SpeechAdd("设置黑体温度校准成功，15秒后开始校准",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return ffcData;
     }
 
@@ -209,6 +219,8 @@ public class SettingController {
         if (ffcData == null) {
             ffcData = new FFCData();
         }
+        TtsSpeak.getInstance().SpeechAdd("设置平均温度校准成功，15秒后开始校准",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return ffcData;
     }
 
@@ -226,6 +238,8 @@ public class SettingController {
         }
         TemperCameraData temperCameraData = JSON.parseObject(content, TemperCameraData.class);
         SetConfigServer.getInstance().setTemperatureCameraData(temperCameraData);
+        TtsSpeak.getInstance().SpeechAdd("设置目标距离"+temperCameraData.getDistance()+"成功",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return temperCameraData;
     }
 
@@ -255,6 +269,8 @@ public class SettingController {
         if (calibratPositionData != null) {
             SetConfigServer.getInstance().setCalibratPosition(calibratPositionData);
         }
+        TtsSpeak.getInstance().SpeechAdd("校准红外定位框成功",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return new ReturnData();
     }
 
@@ -285,6 +301,8 @@ public class SettingController {
         if (validAreaData != null) {
             SetConfigServer.getInstance().setValidAreaData(validAreaData);
         }
+        TtsSpeak.getInstance().SpeechAdd("设置有效区域预览成功",
+                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return validAreaData;
     }
 

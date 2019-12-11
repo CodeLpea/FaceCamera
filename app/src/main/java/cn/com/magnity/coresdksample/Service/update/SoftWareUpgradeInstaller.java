@@ -32,7 +32,7 @@ import cn.com.magnity.coresdksample.utils.ShellUtils;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static cn.com.magnity.coresdksample.utils.Config.DdnDownLoadApkPath;
+import static cn.com.magnity.coresdksample.Config.DdnDownLoadApkPath;
 
 
 public class SoftWareUpgradeInstaller {

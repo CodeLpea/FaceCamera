@@ -11,13 +11,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cn.com.magnity.coresdksample.utils.Config;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 
-import static cn.com.magnity.coresdksample.utils.Config.AreaBottom;
-import static cn.com.magnity.coresdksample.utils.Config.AreaLeft;
-import static cn.com.magnity.coresdksample.utils.Config.AreaRight;
-import static cn.com.magnity.coresdksample.utils.Config.AreaUp;
+import static cn.com.magnity.coresdksample.Config.AreaBottom;
+import static cn.com.magnity.coresdksample.Config.AreaLeft;
+import static cn.com.magnity.coresdksample.Config.AreaRight;
+import static cn.com.magnity.coresdksample.Config.AreaUp;
 
 public class AreaFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "AreaFragment";

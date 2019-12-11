@@ -1,7 +1,5 @@
 package cn.com.magnity.coresdksample.ddnwebserver;
 
-import cn.com.magnity.coresdksample.utils.Config;
-
 public interface WebConfig {
 
     /***
