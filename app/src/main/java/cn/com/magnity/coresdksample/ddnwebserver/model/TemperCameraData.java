@@ -8,13 +8,13 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
  * */
 public class TemperCameraData {
     @JSONField(name = WebConfig.DISTANCE)
-    private String distance;
+    private float distance;
 
-    public String getDistance() {
+    public float getDistance() {
         return distance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(float distance) {
         this.distance = distance;
     }
 

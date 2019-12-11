@@ -10,13 +10,13 @@ import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.CAMERA_EXPLORE
  * */
 public class CameraData {
     @JSONField(name = CAMERA_EXPLORE)
-    private String explorer;
+    private int explorer;
 
-    public String getExplorer() {
+    public int getExplorer() {
         return explorer;
     }
 
-    public void setExplorer(String explorer) {
+    public void setExplorer(int explorer) {
         this.explorer = explorer;
     }
 

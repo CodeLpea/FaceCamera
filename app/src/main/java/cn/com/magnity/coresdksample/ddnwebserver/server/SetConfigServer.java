@@ -150,10 +150,10 @@ public class SetConfigServer {
             Log.i(TAG, "FFC平均黑体校准: ");
             return;
         }
-        if (ffcData.getCompensation() != null) {
+        if (ffcData.getCompensation()!= 0) {
             Log.i(TAG, "FFC补偿参数，可为负数 :" + ffcData.getCompensation());
             PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER, ffcData.getCompensation());
-        } else if (ffcData.getCalibration() != null) {
+        } else if (ffcData.getCalibration()!= 0) {
             //如果黑体校准参数不为空，则表示为设置黑体校准参数
             Log.i(TAG, "FFC黑体校准参考值: " + ffcData.getCalibration());
             PreferencesUtils.put(WebConfig.FFC_CALIBRATION_PARAMETER, ffcData.getCalibration());
@@ -170,20 +170,20 @@ public class SetConfigServer {
         PictureData pictureData = new PictureData();
         pictureData.setPersonPath(WebConfig.person_path);
         pictureData.setTemperPath(WebConfig.temper_path);
-        pictureData.setX1("198");
-        pictureData.setY1("94");
+        pictureData.setX1(198);
+        pictureData.setY1(94);
 
-        pictureData.setX2("292");
-        pictureData.setY2("107");
+        pictureData.setX2(292);
+        pictureData.setY2(107);
 
-        pictureData.setX3("292");
-        pictureData.setY3("192");
+        pictureData.setX3(292);
+        pictureData.setY3(192);
 
-        pictureData.setX4("198");
-        pictureData.setY4("192");
+        pictureData.setX4(198);
+        pictureData.setY4(192);
 
-        pictureData.setMoveX(PreferencesUtils.getString(WebConfig.MOVEX, "0"));
-        pictureData.setMoveY(PreferencesUtils.getString(WebConfig.MOVEY, "0"));
+        pictureData.setMoveX(PreferencesUtils.getInt(WebConfig.MOVEX, 0));
+        pictureData.setMoveY(PreferencesUtils.getInt(WebConfig.MOVEY, 0));
         pictureData.setScale(PreferencesUtils.getFloat(WebConfig.SCALE, 1));
 
         return pictureData;
@@ -209,10 +209,10 @@ public class SetConfigServer {
      */
     public ValidAreaData getValidAreaData() {
         ValidAreaData validAreaData = new ValidAreaData();
-        validAreaData.setLineUp(PreferencesUtils.getString(WebConfig.LINEUP, "20"));
-        validAreaData.setLineLeft(PreferencesUtils.getString(WebConfig.LINELEFT, "20"));
-        validAreaData.setLineDown(PreferencesUtils.getString(WebConfig.LINEDWON, "620"));
-        validAreaData.setLineRight(PreferencesUtils.getString(WebConfig.LINERIGHT, "450"));
+        validAreaData.setLineUp(PreferencesUtils.getInt(WebConfig.LINEUP, 20));
+        validAreaData.setLineLeft(PreferencesUtils.getInt(WebConfig.LINELEFT, 20));
+        validAreaData.setLineDown(PreferencesUtils.getInt(WebConfig.LINEDWON, 620));
+        validAreaData.setLineRight(PreferencesUtils.getInt(WebConfig.LINERIGHT, 450));
         return validAreaData;
     }
 

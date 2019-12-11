@@ -9,46 +9,46 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 public class VoiceData {
 
     @JSONField(name = WebConfig.SYSTEM_VOICE)
-    private String system_voice;
+    private int system_voice;
 
     @JSONField(name = WebConfig.ERROR_VOICE)
-    private String error_voice;
+    private int error_voice;
 
     @JSONField(name = WebConfig.NORMAL_VOICE)
-    private String normal_voice;
+    private int normal_voice;
 
     @JSONField(name = WebConfig.VOICE_SPEED)
-    private String voice_speed;
+    private float voice_speed;
 
-    public String getSystem_voice() {
+    public int getSystem_voice() {
         return system_voice;
     }
 
-    public void setSystem_voice(String system_voice) {
+    public void setSystem_voice(int system_voice) {
         this.system_voice = system_voice;
     }
 
-    public String getError_voice() {
+    public int getError_voice() {
         return error_voice;
     }
 
-    public void setError_voice(String error_voice) {
+    public void setError_voice(int error_voice) {
         this.error_voice = error_voice;
     }
 
-    public String getNormal_voice() {
+    public int getNormal_voice() {
         return normal_voice;
     }
 
-    public void setNormal_voice(String normal_voice) {
+    public void setNormal_voice(int normal_voice) {
         this.normal_voice = normal_voice;
     }
 
-    public String getVoice_speed() {
+    public float getVoice_speed() {
         return voice_speed;
     }
 
-    public void setVoice_speed(String voice_speed) {
+    public void setVoice_speed(float voice_speed) {
         this.voice_speed = voice_speed;
     }
 

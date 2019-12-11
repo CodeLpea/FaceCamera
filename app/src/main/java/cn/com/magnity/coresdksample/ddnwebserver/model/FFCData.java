@@ -12,24 +12,24 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 public class FFCData {
     //FFC补偿参数，可为负数
     @JSONField(name = WebConfig.FFC_COMPENSATION_PARAMETER)
-    private String compensation;
+    private float compensation;
     //FFC黑体校准参考值
     @JSONField(name =  WebConfig.FFC_CALIBRATION_PARAMETER)
-    private String calibration;
+    private float calibration;
 
-    public String getCompensation() {
+    public float getCompensation() {
         return compensation;
     }
 
-    public void setCompensation(String compensation) {
+    public void setCompensation(float compensation) {
         this.compensation = compensation;
     }
 
-    public String getCalibration() {
+    public float getCalibration() {
         return calibration;
     }
 
-    public void setCalibration(String calibration) {
+    public void setCalibration(float calibration) {
         this.calibration = calibration;
     }
 

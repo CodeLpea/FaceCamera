@@ -8,46 +8,46 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
  * */
 public class ValidAreaData {
     @JSONField(name = WebConfig.LINEUP)
-    private String lineUp;
+    private int lineUp;
 
     @JSONField(name = WebConfig.LINELEFT)
-    private String lineLeft;
+    private int lineLeft;
 
     @JSONField(name = WebConfig.LINEDWON)
-    private String lineDown;
+    private int lineDown;
 
     @JSONField(name = WebConfig.LINERIGHT)
-    private String lineRight;
+    private int lineRight;
 
-    public String getLineUp() {
+    public int getLineUp() {
         return lineUp;
     }
 
-    public void setLineUp(String lineUp) {
+    public void setLineUp(int lineUp) {
         this.lineUp = lineUp;
     }
 
-    public String getLineLeft() {
+    public int getLineLeft() {
         return lineLeft;
     }
 
-    public void setLineLeft(String lineLeft) {
+    public void setLineLeft(int lineLeft) {
         this.lineLeft = lineLeft;
     }
 
-    public String getLineDown() {
+    public int getLineDown() {
         return lineDown;
     }
 
-    public void setLineDown(String lineDown) {
+    public void setLineDown(int lineDown) {
         this.lineDown = lineDown;
     }
 
-    public String getLineRight() {
+    public int getLineRight() {
         return lineRight;
     }
 
-    public void setLineRight(String lineRight) {
+    public void setLineRight(int lineRight) {
         this.lineRight = lineRight;
     }
 

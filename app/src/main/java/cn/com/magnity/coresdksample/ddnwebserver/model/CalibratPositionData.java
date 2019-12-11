@@ -9,28 +9,25 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 /**
  * 校准定位数据
  * 人脸定位框和温度摄像头定位框的偏移值
- * */
+ */
 public class CalibratPositionData {
     @JSONField(name = WebConfig.MOVEX)
-    private String moveX;
+    private int moveX;
     @JSONField(name = WebConfig.MOVEY)
-    private String moveY;
+    private int moveY;
     @JSONField(name = WebConfig.SCALE)
     private float scale;
 
-    public String getMoveX() {
+    public int getMoveX() {
         return moveX;
     }
 
-    public void setMoveX(String moveX) {
+    public void setMoveX(int moveX) {
         this.moveX = moveX;
     }
 
-    public String getMoveY() {
-        return moveY;
-    }
-
-    public void setMoveY(String moveY) {
+    public int getMoveY() { return moveY; }
+    public void setMoveY(int moveY) {
         this.moveY = moveY;
     }
 
