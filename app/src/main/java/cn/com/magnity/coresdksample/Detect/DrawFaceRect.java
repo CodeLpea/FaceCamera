@@ -8,6 +8,7 @@ import android.graphics.Rect;
 
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.Config;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 public class DrawFaceRect {
@@ -151,7 +152,7 @@ public class DrawFaceRect {
             result=true;
             //Log.i(TAG, "张嘴了！！！！:");
         }else {
-            TtsSpeak.getInstance().SpeechRepead("请张开嘴巴   ", Config.heightTempVoiceVolume);
+            TtsSpeak.getInstance().SpeechRepead("请张开嘴巴   ", CurrentConfig.getInstance().getCurrentData().getError_voice());
         }
        // Log.i(TAG, "嘴唇开口比例: "+proportion);
          return result;
@@ -175,7 +176,10 @@ public class DrawFaceRect {
         canvas.drawLine(0,Config.AreaBottom,PREVIEW__WIDTH,Config.AreaBottom,paint);*/
        /* Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
         Log.i(TAG, "xPlace: "+xPlace);*/
-        if(Config.AreaLeft<=xPlace&&xPlace<= Config.AreaRight&& Config.AreaBottom>=yPlace&& Config.AreaUp<=yPlace){
+        if(CurrentConfig.getInstance().getCurrentData().getLineLeft()<=xPlace&&xPlace<=
+                CurrentConfig.getInstance().getCurrentData().getLineRight()&&
+                CurrentConfig.getInstance().getCurrentData().getLineDown()>=yPlace&&
+                CurrentConfig.getInstance().getCurrentData().getLineUp()<=yPlace){
            //左侧小于x
            //右侧大于x
            //上方小于x
@@ -189,13 +193,13 @@ public class DrawFaceRect {
         paint.setColor(Color.RED);//设置画笔的颜色
         paint.setStrokeWidth(3);//设置画笔的粗度
         //画上方的一条线
-        canvas.drawLine(0, Config.AreaUp,PREVIEW__WIDTH, Config.AreaUp,paint);
+        canvas.drawLine(0, CurrentConfig.getInstance().getCurrentData().getLineUp(),PREVIEW__WIDTH, CurrentConfig.getInstance().getCurrentData().getLineUp(),paint);
         //画左侧竖的一条线
-        canvas.drawLine(Config.AreaLeft,0, Config.AreaLeft,PREVIEW_HEIGHT,paint);
+        canvas.drawLine(CurrentConfig.getInstance().getCurrentData().getLineLeft(),0, CurrentConfig.getInstance().getCurrentData().getLineLeft(),PREVIEW_HEIGHT,paint);
         //画右侧竖的一条线
-        canvas.drawLine(Config.AreaRight,0, Config.AreaRight,PREVIEW_HEIGHT,paint);
+        canvas.drawLine(CurrentConfig.getInstance().getCurrentData().getLineRight(),0, CurrentConfig.getInstance().getCurrentData().getLineRight(),PREVIEW_HEIGHT,paint);
         //画下方的一条线
-        canvas.drawLine(0, Config.AreaBottom,PREVIEW__WIDTH, Config.AreaBottom,paint);
+        canvas.drawLine(0,CurrentConfig.getInstance().getCurrentData().getLineDown(),PREVIEW__WIDTH, CurrentConfig.getInstance().getCurrentData().getLineDown(),paint);
     }
 
 }

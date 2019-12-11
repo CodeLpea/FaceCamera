@@ -165,6 +165,53 @@ public class NetUtil {
     }
 
     /**
+     * Ipv4 address check.
+     */
+    private static final Pattern IPV4_PATTERN = Pattern.compile(
+            "^(" + "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}" +
+                    "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+
+    /**
+     * Check if valid IPV4 address.
+     *
+     * @param input the address string to check for validity.
+     *
+     * @return True if the input parameter is a valid IPv4 address.
+     */
+    public static boolean isIPv4Address(String input) {
+        return IPV4_PATTERN.matcher(input).matches();
+    }
+
+    /**
+     * Get local Ip address.
+     * 可以获得wifiip和有线网络的ip，不用专门区分。
+     * ip格式：/192.168.8.197
+     */
+    public static InetAddress getLocalIPAddress() {
+        Enumeration<NetworkInterface> enumeration = null;
+        try {
+            enumeration = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        if (enumeration != null) {
+            while (enumeration.hasMoreElements()) {
+                NetworkInterface nif = enumeration.nextElement();
+                Enumeration<InetAddress> inetAddresses = nif.getInetAddresses();
+                if (inetAddresses != null) {
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+                        if (!inetAddress.isLoopbackAddress() && isIPv4Address(inetAddress.getHostAddress())) {
+                            return inetAddress;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 将得到的int类型的IP转换为String类型
      *
      * @param ip
@@ -172,9 +219,11 @@ public class NetUtil {
      */
     public static String longToIpString(long ip) {
 
-        return ((ip >> 24 & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + (ip & 0xFF));
+        return (ip & 0xFF ) + "." +
+                ((ip >> 8 ) & 0xFF) + "." +
+                ((ip >> 16 ) & 0xFF) + "." +
+                ( ip >> 24 & 0xFF) ;
     }
-
     /**
      * ip地址字符串转long型
      * @param strIp

@@ -1,8 +1,9 @@
 package cn.com.magnity.coresdksample;
 
 import android.app.Application;
-import android.content.Intent;
 import android.util.Log;
+
+import com.example.lpnetstatus.NetStatusBus;
 
 import org.litepal.LitePal;
 
@@ -12,10 +13,10 @@ import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
-import cn.com.magnity.coresdksample.ddnwebserver.CoreService;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
 import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.SPUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
@@ -54,13 +55,13 @@ public class MyApplication extends Application {
         LitePal.initialize(this);//初始化LitePal数据库
         //提前绑定服务，避免使用时才绑定崩溃
         SetConfigServer.getInstance();
-        test();
+        NetStatusBus.getInstance().init(this);
+        //初始化默认值
+        CurrentConfig.getInstance().updateSetting();
         putDataIntoDb();
     }
 
-    private void test() {
-        startService(new Intent(this, CoreService.class));
-    }
+
     //放入测试数据
     private void putDataIntoDb() {
         LitePal.deleteAll(PhotoRecordDb.class);

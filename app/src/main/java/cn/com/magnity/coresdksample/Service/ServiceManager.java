@@ -6,6 +6,7 @@ import android.util.Log;
 
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.Service.update.SoftWareUpgradeService;
+import cn.com.magnity.coresdksample.ddnwebserver.WebCoreService;
 import cn.com.magnity.coresdksample.websocket.service.WebSocketService;
 
 
@@ -47,6 +48,15 @@ public class ServiceManager {
             Intent websorketIntent = new Intent(mContext, WebSocketService.class);
             mContext.startService(websorketIntent);
         }
+        //开启Web配置界面服务
+        if(!WebCoreService.isServiceRunning()) {
+            mContext.startService(new Intent(mContext, WebCoreService.class));
+        }
+        //开启网络连接服务
+        if(!NetService.isServiceRunning()) {
+            mContext.startService(new Intent(mContext, NetService.class));
+        }
+
 
     }
 
@@ -66,6 +76,14 @@ public class ServiceManager {
         if(WebSocketService.isServiceRunning()) {
             Intent websorketIntent = new Intent(mContext, WebSocketService.class);
             mContext.stopService(websorketIntent);
+        }
+        //关闭Web配置界面服务
+        if(WebCoreService.isServiceRunning()) {
+            mContext.stopService(new Intent(mContext, WebCoreService.class));
+        }
+        //关闭网络连接服务
+        if(NetService.isServiceRunning()) {
+            mContext.stopService(new Intent(mContext, NetService.class));
         }
 
 

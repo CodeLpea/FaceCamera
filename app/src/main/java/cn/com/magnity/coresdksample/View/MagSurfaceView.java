@@ -29,6 +29,7 @@ import cn.com.magnity.coresdksample.Temp.AreaUtil;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.Config;
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
@@ -36,7 +37,7 @@ import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.photoNameSave;
 import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameWidth;
-import static cn.com.magnity.coresdksample.Config.DefaultTempThreshold;
+
 import static cn.com.magnity.coresdksample.Config.FFCTemps;
 import static cn.com.magnity.coresdksample.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.Config.iftaken;
@@ -128,7 +129,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
        // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
         Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
         correctionPara.fTaoFilter=(float)0.85;
-        correctionPara.fDistance=Config.FDistance;
+        correctionPara.fDistance=CurrentConfig.getInstance().getCurrentData().getDistance();
         mDev.setFixPara(correctionPara);
         Log.i(TAG, "fTaoFilter: "+correctionPara.fTaoFilter);
         Log.i(TAG, "fDistance: "+correctionPara.fDistance);
@@ -261,10 +262,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         } else {
             paint.setStrokeWidth(2);//设置画笔的粗度
         }
-        int drawL= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
-        int drawR= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-        int drawU=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ Config.YPalce;//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
-        int drawD=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ Config.YPalce;
+        int drawL= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
+        int drawR= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
+        int drawU=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ CurrentConfig.getInstance().getCurrentData().getMovey();//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
+        int drawD=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ CurrentConfig.getInstance().getCurrentData().getMovey();
 
         drawL=drawL * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
         drawR=drawR * dstRect.width() / cameraInfo.fpaWidth + dstRect.left;
@@ -306,7 +307,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
        /* Log.i(TAG, "bmp: getWidth "+bmp.getWidth());
         Log.i(TAG, "bmp: getHeight"+bmp.getHeight());*/
         /* text to show */
-        String s = String.format(Locale.ENGLISH, "%.1fC", temp * 0.001f);
+        String s = String.format(Locale.ENGLISH, "%.1fC", temp * 0.001f+CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter());
 
         /* FIXME: allocate new object in high frequently running function */
         Rect rt = new Rect();
@@ -396,15 +397,15 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                  * @param bitmap1*/
              private  void GetRectTemperature(CameraInfo cameraInfo, int[] temps, Bitmap bitmap1){
 
-                  int x0= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
-                  int x1= Config.XPalce+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
-                  int y0=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ Config.YPalce;
-                  int y1=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ Config.YPalce;
+                  int x0= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
+                  int x1= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
+                  int y0=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ CurrentConfig.getInstance().getCurrentData().getMovey();
+                  int y1=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ CurrentConfig.getInstance().getCurrentData().getMovey();
                   int area[]=AreaUtil.AreaLimit(x0,x1,y0,y1);
 
                   int []maxTemp=TempUtil.DDNgetRectTemperatureInfo(temps,area[0],area[1],area[2],area[3]);//获取指定矩形区域中最大的值
 
-                  float maxTmp= (maxTemp[0]*0.001f+Config.FFCcompensation);//减去黑体补偿
+                  float maxTmp= (maxTemp[0]*0.001f+CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter());//减去黑体补偿
 
                       if(maxTmp>TempThreshold&&! TtsSpeak.getInstance().isSpeaking()){
                           iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
@@ -415,7 +416,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                               maxTmp2=maxTmp2.substring(0,4);
                               Log.i(TAG, "maxTmp2: "+maxTmp2);
                           }
-                          TtsSpeak.getInstance().SpeechRepead("体温异常   "+maxTmp2, Config.heightTempVoiceVolume);
+                          TtsSpeak.getInstance().SpeechRepead("口腔温度   "+maxTmp2,CurrentConfig.getInstance().getCurrentData().getError_voice());
                          // Log.i(TAG, "maxTmp2222: "+maxTmp2);
                           Canvas saveBmpCanvas=new Canvas(bitmap1);
                           float x2=maxTemp[1];
@@ -446,12 +447,12 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
                       }
                       else {
-                          if(TempThreshold>DefaultTempThreshold){//当前温度阈值与默认温度阈值不同的时播报异常
-                              TtsSpeak.getInstance().SpeechRepead("体温异常   ", Config.heightTempVoiceVolume);
+                          if(TempThreshold> CurrentConfig.getInstance().getCurrentData().getTemperature_threshold()){//当前温度阈值与默认温度阈值不同的时播报异常
+                              //TtsSpeak.getInstance().SpeechRepead("体温异常   ",CurrentConfig.getInstance().getCurrentData().getError_voice());
                               lampUtil.setlamp(2,500,3000);
                           }
                           else {//在没有超过阈值的情况下才会播报异常
-                              TtsSpeak.getInstance().SpeechRepead("体温正常   ", Config.normolTempVoiceVolume);
+                              TtsSpeak.getInstance().SpeechRepead("体温正常   ", CurrentConfig.getInstance().getCurrentData().getError_voice());
                               lampUtil.setlamp(1,500,2000);
                           }
 

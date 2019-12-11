@@ -14,6 +14,7 @@ import org.litepal.LitePal;
 import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.Service.TempHandler;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
@@ -31,6 +32,7 @@ import cn.com.magnity.coresdksample.ddnwebserver.model.WifiData;
 import cn.com.magnity.coresdksample.ddnwebserver.service.BindServiceTest;
 import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
+import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -95,6 +97,7 @@ public class SetConfigServer {
         PreferencesUtils.put(WebConfig.SYSTEM_VOICE, voiceData.getSystem_voice());
         PreferencesUtils.put(WebConfig.ERROR_VOICE, voiceData.getError_voice());
         CurrentConfig.getInstance().updateSetting();
+        TtsSpeak.getInstance().setSpeed();
         /*直接修改Tts配置*/
 
     }
@@ -148,6 +151,7 @@ public class SetConfigServer {
         if (ffcData == null) {
             //如果都是空的，则表示为平均黑体校准
             Log.i(TAG, "FFC平均黑体校准: ");
+
             return;
         }
         if (ffcData.getCompensation()!= 0) {

@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 
 
@@ -73,23 +75,26 @@ public class LoactionFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.bt_location_up:
                 Log.i(TAG, "上移动: ");
-                Config.YPalce= Config.YPalce-1;
+                PreferencesUtils.put(WebConfig.MOVEY,  CurrentConfig.getInstance().getCurrentData().getMovey()-1);
+                CurrentConfig.getInstance().updateSetting();
                 break;
             case R.id.bt_location_bottom:
-                Config.YPalce= Config.YPalce+1;
+                PreferencesUtils.put(WebConfig.MOVEY,  CurrentConfig.getInstance().getCurrentData().getMovey()+1);
+                CurrentConfig.getInstance().updateSetting();
                 Log.i(TAG, "下移动: ");
                 break;
             case R.id.bt_location_left:
-                Config.XPalce= Config.XPalce-1;
+                PreferencesUtils.put(WebConfig.MOVEX,  CurrentConfig.getInstance().getCurrentData().getMovey()-1);
+                CurrentConfig.getInstance().updateSetting();
                 Log.i(TAG, "左移动: ");
                 break;
             case R.id.bt_location_right:
-                Config.XPalce= Config.XPalce+1;
+                PreferencesUtils.put(WebConfig.MOVEX,  CurrentConfig.getInstance().getCurrentData().getMovey()+1);
+                CurrentConfig.getInstance().updateSetting();
                 Log.i(TAG, "右移动: ");
                 break;
             case R.id.bt_location_save:
-                PreferencesUtils.put(Config.KeyXplace, Config.XPalce);
-                PreferencesUtils.put(Config.KeyYplace, Config.YPalce);
+                CurrentConfig.getInstance().updateSetting();
                 Log.i(TAG, "保存，成功");
                 break;
 

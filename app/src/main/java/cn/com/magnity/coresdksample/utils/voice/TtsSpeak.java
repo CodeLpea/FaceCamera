@@ -10,6 +10,7 @@ import com.iflytek.thirdparty.E;
 import java.util.Locale;
 
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 public class TtsSpeak {
@@ -92,8 +93,8 @@ public class TtsSpeak {
      * 线性变换
      * 0.5为一般速度，2为两倍速
      * */
-    public void setSpeed(float rate){
-        textToSpeech.setSpeechRate(rate);
+    public void setSpeed(){
+        textToSpeech.setSpeechRate(CurrentConfig.getInstance().getCurrentData().getVoice_speed());
     }
 
     /**

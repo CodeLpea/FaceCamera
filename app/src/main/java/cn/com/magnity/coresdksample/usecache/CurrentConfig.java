@@ -59,6 +59,9 @@ public class CurrentConfig {
      * 获取最新的信息
      * */
     public CurrentSettingData getCurrentData() {
+        if(this.currentSettingData==null){
+            currentSettingData=updateData();
+        }
         return this.currentSettingData;
     }
 }

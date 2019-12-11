@@ -11,12 +11,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 
-import static cn.com.magnity.coresdksample.Config.AreaBottom;
-import static cn.com.magnity.coresdksample.Config.AreaLeft;
-import static cn.com.magnity.coresdksample.Config.AreaRight;
-import static cn.com.magnity.coresdksample.Config.AreaUp;
+
 
 public class AreaFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "AreaFragment";
@@ -120,16 +119,20 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
             case R.id.bt_area_up://向上调整（只能用于上下方的线条）
                 switch (WhichLine){
                     case 1://1为上方的线条
-                        if(AreaUp>10){
-                            AreaUp=AreaUp-10;//点击一下，就加1
+                        if(CurrentConfig.getInstance().getCurrentData().getLineUp()>10){
+                            //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINEUP,  CurrentConfig.getInstance().getCurrentData().getLineUp()-10);
+                            CurrentConfig.getInstance().updateSetting();
                         }else {
                             Toast.makeText(getActivity(),"已到达最顶部",Toast.LENGTH_SHORT).show();
                         }
 
                         break;
                     case 4://4为下方的线条
-                        if(AreaBottom>10){
-                            AreaBottom=AreaBottom-10;//点击一下，就加1
+                        if(CurrentConfig.getInstance().getCurrentData().getLineDown()>10){
+                            //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINEDWON,  CurrentConfig.getInstance().getCurrentData().getLineDown()-10);
+                            CurrentConfig.getInstance().updateSetting();
                         }else {
                             Toast.makeText(getActivity(),"已到达最顶部",Toast.LENGTH_SHORT).show();
                         }
@@ -140,19 +143,23 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
             case R.id.bt_area_left://左侧调整（只能用于左右的线条）
                 switch (WhichLine){
                     case 2://2为左边方的线条
-                        Log.i(TAG, "AreaLeftBefore: "+AreaLeft);
-                        if(AreaLeft>10){
-                            AreaLeft=AreaLeft-10;//点击一下，就加1
-                            Log.i(TAG, "AreaLeftAfter: "+AreaLeft);
+                        Log.i(TAG, "AreaLeftBefore: "+CurrentConfig.getInstance().getCurrentData().getLineLeft());
+                        if(CurrentConfig.getInstance().getCurrentData().getLineLeft()>10){
+                           //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINELEFT,  CurrentConfig.getInstance().getCurrentData().getLineLeft()-10);
+                            CurrentConfig.getInstance().updateSetting();
+                            Log.i(TAG, "AreaLeftAfter: "+CurrentConfig.getInstance().getCurrentData().getLineLeft());
                         }else {
                             Toast.makeText(getActivity(),"已到达最左侧",Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 3://3为右方的线条
-                        Log.i(TAG, "AreaRightBefore: "+AreaRight);
-                        if(AreaRight>10){
-                            AreaRight=AreaRight-10;//点击一下，就加1
-                            Log.i(TAG, "AreaRightAfter: "+AreaRight);
+                        Log.i(TAG, "AreaRightBefore: "+CurrentConfig.getInstance().getCurrentData().getLineRight());
+                        if(CurrentConfig.getInstance().getCurrentData().getLineRight()>10){
+                           //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINERIGHT,  CurrentConfig.getInstance().getCurrentData().getLineRight()-10);
+                            CurrentConfig.getInstance().updateSetting();
+                            Log.i(TAG, "AreaRightAfter: "+CurrentConfig.getInstance().getCurrentData().getLineRight());
                         }else {
                             Toast.makeText(getActivity(),"已到达最左侧",Toast.LENGTH_SHORT).show();
                         }
@@ -162,16 +169,20 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
             case R.id.bt_area_right://右侧调整（只能用于左右的线条）
                 switch (WhichLine){
                     case 2://2为左边方的线条
-                        if(AreaLeft<470){
-                            AreaLeft=AreaLeft+10;//点击一下，就加1
+                        if(CurrentConfig.getInstance().getCurrentData().getLineLeft()<470){
+                          //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINELEFT,  CurrentConfig.getInstance().getCurrentData().getLineLeft()+10);
+                            CurrentConfig.getInstance().updateSetting();
                         }else {
                             Toast.makeText(getActivity(),"已到达最右侧",Toast.LENGTH_SHORT).show();
                         }
 
                         break;
                     case 3://3为右方的线条
-                        if(AreaRight<470){
-                            AreaRight=AreaRight+10;//点击一下，就加1
+                        if(CurrentConfig.getInstance().getCurrentData().getLineRight()<470){
+                           //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINERIGHT,  CurrentConfig.getInstance().getCurrentData().getLineRight()+10);
+                            CurrentConfig.getInstance().updateSetting();
                         }else {
                             Toast.makeText(getActivity(),"已到达最右侧",Toast.LENGTH_SHORT).show();
                         }
@@ -182,16 +193,20 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
             case R.id.bt_area_bottom://向下调整（只能用于上下方的线条）
                 switch (WhichLine){
                     case 1://1为上方的线条
-                        if(AreaUp<630){
-                            AreaUp=AreaUp+10;//点击一下，就加1
+                        if(CurrentConfig.getInstance().getCurrentData().getLineUp()<630){
+                           //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINEUP,  CurrentConfig.getInstance().getCurrentData().getLineUp()+10);
+                            CurrentConfig.getInstance().updateSetting();
                         }else {
                             Toast.makeText(getActivity(),"已到达最底部",Toast.LENGTH_SHORT).show();
                         }
 
                         break;
                     case 4://4为下方的线条
-                        if(AreaBottom<630){
-                            AreaBottom=AreaBottom+10;//点击一下，就加1
+                        if(CurrentConfig.getInstance().getCurrentData().getLineDown()<630){
+                            //点击一下，就加1
+                            PreferencesUtils.put(WebConfig.LINEDWON,  CurrentConfig.getInstance().getCurrentData().getLineDown()+10);
+                            CurrentConfig.getInstance().updateSetting();
                         }else {
                             Toast.makeText(getActivity(),"已到达最底部",Toast.LENGTH_SHORT).show();
                         }
@@ -202,10 +217,7 @@ public class AreaFragment extends Fragment implements View.OnClickListener {
 
                 //保存
             case R.id.bt_area_save:
-                PreferencesUtils.put(Config.KeyAreaLineUp,AreaUp);
-                PreferencesUtils.put(Config.KeyAreaLineLeft,AreaLeft);
-                PreferencesUtils.put(Config.KeyAreaLineRight,AreaRight);
-                PreferencesUtils.put(Config.KeyAreaLineBottom,AreaBottom);
+                CurrentConfig.getInstance().updateSetting();
                 Toast.makeText(getActivity(),"已经保存成功",Toast.LENGTH_SHORT).show();
                 break;
 

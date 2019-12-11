@@ -16,7 +16,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.net.wifi.ScanResult;
 import android.os.Handler;
 import android.os.Message;
 
@@ -46,7 +45,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.CorrectionPara;
@@ -54,16 +52,20 @@ import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
+import cn.com.magnity.coresdksample.Service.DelayDoHandler;
 import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.Service.LoadService;
 import cn.com.magnity.coresdksample.Service.ServiceManager;
 import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.View.QiuView;
+import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.EthernetUtil;
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.Temp.SaveTemps;
+import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.Utils;
@@ -79,13 +81,8 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.MyApplication.photoNameSave2;
-import static cn.com.magnity.coresdksample.Config.DefaultTempThreshold;
-import static cn.com.magnity.coresdksample.Config.DefaultWifiName;
-import static cn.com.magnity.coresdksample.Config.DefaultWifiPassWord;
 import static cn.com.magnity.coresdksample.Config.FFCTemps;
 import static cn.com.magnity.coresdksample.Config.InitLoadServieAction;
-import static cn.com.magnity.coresdksample.Config.MSG0;
-import static cn.com.magnity.coresdksample.Config.MSG1;
 import static cn.com.magnity.coresdksample.Config.MSG10;
 import static cn.com.magnity.coresdksample.Config.MSG2;
 import static cn.com.magnity.coresdksample.Config.MSG3;
@@ -97,8 +94,6 @@ import static cn.com.magnity.coresdksample.Config.MSG8;
 import static cn.com.magnity.coresdksample.Config.MSG9;
 import static cn.com.magnity.coresdksample.Config.ReLoadServieAction;
 import static cn.com.magnity.coresdksample.Config.TempThreshold;
-import static cn.com.magnity.coresdksample.Config.WifiName;
-import static cn.com.magnity.coresdksample.Config.WifiPassWord;
 import static cn.com.magnity.coresdksample.Config.ifBlackfFFC;
 import static cn.com.magnity.coresdksample.Config.iftaken;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
@@ -151,7 +146,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button BtLocate, BtLink, BtArea;
     //wifi管理
     WifiAdmin wifiAdmin;
-    private Handler WifiScanHandler;
+
     private String NoewIp = "0.0.0.0";
     public static Handler DelayStartHandler;
     public static Handler ReloadServiceHandler;
@@ -170,11 +165,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initFragment();
 
         //连接指定wifi
-        wifiScan();
+//        wifiScan();
 
         //初始化延迟Handler
         delayStart();
-
         //温度摄像头初始化
         initJuge(savedInstanceState);
 
@@ -228,7 +222,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             Camera.Parameters parameters = mCamera.getParameters();
                             Log.e(TAG, "ExposureBefore++: " + parameters.getExposureCompensation());
                             parameters.setAutoExposureLock(false);
-                            parameters.setExposureCompensation(Config.ExploreValue);
+                            parameters.setExposureCompensation(CurrentConfig.getInstance().getCurrentData().getCamera_explore());
                             mCamera.setParameters(parameters);
                             parameters = mCamera.getParameters();
                             Log.e(TAG, "ExposureNow: " + parameters.getExposureCompensation());
@@ -256,35 +250,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what) {
-                    case MSG2://延时播放ftp服务器语音，包括网络信息
-                        String voice2 = msg.obj.toString();
-                        TtsSpeak.getInstance().SpeechAdd(voice2, Config.currtentVoiceVolume);
-                        Log.i(TAG, "延时播放ftp服务器语音: " + voice2);
-                        break;
-                    case MSG3://延时人脸摄像头语音
-                        String voice3 = msg.obj.toString();
-                        TtsSpeak.getInstance().SpeechAdd(voice3, Config.currtentVoiceVolume);
-                        Log.i(TAG, "延时人脸摄像头语音: " + voice3);
-                        break;
-                    case MSG4://延时的文件检查
-                        String voice4 = msg.obj.toString();
-                        TtsSpeak.getInstance().SpeechAdd(voice4, Config.currtentVoiceVolume);
-                        Log.i(TAG, "延时的文件检查: " + voice4);
-                        break;
-                    case MSG5://延时播放温度摄像头语音
-                        String voice5 = msg.obj.toString();
-                        TtsSpeak.getInstance().SpeechAdd(voice5, Config.currtentVoiceVolume);
-                        Log.i(TAG, "延时播放温度摄像头语音: " + voice5);
-                        break;
-                    case MSG8://延时播放温度摄像头语音
-                        String voice8 = msg.obj.toString();
-                        TtsSpeak.getInstance().SpeechAdd(voice8, Config.currtentVoiceVolume);
-                        Log.i(TAG, "升级语音播报: " + voice8);
-                        break;
                     case MSG9://延时播放温度摄像头语音，FFC校准成功的播报和测试
                         String voice9 = msg.obj.toString();
                         if (voice9.equals("10秒钟后开始校准FFC")) {
-                            TtsSpeak.getInstance().SpeechAdd(voice9, Config.currtentVoiceVolume);
+                            TtsSpeak.getInstance().SpeechAdd(voice9, CurrentConfig.getInstance().getCurrentData().getSystem_voice());
                             Log.i(TAG, "10秒钟后开始校准FFC: " + voice9);
                         }
                         if (voice9.equals("FFC校准成功")) {//校准成功后再保存校准后的数据
@@ -299,7 +268,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             }
                             SaveTemps.saveIntTemps(temps, "After");
 
-                            TtsSpeak.getInstance().SpeechAdd(voice9 + "    请重新遮挡温度摄像头，五秒后开始测试FFC效果", Config.currtentVoiceVolume);
+                            TtsSpeak.getInstance().SpeechAdd(voice9 + "    请重新遮挡温度摄像头，五秒后开始测试FFC效果",CurrentConfig.getInstance().getCurrentData().getSystem_voice());
                             Log.i(TAG, "FFC校准语音播报: " + voice9);
 
                             Message message = Message.obtain();
@@ -319,7 +288,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
                             Log.i(TAG, "fTaoFilter: " + correctionPara.fTaoFilter);
                             correctionPara.fTaoFilter = (float) 0.85;
-                            correctionPara.fDistance = Config.FDistance;
+                            correctionPara.fDistance = CurrentConfig.getInstance().getCurrentData().getDistance();
                             mDev.setFixPara(correctionPara);
 
                             int[] AfterTemps = new int[temps.length];
@@ -330,17 +299,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             }
                             int[] maxAndmin = TempUtil.MaxMinTemp(AfterTemps);
                             int cha = maxAndmin[0] - maxAndmin[1];
-                            int max = (int) (maxAndmin[0] + Config.FFCcompensation * 1000);//统一刻度
-                            int min = (int) (maxAndmin[1] + Config.FFCcompensation * 1000);
-                            int avg = (int) (maxAndmin[2] + Config.FFCcompensation * 1000);
+                            int max = (int) (maxAndmin[0] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);//统一刻度
+                            int min = (int) (maxAndmin[1] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()* 1000);
+                            int avg = (int) (maxAndmin[2] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);
                             int TDEV = TempUtil.DDNgetTdevTemperatureInfo(AfterTemps);
-                            TtsSpeak.getInstance().SpeechAdd("TDEV为：    " + String.valueOf(TDEV * 0.001f).substring(0, 4), Config.currtentVoiceVolume);
-                            TtsSpeak.getInstance().SpeechAdd("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4), Config.currtentVoiceVolume);
-                            TtsSpeak.getInstance().SpeechAdd("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4), Config.currtentVoiceVolume);
-                            TtsSpeak.getInstance().SpeechAdd("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4), Config.currtentVoiceVolume);
-                            TtsSpeak.getInstance().SpeechAdd("平均温度为： " + String.valueOf(avg * 0.001f).substring(0, 4), Config.currtentVoiceVolume);
-                            TtsSpeak.getInstance().SpeechAdd("黑体补偿为： " + String.valueOf(Config.FFCcompensation), Config.currtentVoiceVolume);
-                            TtsSpeak.getInstance().SpeechAdd("测试结束", Config.currtentVoiceVolume);
+                            TtsSpeak.getInstance().SpeechAdd("TDEV为：    " + String.valueOf(TDEV * 0.001f).substring(0, 4), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                            TtsSpeak.getInstance().SpeechAdd("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                            TtsSpeak.getInstance().SpeechAdd("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                            TtsSpeak.getInstance().SpeechAdd("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                            TtsSpeak.getInstance().SpeechAdd("平均温度为： " + String.valueOf(avg * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                            TtsSpeak.getInstance().SpeechAdd("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                            TtsSpeak.getInstance().SpeechAdd("测试结束", CurrentConfig.getInstance().getCurrentData().getSystem_voice());
                         }
                         break;
                     case MSG10://延时播放温度摄像头语音，进行多帧率FFC
@@ -348,7 +317,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         String voice10 = ffcHolder.getSpeechString();
                         float targetTemp = ffcHolder.getTemp();
                         if (voice10.equals("开始校准")) {//只有第一次进入才会播报
-                            TtsSpeak.getInstance().SpeechAdd(voice10, Config.currtentVoiceVolume);
+                            TtsSpeak.getInstance().SpeechAdd(voice10, CurrentConfig.getInstance().getCurrentData().getSystem_voice());
                             Log.i(TAG, "FFC校准: " + voice10);
                         }
 
@@ -362,145 +331,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //DelayStartHandler.sendEmptyMessageDelayed(MSG2,5000);
     }
 
-    /**
-     * 连接指定的wifi
-     */
-    private void wifiScan() {
-        WifiScanHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case MSG1://自动连接指定的wifi
-                        WifiScanHandler.removeMessages(MSG1);
-                        wifiAdmin = new WifiAdmin(getApplicationContext());//刷新wifiAdmin
-                        wifiAdmin.openWifi();
-                        countWifiRssi++;
-                        if (countWifiRssi >= 20) {
-                            countWifiRssi = 0;
-                            Log.i(TAG, "当前网络名称: " + wifiAdmin.getSSID() + "当前信号强度" + wifiAdmin.getWifRssi());
-                        }
-                        //执行搜索
-                        if (!wifiAdmin.getSSID().equals("\"" + WifiName + "\"") && !wifiAdmin.getSSID().equals("\"" + DefaultWifiName + "\"") && !isEthernet) {
-                            //连接的wifi与设置的wifi不同。而且没有连接以太网。
-                            //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
-                            wifiAdmin.startScan();
-                            List<ScanResult> scanResultList;
-                            scanResultList = wifiAdmin.getWifiList();
-                            //Log.i(TAG, "scanResultList.size(): "+scanResultList.size());
-                            for (int i = 0; i < scanResultList.size(); i++) {
-                                Log.i(TAG, "scanResultList.SSID(): " + scanResultList.get(i).SSID);
-                                if (scanResultList.get(i).SSID.equals(WifiName)) {//搜索到wifi名称相同
-                                    Log.i(TAG, "找到指定wifi： " + WifiName + "  准备连接: ");
-                                    wifiAdmin.addNetwork(
-                                            wifiAdmin.CreateWifiInfo(WifiName,
-                                                    WifiPassWord, 3));
-                                    break;
-                                }
-                            }
-                        }
-                        WifiScanHandler.sendEmptyMessageDelayed(MSG1, 5000);//每隔500ms询问一次
-                        break;
-                    case MSG0://自动连接指定的默认wifi
-                        WifiScanHandler.removeMessages(MSG0);
-                        wifiAdmin = new WifiAdmin(getApplicationContext());//刷新wifiAdmin
-                        wifiAdmin.openWifi();
-                        //执行搜索
-                        if (!wifiAdmin.getSSID().equals("\"" + DefaultWifiName + "\"") && !isEthernet) {//连接的wifi与设置的wifi不同。而且没有连接以太网。
-                            //Log.i(TAG, "wifiAdmin.getSSID(): "+wifiAdmin.getSSID());
-                            wifiAdmin.startScan();
-                            List<ScanResult> scanResultList;
-                            scanResultList = wifiAdmin.getWifiList();
-                            //Log.i(TAG, "scanResultList.size(): "+scanResultList.size());
-                            for (int i = 0; i < scanResultList.size(); i++) {
-                                // Log.i(TAG, "scanResultList.SSID(): "+scanResultList.get(i).SSID);
-                                if (scanResultList.get(i).SSID.equals(DefaultWifiName)) {//搜索到wifi名称相同
-                                    Log.i(TAG, "找到指定wifi： " + DefaultWifiName + "  准备连接: ");
-                                    wifiAdmin.addNetwork(
-                                            wifiAdmin.CreateWifiInfo(DefaultWifiName,
-                                                    DefaultWifiPassWord, 3));
-                                    break;
-                                }
-                            }
-                        }
-                        WifiScanHandler.sendEmptyMessageDelayed(MSG0, 1000);//每隔500ms询问一次
-                        break;
 
-                    case 404:  //初始化ftp
-                        WifiScanHandler.removeMessages(404);
-                        initFtp();
-                        WifiScanHandler.sendEmptyMessageDelayed(404, 3000);//每隔500ms询问一次
-                        break;
-
-                }
-            }
-        };
-        WifiScanHandler.sendEmptyMessage(MSG1);//启动
-        WifiScanHandler.sendEmptyMessage(MSG0);//启动
-        WifiScanHandler.sendEmptyMessageDelayed(404, 7000);//延时启动
-    }
-
-    /***
-     * 初始化ftp
-     * */
-    private int count = 0;
-    private int countWifiRssi = 0;
-    private boolean isEthernet = false;//是否正在用以太网
-    private String currentNetName = "";
-
-    private void initFtp() {
-        Message message = Message.obtain();
-        WifiUtil wifiUtil = new WifiUtil();
-        String wifiip = wifiUtil.getIp(this);
-        String Ethernetip = EthernetUtil.getEthernetIp();
-        wifiAdmin = new WifiAdmin(getApplicationContext());//刷新wifiAdmin
-        currentNetName = wifiAdmin.getSSID();
-        if (wifiip.equals(Ethernetip)) {
-            Ethernetip = "127.0.0.1";
-        }
-        wifiUtil = null;
-        if (wifiip.equals("0.0.0.0") && Ethernetip.equals("127.0.0.1")) {//每隔30个周期，判断wifi和以太网是否连接
-            isEthernet = false;
-            count++;
-            Log.i(TAG, "count++: " + count);
-            if (count >= 10) {
-                count = 0;
-                Log.e(TAG, "获取不到IP，请连接网络");
-                message.what = MSG2;
-                message.obj = "网络不通，请检查";
-                DelayStartHandler.sendMessageDelayed(message, 1000);
-                lampUtil.setlamp(2, 500, -1);//设置默认的故障灯光
-
-            }
-        } else if (!wifiip.equals(NoewIp) && !wifiip.equals("0.0.0.0") && Ethernetip.equals("127.0.0.1")) {//wifi有ip且与之前的不同，而且以太网没有连接
-            NoewIp = wifiip;
-            String str = "请在IE浏览器上输入网址访问FTP服务\n" +
-                    "ftp://" + wifiip + ":2221\n" +
-                    "账号:didano\n" +
-                    "密码:12345678";
-            Log.i(TAG, str);
-            message.what = MSG2;
-            message.obj = "连接到网络" + currentNetName + "，当前 i p 为" + wifiip;
-            DelayStartHandler.sendMessageDelayed(message, 5000);
-            startService(new Intent(this, FtpService.class));
-            lampUtil.setlamp(1, 500, -1);
-        } else if (!Ethernetip.equals(NoewIp) && wifiip.equals("0.0.0.0") && !Ethernetip.equals("127.0.0.1") && currentNetName.equals("0x")) {//wifi没有连接，而且以太网wifi和之前的不相同
-            isEthernet = true;
-            NoewIp = EthernetUtil.getEthernetIp();
-            Log.i(TAG, "NoewIp: " + NoewIp);
-            String str = "请在IE浏览器上输入网址访问FTP服务\n" +
-                    "ftp://" + NoewIp + ":2221\n" +
-                    "账号:didano\n" +
-                    "密码:12345678";
-            Log.i(TAG, str);
-            message.what = MSG2;
-            message.obj = "连接以太网，当前 i p 为" + NoewIp;
-            DelayStartHandler.sendMessageDelayed(message, 5000);
-            startService(new Intent(this, FtpService.class));
-            lampUtil.setlamp(1, 500, -1);
-        }
-
-    }
 
     /**
      * initView
@@ -708,10 +539,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mRestoreRunnable = null;
             mRestoreHandler = null;
         }
-        WifiScanHandler.removeCallbacksAndMessages(null);
-        WifiScanHandler = null;
+
         DelayStartHandler.removeCallbacksAndMessages(null);
-        WifiScanHandler = null;
+
         ReloadServiceHandler.removeCallbacksAndMessages(null);
         ReloadServiceHandler = null;
         /* disconnect camera when app exited */
@@ -761,13 +591,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
             closeCamera();
-            Message message = Message.obtain();
-            message.what = MSG3;
-            message.obj = "人脸摄像头开启失败，请检查";
+            DelayDoHandler.getInstance().sendDelayVoice("人脸摄像头开启失败，请检查",3*1000);
+
             RunningInfo runningInfo = new RunningInfo();
             runningInfo.setCameraStatus("人脸摄像头开启失败，请检查");
             runningInfo.upload();
-            DelayStartHandler.sendMessageDelayed(message, 6000);
+
             lampUtil.setlamp(2, 500, -1);//设置默认的故障灯光
             return;
         }
@@ -940,7 +769,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         //否则同一个人不会反复拍摄同样温度的照片
                         if (TimeUitl.timeInterval(500)) {
                             Log.i(TAG, "检测到不同人脸  ");
-                            TempThreshold = DefaultTempThreshold;//超过间隔则表示第二个人，则回复默认的阈值
+                            TempThreshold = CurrentConfig.getInstance().getCurrentData().getTemperature_threshold();//超过间隔则表示第二个人，则回复默认的阈值
                         }
                         face.bound = DrawFaceRect.RotateDeg90(face.bound, PREVIEW_HEIGHT);//绘制人脸的区域
                         if (face.point != null) {//绘制脸上关键点
@@ -1040,7 +869,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 float BlackTempCom = targetTemp * 1000 - avg;  //计算黑体补偿,统一单位
               /*  FFCTemps=FFCUtil.getFFC(ffctemps,(int)targetTemp*1000);
                 float conmpensation=targetTemp*1000-avg;//*/
-                Config.FFCcompensation = BlackTempCom * 0.001f;//黑体补偿等于原始数据平均值减去目标黑体温度。用于之后补偿。
+//                Config.FFCcompensation = BlackTempCom * 0.001f;
+                //黑体补偿等于原始数据平均值减去目标黑体温度。用于之后补偿。
+                PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER,BlackTempCom * 0.001f);
+                CurrentConfig.getInstance().updateSetting();
                 ifBlackfFFC = true;//标志了已经进行了FFC黑体校准
             }
 

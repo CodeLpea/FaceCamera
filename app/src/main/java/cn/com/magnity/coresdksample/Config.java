@@ -36,13 +36,13 @@ public class Config {
 
 
     /*x方向校准参数，y方向校准参数*/
-    public static int XPalce = 1;//
-    public static int YPalce = 1;
+//    public static int XPalce = 1;//
+//    public static int YPalce = 1;
     /*有效区域的划线*/
-    public static int AreaUp = 45;
-    public static int AreaLeft = 114;
-    public static int AreaRight = 448;
-    public static int AreaBottom = 576;
+//    public static int AreaUp = 45;
+//    public static int AreaLeft = 114;
+//    public static int AreaRight = 448;
+//    public static int AreaBottom = 576;
     /*拍照标记*/
     public static boolean iftaken; //拍照状态按钮
 
@@ -54,22 +54,22 @@ public class Config {
     /*配置参数*/
     public static String DEVICENAME = "didnao";
     public static String VERSIONNAME = "1.3.2";
-    public static int currtentVoiceVolume = 15;
-    public static int heightTempVoiceVolume = 15;
-    public static int normolTempVoiceVolume = 10;
+//    public static int currtentVoiceVolume = 15;
+//    public static int heightTempVoiceVolume = 15;
+//    public static int normolTempVoiceVolume = 10;
     public static String WifiName = "XIAONUO1";
     public static String WifiPassWord = "XiaoNuo2018";
     public static String DefaultWifiName = "didano";
     public static String DefaultWifiPassWord = "12345678";
-    public static float FDistance = (float) 1.2;
-    public static String IsFFC = "0";
-    public static float FFCcompensation = 0;
+//    public static float FDistance = (float) 1.2;
+//    public static String IsFFC = "0";
+//    public static float FFCcompensation = 0;
 
     /*温度阀值*/
     //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
     //否则同一个人不会反复拍摄同样温度的照片
     public static float TempThreshold = 30;
-    public static float DefaultTempThreshold = 30;
+//    public static float DefaultTempThreshold = 30;
     public static int ExploreValue = 1; //-3 ---3
     public static boolean ifBlackfFFC = false;
 
