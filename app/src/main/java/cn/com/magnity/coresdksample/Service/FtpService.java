@@ -19,6 +19,8 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 import java.util.ArrayList;
 import java.util.List;
 import cn.com.magnity.coresdksample.MainActivity;
+import cn.com.magnity.coresdksample.utils.NetUtil;
+
 import static cn.com.magnity.coresdksample.Config.MSG2;
 
 
@@ -35,6 +37,7 @@ public class FtpService extends Service {
     private String password = "12345678";
     private static String rootPath;
     private int port = 2221;
+    private static boolean isRuning=false;
 
     @Nullable
     @Override
@@ -45,26 +48,16 @@ public class FtpService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        isRuning=true;
     }
 
     private void initFtp() {
-        Message message=Message.obtain();
         rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         try {
             init();
-         /*   Toast.makeText(this, "启动ftp服务成功", Toast.LENGTH_SHORT).show();
-            message.what=MSG2;
-            message.obj="启动ftp服务成功";
-            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);*/
-
             Log.i(TAG, "启动ftp服务成功: ");
         } catch (FtpException e) {
             e.printStackTrace();
-            message.what=MSG2;
-            message.obj="启动ftp服务失败，请检查";
-            MainActivity.DelayStartHandler.sendMessageDelayed(message,7000);
-            Toast.makeText(this, "启动ftp服务失败", Toast.LENGTH_SHORT).show();
-
             Log.i(TAG, "启动ftp服务失败: ");
         }
     }
@@ -79,7 +72,7 @@ public class FtpService extends Service {
     public void onDestroy() {
         super.onDestroy();
         release();
-        Toast.makeText(this, "关闭ftp服务", Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "onDestroy: 关闭ftp服务");
     }
 
     /**
@@ -114,6 +107,12 @@ public class FtpService extends Service {
         server = serverFactory.createServer();
         server.start();
         Log.i(TAG, "server.isStopped(): "+server.isStopped());
+        Log.e(TAG, "startFtp: "+
+                "ftp://" +
+                NetUtil.getLocalIPAddress().getHostAddress() +
+                ":2221\n" +
+                "账号:didano\n" +
+                "密码:12345678");
     }
 
 
@@ -122,6 +121,7 @@ public class FtpService extends Service {
      * 释放资源
      */
     public void release() {
+        isRuning=false;
         stopFtp();
     }
 
@@ -131,5 +131,9 @@ public class FtpService extends Service {
             server = null;
         }
     }
+    public static boolean isServiceRunning(){
+        return isRuning;
+    }
+
 
 }

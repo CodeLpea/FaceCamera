@@ -5,7 +5,6 @@ import android.os.Message;
 import android.util.Log;
 
 import cn.com.magnity.coresdk.types.CorrectionPara;
-import cn.com.magnity.coresdksample.MainActivity;
 import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.Temp.SaveTemps;
@@ -18,26 +17,41 @@ import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 import static cn.com.magnity.coresdksample.Config.FFCTemps;
 import static cn.com.magnity.coresdksample.Config.MSG10;
 import static cn.com.magnity.coresdksample.Config.MSG9;
-import static cn.com.magnity.coresdksample.Config.ifBlackfFFC;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 
 /**
  * 温度校准Handler
- * */
-public class TempHandler  extends Handler{
-    private String TAG="TempHandler";
-    public static final int MSGTEMP = 300;//自动连接指定的wifi
-    public static final int MSG_1 = MSGTEMP + 1;//ftp语音，包括wifi信息
+ */
+public class TempHandler extends Handler {
+    private String TAG = "TempHandler";
+    //基础
+    public static final int MSGTEMP = 300;
+    //FFC平均/黑体校准，入口
+    public static final int MSG_IN = MSGTEMP + 1;
+    //校准过程
+    public static final int MSG_DO = MSG_IN + 1;
+    //校准完成
+    public static final int MSG_OVER = MSG_DO + 1;
+    public static final int MSG_OVER_TEST = MSG_OVER + 1;
 
+    //接收到命令的标志
+    private static boolean runSign = false;
+
+    private float calibrationValue = 0;
+
+    //单张温度图片图片的矩阵值
     private int[] FFCSingleTemps = new int[120 * 160];
+    //多张温度图片的矩阵值的和
     private int[] FFCALLTemps = new int[120 * 160];
     //间隔多少帧数
-    public int intervalFrame = 10;
+    private static final int INTERVALFRAME = 10;
     //计数
     private int nowInterval = 0;
+
     private static class InnerClass {
-        private static TempHandler intance = new TempHandler();
+        public static TempHandler intance = new TempHandler();
     }
+
     /*静态内部类单例*/
     public static TempHandler getInstance() {
         return InnerClass.intance;
@@ -48,164 +62,242 @@ public class TempHandler  extends Handler{
         super.handleMessage(msg);
 
         switch (msg.what) {
-            case MSG9://延时播放温度摄像头语音，FFC校准成功的播报和测试
-                String voice9 = msg.obj.toString();
-                if (voice9.equals("10秒钟后开始校准FFC")) {
-                    TtsSpeak.getInstance().SpeechAdd(voice9, CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    Log.i(TAG, "10秒钟后开始校准FFC: " + voice9);
+            case MSG_IN:
+                //温度校准标志
+                if (runSign == true) {
+                    //如果标志已经为true，则正在运行中，不需要重复校准
+                    Log.e(TAG, "温度校准运行中，不需要重复校准: ");
+                    TtsSpeak.getInstance().SystemSpeech("温度校准运行中");
+                    return;
                 }
-                if (voice9.equals("FFC校准成功")) {//校准成功后再保存校准后的数据
-                    int[] temps = new int[160 * 120];
-                    mDev.lock();
-                    mDev.getTemperatureData(temps, true, true);
-                    mDev.unlock();
-
-                    int[] readeFfcs = FFCUtil.readFfc();
-                    for (int i = 0; i < readeFfcs.length; i++) {
-                        temps[i] = temps[i] - readeFfcs[i];
-                    }
-                    SaveTemps.saveIntTemps(temps, "After");
-
-                    TtsSpeak.getInstance().SpeechAdd(voice9 + "    请重新遮挡温度摄像头，五秒后开始测试FFC效果",CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    Log.i(TAG, "FFC校准语音播报: " + voice9);
-
-                    Message message = Message.obtain();
-                    message.what = MSG9;
-                    message.obj = "FFC校准后测试";
-                    MainActivity.DelayStartHandler.sendMessageDelayed(message, 15000);
-                }
-                if (voice9.equals("FFC校准后测试")) {
-                    int[] temps = new int[120 * 160];
-                    mDev.lock();
-                    mDev.getTemperatureData(temps, true, true);
-                    mDev.unlock();
-                    /*还原CorrectionPara配置*/
-                    CorrectionPara correctionPara = new CorrectionPara();
-                    Log.i(TAG, "getCorrectionPara: " + mDev.getFixPara(correctionPara));
-                    Log.i(TAG, "fDistance: " + correctionPara.fDistance);
-                    // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
-                    Log.i(TAG, "fTaoFilter: " + correctionPara.fTaoFilter);
-                    correctionPara.fTaoFilter = (float) 0.85;
-                    correctionPara.fDistance = CurrentConfig.getInstance().getCurrentData().getDistance();
-                    mDev.setFixPara(correctionPara);
-
-                    int[] AfterTemps = new int[temps.length];
-                    if (FFCTemps.length > 10) {//本地读取到有效的FFC
-                        for (int i = 0; i < AfterTemps.length; i++) {
-                            AfterTemps[i] = temps[i] - FFCTemps[i];
-                        } //将原始数据通过FFc数据处理
-                    }
-                    int[] maxAndmin = TempUtil.MaxMinTemp(AfterTemps);
-                    int cha = maxAndmin[0] - maxAndmin[1];
-                    int max = (int) (maxAndmin[0] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);//统一刻度
-                    int min = (int) (maxAndmin[1] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()* 1000);
-                    int avg = (int) (maxAndmin[2] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);
-                    int TDEV = TempUtil.DDNgetTdevTemperatureInfo(AfterTemps);
-                    TtsSpeak.getInstance().SpeechAdd("TDEV为：    " + String.valueOf(TDEV * 0.001f).substring(0, 4), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    TtsSpeak.getInstance().SpeechAdd("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    TtsSpeak.getInstance().SpeechAdd("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    TtsSpeak.getInstance().SpeechAdd("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    TtsSpeak.getInstance().SpeechAdd("平均温度为： " + String.valueOf(avg * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    TtsSpeak.getInstance().SpeechAdd("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    TtsSpeak.getInstance().SpeechAdd("测试结束", CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                }
+                //修改运行标志
+                runSign=true;
+                Log.e(TAG, "开始温度校准: ");
+                //开始之前，重置所有需要用到的变量。
+                resetAllVaria();
+                float agvValues = Float.valueOf(msg.obj.toString());
+                //十五秒后开始执行平均温度校准,通过校准值来区黑体校准或者平均校准。
+                sendTemperMessge(MSG_DO, agvValues, 20 * 1000);
+                TtsSpeak.getInstance().SystemSpeech("开始温度校准， 十五秒后开始校准");
                 break;
-            case MSG10://延时播放温度摄像头语音，进行多帧率FFC
-                FFCHolder ffcHolder = (FFCHolder) msg.obj;
-                String voice10 = ffcHolder.getSpeechString();
-                float targetTemp = ffcHolder.getTemp();
-                if (voice10.equals("开始校准")) {//只有第一次进入才会播报
-                    TtsSpeak.getInstance().SpeechAdd(voice10, CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                    Log.i(TAG, "FFC校准: " + voice10);
-                }
-
-                MuiltFFC(targetTemp);//进入多帧率FFC
-
-
+            case MSG_DO:
+                //执行多征率温度校准的循环
+                calibrationValue = Float.valueOf(msg.obj.toString());
+                //多帧率校准
+                MuiltFFC(calibrationValue);
                 break;
+
+            case MSG_OVER:
+                //校准完成
+                Log.e(TAG, "校准完成: ");
+                //完成校准后保存一次测试记录
+                afterCalibratSave();
+                //语音播报，提醒遮盖测试
+                TtsSpeak.getInstance().SystemSpeech(" 校准完成  请均匀遮挡温度摄像头，五秒后开始测试FFC效果");
+                //实际10秒后开始测试效果
+                sendTemperMessge(MSG_OVER_TEST, 0, 10 * 1000);
+                break;
+            case MSG_OVER_TEST:
+                Log.e(TAG, "测试校准效果: ");
+                //测试效果
+                testCalibrat();
+                //还原标志，方便下次校准
+                runSign=false;
+                break;
+
         }
 
     }
 
     /**
-     * 按照平均温度校准FFC
-     * 使成像表面温度分布均匀
-     * */
-    private void avgFFC(){
+     * 测试一下校准效果
+     */
+    private void testCalibrat() {
+        //获取测试数据
+        int[] testCalibrat = getCameraTemps();
+        //获取测试数据之后，还原目标距离
+        setTempCorrect(CurrentConfig.getInstance().getCurrentData().getDistance());
+        //获得校准后的数据
+        int[] calibratFFC = getcalibratFFC(testCalibrat);
+        //获得校准后的数据的最大，最小，平均值
+        int[] maxAndmin = TempUtil.MaxMinTemp(calibratFFC);
+        //获取每个点的温度与平均值的绝对值的和的平均值。
+        int TDEV = TempUtil.DDNgetTdevTemperatureInfo(calibratFFC);
 
+        int cha = maxAndmin[0] - maxAndmin[1];
+        int max = (int) (maxAndmin[0] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);//统一刻度
+        int min = (int) (maxAndmin[1] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);
+        int avg = (int) (maxAndmin[2] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);
+
+        TtsSpeak.getInstance().SystemSpeech("TDEV为：    " + String.valueOf(TDEV * 0.001f).substring(0, 4));
+        TtsSpeak.getInstance().SystemSpeech("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4));
+        TtsSpeak.getInstance().SystemSpeech("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4));
+        TtsSpeak.getInstance().SystemSpeech("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4));
+        TtsSpeak.getInstance().SystemSpeech("平均温度为： " + String.valueOf(avg * 0.001f).substring(0, 4));
+        TtsSpeak.getInstance().SystemSpeech("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()));
+        TtsSpeak.getInstance().SystemSpeech("测试结束");
     }
 
     /**
-     * 多帧率FFC校准
-     * @param targetTemp
+     * 温度校准结束之后
+     * 保存一次测试记录
      */
-    private void MuiltFFC(float targetTemp) {
-        MainActivity.DelayStartHandler.removeMessages(MSG10);
-        nowInterval++;
-        FFCSingleTemps = null;
-        FFCSingleTemps = new int[120 * 160];
-        /*设置距离为0，避免使用时干扰*/
+    private void afterCalibratSave() {
+        //获得最新一帧，然后补偿出数据
+        int[] afterCalibrat = getcalibratFFC(getCameraTemps());
+        //保存测试矩阵，方便查看效果
+        SaveTemps.saveIntTemps(afterCalibrat, SaveTemps.SaveType.AFTER);
+    }
+
+    /**
+     * 简化发送信息
+     *
+     * @param MSG
+     * @param calibrationValue
+     * @param times
+     */
+    public  void sendTemperMessge(int MSG, float calibrationValue, long times) {
+        Message message = this.obtainMessage();
+        message.what = MSG;
+        message.obj = calibrationValue;
+        //times毫秒之后开始进行校准,传递校准的参数。
+        this.sendMessageDelayed(message, times);
+    }
+
+    /**
+     * 设置温度摄像头相关参数
+     * 使校准更加准确
+     * 透光率 默认0.85
+     * 距离
+     *
+     * @param distance
+     */
+    private void setTempCorrect(float distance) {
         CorrectionPara correctionPara = new CorrectionPara();
         Log.i(TAG, "getCorrectionPara: " + mDev.getFixPara(correctionPara));
         Log.i(TAG, "fDistance: " + correctionPara.fDistance);
         // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
         Log.i(TAG, "fTaoFilter: " + correctionPara.fTaoFilter);
         correctionPara.fTaoFilter = (float) 0.85;
-        correctionPara.fDistance = 0;
+        correctionPara.fDistance = distance;
         mDev.setFixPara(correctionPara);
+    }
 
+    /**
+     * 获取温度摄像头当前预览的矩阵
+     *
+     * @return int[]
+     */
+    private int[] getCameraTemps() {
+        int[] temps = new int[120 * 160];
         mDev.lock();
-        mDev.getTemperatureData(FFCSingleTemps, true, true);
+        mDev.getTemperatureData(temps, true, true);
         mDev.unlock();
+        return temps;
+    }
+
+
+    /**
+     * 重置所有变量
+     */
+    private void resetAllVaria() {
+        nowInterval = 0;
+        calibrationValue = 0;
+        FFCSingleTemps = null;
+        FFCALLTemps = null;
+        FFCALLTemps = new int[120 * 160];
+        FFCSingleTemps = new int[120 * 160];
+    }
+
+    /**
+     * 多帧率FFC校准
+     * 输入校准的温度
+     * 0 平均校准
+     * others 黑体校准
+     *
+     * @param targetTemp
+     */
+    private void MuiltFFC(float targetTemp) {
+        Log.i(TAG, "温度校准Step：  " + nowInterval);
+        removeMessages(MSG_DO);
+        //自增
+        nowInterval++;
+
+        /*设置距离为0，避免使用时干扰*/
+        setTempCorrect(0);
+
+        //获取当前温度矩阵
+        FFCSingleTemps = getCameraTemps();
+
+        //将每个点累加起来，用于最终结果中求每个点的平均
         for (int i = 0; i < FFCSingleTemps.length; i++) {
             FFCALLTemps[i] = FFCSingleTemps[i] + FFCALLTemps[i];
         }
-        if (nowInterval == intervalFrame) {
-            int[] origin = new int[120 * 160];
-            mDev.lock();
-            mDev.getTemperatureData(origin, true, true);
-            mDev.unlock();
-            nowInterval = 0;
-            int[] ffctemps = new int[120 * 160];
-            for (int i = 0; i < FFCSingleTemps.length; i++) {
-                ffctemps[i] = FFCSingleTemps[i] / intervalFrame;
-            }
-
-            if (targetTemp == 1) {//如果目标值为1，则表示使用平均值来校准
-                FFCTemps = FFCUtil.getFFC(ffctemps);
-            } else {
-                int avg = TempUtil.MaxMinTemp(origin)[2];//原始数据的平均值
-                FFCTemps = FFCUtil.getFFC(ffctemps);//先得到由平均值补偿后的FFC矩阵。
-                float BlackTempCom = targetTemp * 1000 - avg;  //计算黑体补偿,统一单位
-              /*  FFCTemps=FFCUtil.getFFC(ffctemps,(int)targetTemp*1000);
-                float conmpensation=targetTemp*1000-avg;//*/
-//                Config.FFCcompensation = BlackTempCom * 0.001f;
-                //黑体补偿等于原始数据平均值减去目标黑体温度。用于之后补偿。
-                PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER,BlackTempCom * 0.001f);
-                CurrentConfig.getInstance().updateSetting();
-                ifBlackfFFC = true;//标志了已经进行了FFC黑体校准
-            }
-
-            FFCUtil.saveIntFfc(FFCTemps);//保存校准图
-            SaveTemps.saveIntTemps(origin, "Origin");
-            SaveTemps.saveIntTemps(FFCTemps, "FFC");
-
-            Message message = Message.obtain();
-            message.what = MSG9;
-            message.obj = "FFC校准成功";
-
-            FFCALLTemps = null;
-            FFCALLTemps = new int[120 * 160];//清空总数据，避免下次校准叠加
-
-            MainActivity.DelayStartHandler.sendMessageDelayed(message, 2000);
-        } else {
-            FFCHolder myHolder = new FFCHolder();
-            myHolder.setSpeechString("多帧率FFC");
-            myHolder.setTemp(targetTemp);
-            Message FFCmessage = Message.obtain();
-            FFCmessage.what = MSG10;
-            FFCmessage.obj = myHolder;
-            MainActivity.DelayStartHandler.sendMessageDelayed(FFCmessage, 100);
+        //如果还没有计算到指定帧率10
+        if (nowInterval != INTERVALFRAME) {
+            //就等待100ms继续发送
+            sendTemperMessge(MSG_DO, targetTemp, 100);
+            return;
         }
+        //当到达指定帧数的时候
+        Log.i(TAG, "到达指定帧数: nowInterval  " + nowInterval);
+
+        //求出每个点的平均值 ，得到总帧率下的单帧值
+        for (int i = 0; i < FFCALLTemps.length; i++) {
+            FFCSingleTemps[i] = FFCALLTemps[i] / nowInterval;
+        }
+        //单帧值的每个点，与平均温度的补偿，就是FFC矩阵
+        FFCTemps = FFCUtil.getFFC(FFCSingleTemps);
+
+        //将每个点的校准数组FFCTemps保存到本地
+        saveFFCtoLoacl(FFCSingleTemps, FFCTemps);
+
+        //如果目标值为不0，则还需要根据黑体温度更新补偿值
+        if (targetTemp != 0) {
+            Log.i(TAG, "黑体温度校准，更新补偿值: ");
+            //获取当前原始温度数据
+//            int[] origin = getCameraTemps();
+            int avg = TempUtil.MaxMinTemp(FFCSingleTemps)[2];//原始数据的平均值
+            float BlackTempCom = targetTemp * 1000 - avg;  //计算黑体补偿,统一单位
+            //黑体补偿等于原始数据平均值减去目标黑体温度。用于之后补偿。
+            PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER, BlackTempCom * 0.001f);
+            //更新补偿值
+            CurrentConfig.getInstance().updateSetting();
+        }
+
+        //发送结束标志
+        sendTemperMessge(MSG_OVER, 0, 1000);
+    }
+
+    /**
+     * 将ffc数据保存到本地
+     */
+    private void saveFFCtoLoacl(int[] origin, int[] ffc) {
+        //保存校准图，方便使用时，从本地读取
+        Log.i(TAG, "保存校准图: ");
+        FFCUtil.saveIntFfc(ffc);
+        SaveTemps.saveIntTemps(origin, SaveTemps.SaveType.ORIGIN);
+        SaveTemps.saveIntTemps(ffc, SaveTemps.SaveType.FFC);
+
+    }
+
+    /**
+     * 将原始温度数据
+     * 经过FFC校准返回
+     *
+     * @param originTemps
+     */
+    private int[] getcalibratFFC(int[] originTemps) {
+        //从本地读取刚刚保存下来的校准矩阵
+        int[] calibratFFC = FFCUtil.readFfc();
+        //补偿矩阵信息
+        if (calibratFFC == null) {
+            Log.e(TAG, "getcalibratFFC: 没有在本地找到");
+            return originTemps;
+        }
+        for (int i = 0; i < calibratFFC.length; i++) {
+            originTemps[i] = originTemps[i] - calibratFFC[i];
+        }
+        return originTemps;
     }
 }

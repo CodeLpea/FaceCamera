@@ -118,6 +118,9 @@ public class TempUtil {
         }
     }
 
+    /**
+     * 根据数组，获得其中的最大最小和平均值
+     * */
     public static int[] MaxMinTemp(int temps[]){
         int []MaxMin=new int[3];
         int i,min,max,total = 0,avg;

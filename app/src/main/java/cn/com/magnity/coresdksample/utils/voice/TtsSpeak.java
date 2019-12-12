@@ -80,6 +80,13 @@ public class TtsSpeak {
       //  Log.i(TAG, "GetVoiceVolume:   "+mgr.getStreamVolume(AudioManager.STREAM_MUSIC));
     }
     /**
+     * 排队播放系统提示
+     * */
+    public void SystemSpeech(String text){
+        this.SetVoiceVolume(CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+        textToSpeech.speak(text.toString(), TextToSpeech.QUEUE_ADD, null);
+    }
+    /**
      * 设置音量
      * */
     public void SetVoiceVolume(int tempVolume){

@@ -8,7 +8,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-
+import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
 
 import java.util.List;
@@ -135,6 +135,7 @@ public class SetConfigServer {
         /*存入SP*/
         /*直接修改配置*/
         Log.i(TAG, "setCameraData: " + cameraData.toString());
+        EventBus.getDefault().post(cameraData);
         PreferencesUtils.put(WebConfig.CAMERA_EXPLORE, cameraData.getExplorer());
         CurrentConfig.getInstance().updateSetting();
     }
@@ -151,6 +152,9 @@ public class SetConfigServer {
         if (ffcData == null) {
             //如果都是空的，则表示为平均黑体校准
             Log.i(TAG, "FFC平均黑体校准: ");
+            //校准值为0，标志平均温度校准
+            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN,0,100);
+
 
             return;
         }
@@ -160,6 +164,8 @@ public class SetConfigServer {
         } else if (ffcData.getCalibration()!= 0) {
             //如果黑体校准参数不为空，则表示为设置黑体校准参数
             Log.i(TAG, "FFC黑体校准参考值: " + ffcData.getCalibration());
+            //开启指定温度黑体校准
+            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN,ffcData.getCompensation(),100);
             PreferencesUtils.put(WebConfig.FFC_CALIBRATION_PARAMETER, ffcData.getCalibration());
         }
         CurrentConfig.getInstance().updateSetting();

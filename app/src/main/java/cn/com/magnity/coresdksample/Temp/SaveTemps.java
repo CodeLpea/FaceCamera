@@ -16,9 +16,17 @@ public class SaveTemps {
     private static BufferedWriter bufferedWriter;
     private static   String pathTemps =null;
 
+    public enum  SaveType{
+        //当前原始矩阵
+        ORIGIN,
+        //FFC校准矩阵
+        FFC,
+        //校准完成之后矩阵
+        AFTER
+    }
 
 
-    public static void saveIntTemps(int[] a,String tempName) {
+    public static void saveIntTemps(int[] a,SaveType type) {
         File file1 = new File(Temp_DIR);
         if (!file1.exists()) {
             file1.mkdirs();
@@ -32,14 +40,14 @@ public class SaveTemps {
         String write = intToString(a);
         try {
             bufferedWriter = new BufferedWriter(new FileWriter(pathTemps,true));
-            switch (tempName){
-                case "Origin":
+            switch (type){
+                case ORIGIN:
                     bufferedWriter.write("\r\n"+formatStr+" 原始数据  : "+"\r\n"+write+"\r\n");
                     break;
-                case "FFC":
+                case FFC:
                     bufferedWriter.write("\r\n"+formatStr+" FFC数据  : "+"\r\n"+write+"\r\n");
                     break;
-                case "After":
+                case AFTER:
                     bufferedWriter.write("\r\n"+formatStr+" 校准后的数据  : "+"\r\n"+write+"\r\n");
                     break;
             }

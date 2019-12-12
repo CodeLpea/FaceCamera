@@ -50,6 +50,7 @@ public class NetService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate: ");
+        isRunning=true;
         wifiAdmin = new WifiAdmin(getApplicationContext());
         NetStatusBus.getInstance().register(this);
 
@@ -81,11 +82,11 @@ public class NetService extends Service {
                 Log.e(TAG, "IP: " + NetUtil.getLocalIPAddress().getHostAddress());
                 DelayDoHandler.getInstance().sendDelayVoice("已连接wifi  " + wifiAdmin.getSSID() + "  地址为 " + currentIp, 2 * 1000);
 
-                this.startService(new Intent(this, WebCoreService.class));
+                startNeedNetService();
                 break;
             case MOBILE:
                 Log.e(TAG, "移动网络已连接: ");
-                this.startService(new Intent(this, WebCoreService.class));
+                startNeedNetService();
                 break;
             case ETHERNET:
                 if (currentIp.equals(NetUtil.getLocalIPAddress().getHostAddress())) {
@@ -95,8 +96,7 @@ public class NetService extends Service {
                 currentIp = NetUtil.getLocalIPAddress().getHostAddress();
                 Log.e(TAG, "IP: " + NetUtil.getLocalIPAddress().getHostAddress());
                 DelayDoHandler.getInstance().sendDelayVoice("有线网络已连接   地址为" + currentIp, 2 * 1000);
-                this.startService(new Intent(this, WebCoreService.class));
-
+                startNeedNetService();
                 break;
             default:
         }
@@ -220,11 +220,25 @@ public class NetService extends Service {
         return isRunning;
     }
 
+    /**
+     * 在网络已经连接的时候
+     * 重新开启需要网络的服务
+     * 因为ip已经变化
+     * 所以需要重新开启
+     * */
+    private  void startNeedNetService(){
+        Log.e(TAG, "startNeedNetService: ");
+        //开启web配置服务
+        this.startService(new Intent(this, WebCoreService.class));
+        //开启ftp服务
+        this.startService(new Intent(this, FtpService.class));
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
         wifiAdmin = null;
         MyWifiScanHandler.removeCallbacksAndMessages(null);
         MyWifiScanHandler = null;
+        isRunning=false;
     }
 }

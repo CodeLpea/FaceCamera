@@ -37,6 +37,9 @@ import com.iflytek.cloud.FaceDetector;
 import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.util.Accelerometer;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,54 +50,44 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import cn.com.magnity.coresdk.MagDevice;
-import cn.com.magnity.coresdk.types.CorrectionPara;
+
 import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.DelayDoHandler;
 import cn.com.magnity.coresdksample.Service.FtpService;
-import cn.com.magnity.coresdksample.Service.LoadService;
+
 import cn.com.magnity.coresdksample.Service.ServiceManager;
-import cn.com.magnity.coresdksample.Temp.FFCHolder;
-import cn.com.magnity.coresdksample.Temp.TempUtil;
+
 import cn.com.magnity.coresdksample.View.QiuView;
-import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
+
+import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
-import cn.com.magnity.coresdksample.utils.EthernetUtil;
-import cn.com.magnity.coresdksample.Temp.FFCUtil;
-import cn.com.magnity.coresdksample.utils.FlieUtil;
-import cn.com.magnity.coresdksample.Temp.SaveTemps;
-import cn.com.magnity.coresdksample.utils.PreferencesUtils;
+
+
 import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.Utils;
-import cn.com.magnity.coresdksample.utils.WifiAdmin;
-import cn.com.magnity.coresdksample.utils.WifiUtil;
+
 import cn.com.magnity.coresdksample.utils.lampUtil;
-import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
+
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 
 import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
-//import static cn.com.magnity.coresdksample.MyApplication.isplay;
+
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.MyApplication.photoNameSave2;
-import static cn.com.magnity.coresdksample.Config.FFCTemps;
+
 import static cn.com.magnity.coresdksample.Config.InitLoadServieAction;
-import static cn.com.magnity.coresdksample.Config.MSG10;
-import static cn.com.magnity.coresdksample.Config.MSG2;
-import static cn.com.magnity.coresdksample.Config.MSG3;
-import static cn.com.magnity.coresdksample.Config.MSG4;
-import static cn.com.magnity.coresdksample.Config.MSG5;
+
 import static cn.com.magnity.coresdksample.Config.MSG6;
 import static cn.com.magnity.coresdksample.Config.MSG7;
-import static cn.com.magnity.coresdksample.Config.MSG8;
-import static cn.com.magnity.coresdksample.Config.MSG9;
-import static cn.com.magnity.coresdksample.Config.ReLoadServieAction;
+
 import static cn.com.magnity.coresdksample.Config.TempThreshold;
-import static cn.com.magnity.coresdksample.Config.ifBlackfFFC;
+
 import static cn.com.magnity.coresdksample.Config.iftaken;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
@@ -144,10 +137,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TextView Tvlocation1, Tvlocation2, Tvpoint1, Tvpoint2;
     private QiuView QiuView1, QiuView2;
     private Button BtLocate, BtLink, BtArea;
-    //wifi管理
-    WifiAdmin wifiAdmin;
-
-    private String NoewIp = "0.0.0.0";
     public static Handler DelayStartHandler;
     public static Handler ReloadServiceHandler;
 
@@ -164,174 +153,41 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //初始化Fragment
         initFragment();
 
-        //连接指定wifi
-//        wifiScan();
-
-        //初始化延迟Handler
-        delayStart();
         //温度摄像头初始化
         initJuge(savedInstanceState);
 
         // 人像摄像头初始化
         initPersonCamera();
 
-        //检查文件夹
-      /*  FlieUtil.initFile(SavaRootDirName);//初始化文件夹
-        FlieUtil.initFile(SavaTestDirName);//初始化文件夹*/
-        FlieUtil.initFile(getFolderPathToday());//初始化文件夹
-
-        //启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
-        initLoadService();
-
-
-        //初始化ftp
-        // initFtp();
         startService();
 
     }
+
     private void startService() {
         ServiceManager.getInstance().startServices();
     }
-    /**
-     * 启动加载数据的服务（包括声音配置，wifi配置，亮度配置等）
-     * 反复加载配置文件
-     */
-    private void initLoadService() {
-        Log.i(TAG, "initLoadService: 开启加载数据服务");
-        LoadService loadService = new LoadService();
-        Intent toLoadService = new Intent(this, loadService.getClass());
-        toLoadService.setAction(InitLoadServieAction);
-        startService(toLoadService);
-        ReloadServiceHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case MSG6://反复加载配置服务
-                        ReloadServiceHandler.removeMessages(MSG6);
-                        Intent intent = (Intent) msg.obj;
-                        intent.setAction(ReLoadServieAction);
-                        startService(intent);
-                        Message message = Message.obtain();
-                        message.what = MSG6;
-                        message.obj = msg.obj;
-                        ReloadServiceHandler.sendMessageDelayed(message, 1000 * 30);//每隔三十秒加载一次
-                        break;
-                    case MSG7:
-                        if (mCamera != null) {
-                            Camera.Parameters parameters = mCamera.getParameters();
-                            Log.e(TAG, "ExposureBefore++: " + parameters.getExposureCompensation());
-                            parameters.setAutoExposureLock(false);
-                            parameters.setExposureCompensation(CurrentConfig.getInstance().getCurrentData().getCamera_explore());
-                            mCamera.setParameters(parameters);
-                            parameters = mCamera.getParameters();
-                            Log.e(TAG, "ExposureNow: " + parameters.getExposureCompensation());
-                        }
-                        break;
-                }
-
-            }
-        };
-        Message message = Message.obtain();
-        message.what = MSG6;
-        message.obj = toLoadService;
-        ReloadServiceHandler.sendMessageDelayed(message, 1000 * 30);//每隔三十秒加载一次
-
-    }
 
 
     /**
-     * 延时启动ftp wifi扫描等功能
-     * 以便tts语音已经被初始化
+     * 设置摄像头曝光值
+     *
+     * @param cameraData
      */
-    private void delayStart() {
-        DelayStartHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case MSG9://延时播放温度摄像头语音，FFC校准成功的播报和测试
-                        String voice9 = msg.obj.toString();
-                        if (voice9.equals("10秒钟后开始校准FFC")) {
-                            TtsSpeak.getInstance().SpeechAdd(voice9, CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            Log.i(TAG, "10秒钟后开始校准FFC: " + voice9);
-                        }
-                        if (voice9.equals("FFC校准成功")) {//校准成功后再保存校准后的数据
-                            int[] temps = new int[160 * 120];
-                            mDev.lock();
-                            mDev.getTemperatureData(temps, true, true);
-                            mDev.unlock();
+    @Subscribe()
+    public void setCameraExplore(CameraData cameraData) {
+        if (mCamera == null) {
+            Log.e(TAG, "mCamera==null ");
+            return;
+        }
+        Camera.Parameters parameters = mCamera.getParameters();
+        Log.e(TAG, "ExposureBefore++: " + parameters.getExposureCompensation());
+        parameters.setAutoExposureLock(false);
+        parameters.setExposureCompensation(cameraData.getExplorer());
+        mCamera.setParameters(parameters);
+        parameters = mCamera.getParameters();
+        Log.e(TAG, "ExposureNow: " + parameters.getExposureCompensation());
 
-                            int[] readeFfcs = FFCUtil.readFfc();
-                            for (int i = 0; i < readeFfcs.length; i++) {
-                                temps[i] = temps[i] - readeFfcs[i];
-                            }
-                            SaveTemps.saveIntTemps(temps, "After");
-
-                            TtsSpeak.getInstance().SpeechAdd(voice9 + "    请重新遮挡温度摄像头，五秒后开始测试FFC效果",CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            Log.i(TAG, "FFC校准语音播报: " + voice9);
-
-                            Message message = Message.obtain();
-                            message.what = MSG9;
-                            message.obj = "FFC校准后测试";
-                            MainActivity.DelayStartHandler.sendMessageDelayed(message, 15000);
-                        }
-                        if (voice9.equals("FFC校准后测试")) {
-                            int[] temps = new int[120 * 160];
-                            mDev.lock();
-                            mDev.getTemperatureData(temps, true, true);
-                            mDev.unlock();
-                            /*还原CorrectionPara配置*/
-                            CorrectionPara correctionPara = new CorrectionPara();
-                            Log.i(TAG, "getCorrectionPara: " + mDev.getFixPara(correctionPara));
-                            Log.i(TAG, "fDistance: " + correctionPara.fDistance);
-                            // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
-                            Log.i(TAG, "fTaoFilter: " + correctionPara.fTaoFilter);
-                            correctionPara.fTaoFilter = (float) 0.85;
-                            correctionPara.fDistance = CurrentConfig.getInstance().getCurrentData().getDistance();
-                            mDev.setFixPara(correctionPara);
-
-                            int[] AfterTemps = new int[temps.length];
-                            if (FFCTemps.length > 10) {//本地读取到有效的FFC
-                                for (int i = 0; i < AfterTemps.length; i++) {
-                                    AfterTemps[i] = temps[i] - FFCTemps[i];
-                                } //将原始数据通过FFc数据处理
-                            }
-                            int[] maxAndmin = TempUtil.MaxMinTemp(AfterTemps);
-                            int cha = maxAndmin[0] - maxAndmin[1];
-                            int max = (int) (maxAndmin[0] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);//统一刻度
-                            int min = (int) (maxAndmin[1] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()* 1000);
-                            int avg = (int) (maxAndmin[2] + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter() * 1000);
-                            int TDEV = TempUtil.DDNgetTdevTemperatureInfo(AfterTemps);
-                            TtsSpeak.getInstance().SpeechAdd("TDEV为：    " + String.valueOf(TDEV * 0.001f).substring(0, 4), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            TtsSpeak.getInstance().SpeechAdd("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            TtsSpeak.getInstance().SpeechAdd("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            TtsSpeak.getInstance().SpeechAdd("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            TtsSpeak.getInstance().SpeechAdd("平均温度为： " + String.valueOf(avg * 0.001f).substring(0, 4),CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            TtsSpeak.getInstance().SpeechAdd("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            TtsSpeak.getInstance().SpeechAdd("测试结束", CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                        }
-                        break;
-                    case MSG10://延时播放温度摄像头语音，进行多帧率FFC
-                        FFCHolder ffcHolder = (FFCHolder) msg.obj;
-                        String voice10 = ffcHolder.getSpeechString();
-                        float targetTemp = ffcHolder.getTemp();
-                        if (voice10.equals("开始校准")) {//只有第一次进入才会播报
-                            TtsSpeak.getInstance().SpeechAdd(voice10, CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                            Log.i(TAG, "FFC校准: " + voice10);
-                        }
-
-                        MuiltFFC(targetTemp);//进入多帧率FFC
-
-
-                        break;
-                }
-            }
-        };
-        //DelayStartHandler.sendEmptyMessageDelayed(MSG2,5000);
     }
-
-
 
     /**
      * initView
@@ -540,7 +396,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mRestoreHandler = null;
         }
 
-        DelayStartHandler.removeCallbacksAndMessages(null);
 
         ReloadServiceHandler.removeCallbacksAndMessages(null);
         ReloadServiceHandler = null;
@@ -572,7 +427,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mCamera = Camera.open(mCameraId);
             Toast.makeText(this, "摄像头已开启,请勿拔下摄像头", Toast.LENGTH_SHORT).show();
             this.degrees = setCameraDisplayOrientation(this, mCameraId, mCamera);//设置摄像头的预览方向
-            Log.i(TAG, "this.degrees: "+this.degrees);
+            Log.i(TAG, "this.degrees: " + this.degrees);
             //获取摄像头参数对象
             Camera.Parameters params = mCamera.getParameters();
             //设置预览的格式
@@ -582,6 +437,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             params.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
             params.setPreviewFrameRate(5);
             params.setRotation(degrees);
+            params.setExposureCompensation(CurrentConfig.getInstance().getCurrentData().getCamera_explore());
             //给摄像头设置参数配置
             mCamera.setParameters(params);
             //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
@@ -591,7 +447,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
             closeCamera();
-            DelayDoHandler.getInstance().sendDelayVoice("人脸摄像头开启失败，请检查",3*1000);
+            DelayDoHandler.getInstance().sendDelayVoice("人脸摄像头开启失败，请检查", 3 * 1000);
 
             RunningInfo runningInfo = new RunningInfo();
             runningInfo.setCameraStatus("人脸摄像头开启失败，请检查");
@@ -812,7 +668,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onStart() {
         Log.i(TAG, "onStart: ");
+        EventBus.getDefault().register(this);
         super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop: ");
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -821,82 +685,5 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onRestart();
     }
 
-    private int[] FFCZhenTemps = new int[120 * 160];
-    private int[] FFCZhenTempsALL = new int[120 * 160];
-    public int zhenCount = 10;//间隔多少帧数
-    private int FFCCount = 0;//计数
-
-    /**
-     * 多帧率FFC校准
-     */
-    private void MuiltFFC(float targetTemp) {
-        MainActivity.DelayStartHandler.removeMessages(MSG10);
-        FFCCount++;
-        FFCZhenTemps = null;
-        FFCZhenTemps = new int[120 * 160];
-        /*设置距离为0，避免使用时干扰*/
-        CorrectionPara correctionPara = new CorrectionPara();
-        Log.i(TAG, "getCorrectionPara: " + mDev.getFixPara(correctionPara));
-        Log.i(TAG, "fDistance: " + correctionPara.fDistance);
-        // Log.i(TAG, "fTemp: "+correctionPara.fTemp);
-        Log.i(TAG, "fTaoFilter: " + correctionPara.fTaoFilter);
-        correctionPara.fTaoFilter = (float) 0.85;
-        correctionPara.fDistance = 0;
-        mDev.setFixPara(correctionPara);
-
-        mDev.lock();
-        mDev.getTemperatureData(FFCZhenTemps, true, true);
-        mDev.unlock();
-        for (int i = 0; i < FFCZhenTemps.length; i++) {
-            FFCZhenTempsALL[i] = FFCZhenTemps[i] + FFCZhenTempsALL[i];
-        }
-        if (FFCCount == zhenCount) {
-            int[] origin = new int[120 * 160];
-            mDev.lock();
-            mDev.getTemperatureData(origin, true, true);
-            mDev.unlock();
-            FFCCount = 0;
-            int[] ffctemps = new int[120 * 160];
-            for (int i = 0; i < FFCZhenTemps.length; i++) {
-                ffctemps[i] = FFCZhenTempsALL[i] / zhenCount;
-            }
-
-            if (targetTemp == 1) {//如果目标值为1，则表示使用平均值来校准
-                FFCTemps = FFCUtil.getFFC(ffctemps);
-            } else {
-                int avg = TempUtil.MaxMinTemp(origin)[2];//原始数据的平均值
-                FFCTemps = FFCUtil.getFFC(ffctemps);//先得到由平均值补偿后的FFC矩阵。
-                float BlackTempCom = targetTemp * 1000 - avg;  //计算黑体补偿,统一单位
-              /*  FFCTemps=FFCUtil.getFFC(ffctemps,(int)targetTemp*1000);
-                float conmpensation=targetTemp*1000-avg;//*/
-//                Config.FFCcompensation = BlackTempCom * 0.001f;
-                //黑体补偿等于原始数据平均值减去目标黑体温度。用于之后补偿。
-                PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER,BlackTempCom * 0.001f);
-                CurrentConfig.getInstance().updateSetting();
-                ifBlackfFFC = true;//标志了已经进行了FFC黑体校准
-            }
-
-            FFCUtil.saveIntFfc(FFCTemps);//保存校准图
-            SaveTemps.saveIntTemps(origin, "Origin");
-            SaveTemps.saveIntTemps(FFCTemps, "FFC");
-
-            Message message = Message.obtain();
-            message.what = MSG9;
-            message.obj = "FFC校准成功";
-
-            FFCZhenTempsALL = null;
-            FFCZhenTempsALL = new int[120 * 160];//清空总数据，避免下次校准叠加
-
-            MainActivity.DelayStartHandler.sendMessageDelayed(message, 2000);
-        } else {
-            FFCHolder myHolder = new FFCHolder();
-            myHolder.setSpeechString("多帧率FFC");
-            myHolder.setTemp(targetTemp);
-            Message FFCmessage = Message.obtain();
-            FFCmessage.what = MSG10;
-            FFCmessage.obj = myHolder;
-            MainActivity.DelayStartHandler.sendMessageDelayed(FFCmessage, 100);
-        }
-    }
 
 }

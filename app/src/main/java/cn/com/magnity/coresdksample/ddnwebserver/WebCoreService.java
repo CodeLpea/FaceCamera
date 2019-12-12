@@ -41,6 +41,7 @@ public class WebCoreService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate: ");
+        isRunning=true;
         initServer();
     }
 
@@ -102,6 +103,7 @@ public class WebCoreService extends Service {
             if(!mServer.getInetAddress().getHostAddress().equals(NetUtil.getLocalIPAddress().getHostAddress())){
                 Log.i(TAG, "服务ip也连接的ip不符。则需要重新连接: ");
                 initServer();
+                mServer.startup();
             }
         } else {
             Log.i(TAG, "startServer: startup");
@@ -113,6 +115,7 @@ public class WebCoreService extends Service {
      * Stop server.
      */
     private void stopServer() {
+        isRunning=false;
         mServer.shutdown();
     }
 

@@ -12,11 +12,13 @@ import java.util.Random;
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
+import cn.com.magnity.coresdksample.Service.TempHandler;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
 import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
+import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.SPUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
@@ -26,6 +28,7 @@ import cn.com.magnity.coresdksample.utils.logSave;
 import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.person_path;
 import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.temper_path;
 import static cn.com.magnity.coresdksample.Config.CONFIG_DIR;
+import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
@@ -58,7 +61,12 @@ public class MyApplication extends Application {
         NetStatusBus.getInstance().init(this);
         //初始化默认值
         CurrentConfig.getInstance().updateSetting();
-        putDataIntoDb();
+        //初始化
+        TempHandler.getInstance();
+        //初始化文件夹
+        FlieUtil.initFile(getFolderPathToday());
+
+        //putDataIntoDb();
     }
 
 

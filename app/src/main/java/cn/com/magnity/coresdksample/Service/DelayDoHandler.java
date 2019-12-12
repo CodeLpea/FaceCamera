@@ -10,6 +10,7 @@ import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 /**
  * 延时操作Handler
+ * 主要用于语音信息的延迟
  */
 public class DelayDoHandler extends Handler {
     private String TAG = "DelayDoHandler";
@@ -26,7 +27,7 @@ public class DelayDoHandler extends Handler {
     public static final int MSG10 = MSGDELAY9 + 1;//FFC校准
 
     private static class InnerClass {
-        private static DelayDoHandler intance = new DelayDoHandler();
+        public static DelayDoHandler intance = new DelayDoHandler();
     }
 
     /*静态内部类单例*/
@@ -42,7 +43,7 @@ public class DelayDoHandler extends Handler {
                 String voiceInfo = msg.obj.toString();
                 Log.e(TAG, "voiceInfo: " + voiceInfo);
                 Log.i(TAG, "voice: " + CurrentConfig.getInstance().getCurrentData().getSystem_voice());
-                TtsSpeak.getInstance().SpeechAdd(msg.obj.toString(), CurrentConfig.getInstance().getCurrentData().getSystem_voice());
+                TtsSpeak.getInstance().SystemSpeech(voiceInfo);
                 break;
         }
     }

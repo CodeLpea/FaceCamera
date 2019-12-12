@@ -92,7 +92,7 @@ public class SettingController {
         }
         WifiData wifiData = JSON.parseObject(content, WifiData.class);
         SetConfigServer.getInstance().setWifiData(wifiData);
-        TtsSpeak.getInstance().SpeechAdd("设置wifi信息成功",Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置wifi信息成功");
         return wifiData;
 
 //HttpRequest request
@@ -117,7 +117,7 @@ public class SettingController {
         }
         VoiceData voiceData = JSON.parseObject(content, VoiceData.class);
         SetConfigServer.getInstance().setVoiceData(voiceData);
-        TtsSpeak.getInstance().SpeechAdd("设置语音信息成功",Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置有效区域预览成功");
         return voiceData;
 
     }
@@ -136,8 +136,7 @@ public class SettingController {
         }
         TemperatureData temperatureData = JSON.parseObject(content, TemperatureData.class);
         SetConfigServer.getInstance().setTemperatureData(temperatureData);
-        TtsSpeak.getInstance().SpeechAdd("设置温度阀值"+temperatureData.getTemperature_threshold1()+"成功",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置温度阀值"+temperatureData.getTemperature_threshold1()+"成功");
         return temperatureData;
 
     }
@@ -156,8 +155,7 @@ public class SettingController {
         }
         CameraData cameraData = JSON.parseObject(content, CameraData.class);
         SetConfigServer.getInstance().setCameraData(cameraData);
-        TtsSpeak.getInstance().SpeechAdd("设置曝光参数"+cameraData.getExplorer()+"成功",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置曝光参数"+cameraData.getExplorer()+"成功");
         return cameraData;
     }
 
@@ -176,8 +174,7 @@ public class SettingController {
         }
         FFCData ffcData = JSON.parseObject(content, FFCData.class);
         SetConfigServer.getInstance().setFFCData(ffcData);
-        TtsSpeak.getInstance().SpeechAdd("设置FFC补偿参数"+ffcData.getCompensation()+"成功",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置FFC补偿参数"+ffcData.getCompensation()+"成功");
         return ffcData;
     }
 
@@ -196,8 +193,6 @@ public class SettingController {
         }
         FFCData ffcData = JSON.parseObject(content, FFCData.class);
         SetConfigServer.getInstance().setFFCData(ffcData);
-        TtsSpeak.getInstance().SpeechAdd("设置黑体温度校准成功，15秒后开始校准",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return ffcData;
     }
 
@@ -219,8 +214,6 @@ public class SettingController {
         if (ffcData == null) {
             ffcData = new FFCData();
         }
-        TtsSpeak.getInstance().SpeechAdd("设置平均温度校准成功，15秒后开始校准",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
         return ffcData;
     }
 
@@ -238,8 +231,7 @@ public class SettingController {
         }
         TemperCameraData temperCameraData = JSON.parseObject(content, TemperCameraData.class);
         SetConfigServer.getInstance().setTemperatureCameraData(temperCameraData);
-        TtsSpeak.getInstance().SpeechAdd("设置目标距离"+temperCameraData.getDistance()+"成功",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置目标距离"+temperCameraData.getDistance()+"成功");
         return temperCameraData;
     }
 
@@ -269,8 +261,7 @@ public class SettingController {
         if (calibratPositionData != null) {
             SetConfigServer.getInstance().setCalibratPosition(calibratPositionData);
         }
-        TtsSpeak.getInstance().SpeechAdd("校准红外定位框成功",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("校准红外定位框成功");
         return new ReturnData();
     }
 
@@ -301,8 +292,7 @@ public class SettingController {
         if (validAreaData != null) {
             SetConfigServer.getInstance().setValidAreaData(validAreaData);
         }
-        TtsSpeak.getInstance().SpeechAdd("设置有效区域预览成功",
-                Integer.valueOf(CurrentConfig.getInstance().getCurrentData().getSystem_voice()));
+        TtsSpeak.getInstance().SystemSpeech("设置有效区域预览成功");
         return validAreaData;
     }
 
