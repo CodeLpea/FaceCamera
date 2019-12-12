@@ -86,59 +86,59 @@ public class LoadService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        switch (intent.getAction()){
-            case InitLoadServieAction://第一次初始化时候，会全部进行
-                Log.i(TAG, "第一次初始化: ");
-                //读取设备信息
-                LoadDevice();
-
-                //加载温度人脸框微调信息
-//                LoadFacePlace();
-
-                //加载配置文件的数据
-//                LoadConfigFlie(intent);
-                break;
-            case ReLoadServieAction://反复加载的时候，只读配置文件的变化
-                Log.i(TAG, "反复加载配置文件: ");
-                //加载配置文件的数据
-//                LoadConfigFlie(intent);
-                UpadateApk();
-                checkJuGe();
-                break;
-        }
-
-
-
-    }
-//测试巨哥摄像头是否连接
-    private void checkJuGe() {
-        if(isplay!=true){
-            Log.e(TAG, "温度摄像头没有连接： " );
-            //lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
-            Message message=Message.obtain();
-            message.what=MSG4;
-            message.obj="温度摄像头没有连接";
-            MainActivity.DelayStartHandler.sendMessageDelayed(message,500);
-        }
-    }
-
-    private void UpadateApk() {
-        Log.i(TAG, "UpadateApkStart: ");
-        File file = new File(DdnUpdateApkPath);
-        if(file.exists()){//如果存在apk，则执行升级操作
-            AppUtils.install(DdnUpdateApkPath);
-            Log.i(TAG, "UpadateApkSuccess！！！！！！！！！ ");
-        }
-    }
+//        switch (intent.getAction()){
+//            case InitLoadServieAction://第一次初始化时候，会全部进行
+//                Log.i(TAG, "第一次初始化: ");
+//                //读取设备信息
+//                LoadDevice();
+//
+//                //加载温度人脸框微调信息
+////                LoadFacePlace();
+//
+//                //加载配置文件的数据
+////                LoadConfigFlie(intent);
+//                break;
+//            case ReLoadServieAction://反复加载的时候，只读配置文件的变化
+//                Log.i(TAG, "反复加载配置文件: ");
+//                //加载配置文件的数据
+////                LoadConfigFlie(intent);
+//                UpadateApk();
+//                checkJuGe();
+//                break;
+//        }
 
 
-    private void LoadDevice() {
-       Config.DEVICENAME= AppUtils.getLocalMacAddressFromWifiInfo(this.getApplicationContext());//读取设备号
-       Config.VERSIONNAME=AppUtils.getVersionName(this.getApplicationContext());//读取版本号
-        Log.i(TAG, "LoadDevice.DEVICENAME "+ Config.DEVICENAME);
-        Log.i(TAG, "LoadDevice.VERSIONNAME "+ Config.VERSIONNAME);
 
     }
+////测试巨哥摄像头是否连接
+//    private void checkJuGe() {
+//        if(isplay!=true){
+//            Log.e(TAG, "温度摄像头没有连接： " );
+//            //lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+//            Message message=Message.obtain();
+//            message.what=MSG4;
+//            message.obj="温度摄像头没有连接";
+//            MainActivity.DelayStartHandler.sendMessageDelayed(message,500);
+//        }
+//    }
+//
+//    private void UpadateApk() {
+//        Log.i(TAG, "UpadateApkStart: ");
+//        File file = new File(DdnUpdateApkPath);
+//        if(file.exists()){//如果存在apk，则执行升级操作
+//            AppUtils.install(DdnUpdateApkPath);
+//            Log.i(TAG, "UpadateApkSuccess！！！！！！！！！ ");
+//        }
+//    }
+//
+//
+//    private void LoadDevice() {
+//       Config.DEVICENAME= AppUtils.getLocalMacAddressFromWifiInfo(this.getApplicationContext());//读取设备号
+//       Config.VERSIONNAME=AppUtils.getVersionName(this.getApplicationContext());//读取版本号
+//        Log.i(TAG, "LoadDevice.DEVICENAME "+ Config.DEVICENAME);
+//        Log.i(TAG, "LoadDevice.VERSIONNAME "+ Config.VERSIONNAME);
+//
+//    }
 
 //    private void LoadFacePlace() {
 //        Config.XPalce=(Integer) PreferencesUtils.get(Config.KeyXplace,-18);

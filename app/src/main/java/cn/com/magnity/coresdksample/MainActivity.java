@@ -55,11 +55,13 @@ import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
-import cn.com.magnity.coresdksample.Service.DelayDoHandler;
+import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.Service.FtpService;
 
 import cn.com.magnity.coresdksample.Service.ServiceManager;
 
+import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
+import cn.com.magnity.coresdksample.Service.handler.RecordHolder;
 import cn.com.magnity.coresdksample.View.QiuView;
 
 import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
@@ -80,11 +82,6 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.MyApplication.photoNameSave2;
-
-import static cn.com.magnity.coresdksample.Config.InitLoadServieAction;
-
-import static cn.com.magnity.coresdksample.Config.MSG6;
-import static cn.com.magnity.coresdksample.Config.MSG7;
 
 import static cn.com.magnity.coresdksample.Config.TempThreshold;
 
@@ -137,8 +134,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TextView Tvlocation1, Tvlocation2, Tvpoint1, Tvpoint2;
     private QiuView QiuView1, QiuView2;
     private Button BtLocate, BtLink, BtArea;
-    public static Handler DelayStartHandler;
-    public static Handler ReloadServiceHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -397,8 +392,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
 
 
-        ReloadServiceHandler.removeCallbacksAndMessages(null);
-        ReloadServiceHandler = null;
         /* disconnect camera when app exited */
         if (mDev.isProcessingImage()) {
             mDev.stopProcessImage();
@@ -480,8 +473,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
                             Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
                             bmp = Screenutil.rotaingImageView(90, bmp);//旋转照片
-                            saveBitmap(bmp);
                             stream.close();
+
+                            //保存记录
+                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON,bmp,TempThreshold);
+
                         }
                     } catch (Exception ex) {
                         Log.e("Sys", "Error:" + ex.getMessage());
@@ -493,35 +489,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
-    public void saveBitmap(Bitmap bitmap) {
-        Log.e(TAG, "保存人脸图片");
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
-        String formatStr = formatter.format(new Date());
-        String maxTmp = String.valueOf(TempThreshold);
-        if (String.valueOf(maxTmp).length() >= 4) {//最多保留4位
-            maxTmp = maxTmp.substring(0, 4);
-        }
-        String fileName = formatStr + "_" + maxTmp + "Person.jpg";
-        File f = new File(getFolderPathToday(), fileName);
-        if (f.exists()) {
-            f.delete();
-        } else {
-            photoNameSave2.saveLog2("人脸照片", fileName + "\r\n");
-        }
 
-
-        try {
-            FileOutputStream out = new FileOutputStream(f);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-            out.flush();
-            out.close();
-            Log.i(TAG, "已经保存");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 释放摄像头资源

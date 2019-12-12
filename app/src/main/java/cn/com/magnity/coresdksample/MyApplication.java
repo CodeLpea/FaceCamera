@@ -12,12 +12,12 @@ import java.util.Random;
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
-import cn.com.magnity.coresdksample.Service.TempHandler;
+import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
+import cn.com.magnity.coresdksample.Service.handler.TempHandler;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
 import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
-import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.SPUtil;
@@ -59,14 +59,14 @@ public class MyApplication extends Application {
         //提前绑定服务，避免使用时才绑定崩溃
         SetConfigServer.getInstance();
         NetStatusBus.getInstance().init(this);
-        //初始化默认值
-        CurrentConfig.getInstance().updateSetting();
         //初始化
         TempHandler.getInstance();
+        RecordHandler.getInstance();
         //初始化文件夹
         FlieUtil.initFile(getFolderPathToday());
 
         //putDataIntoDb();
+        //LitePal.deleteAll(PhotoRecordDb.class);
     }
 
 
@@ -79,7 +79,7 @@ public class MyApplication extends Application {
             photoRecordDb.setTemperPath(temper_path);
             photoRecordDb.setDate(Long.valueOf(TimeUtils.randomDate("20191001101010",TimeUtils.getYMDHMSDate())));
             Random random=new Random();
-            int temp=random.nextInt(20)+20;
+            float temp=random.nextFloat()+20;
             photoRecordDb.setTemp(temp);
             Log.i("放入测试数据", photoRecordDb.toString());
             photoRecordDb.save();

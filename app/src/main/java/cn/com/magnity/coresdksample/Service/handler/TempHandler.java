@@ -1,11 +1,10 @@
-package cn.com.magnity.coresdksample.Service;
+package cn.com.magnity.coresdksample.Service.handler;
 
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 import cn.com.magnity.coresdk.types.CorrectionPara;
-import cn.com.magnity.coresdksample.Temp.FFCHolder;
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.Temp.SaveTemps;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
@@ -15,8 +14,6 @@ import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 import static cn.com.magnity.coresdksample.Config.FFCTemps;
-import static cn.com.magnity.coresdksample.Config.MSG10;
-import static cn.com.magnity.coresdksample.Config.MSG9;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 
 /**

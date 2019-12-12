@@ -26,8 +26,9 @@ import com.yanzhenjie.andserver.Server;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.com.magnity.coresdksample.Service.DelayDoHandler;
+import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.ddnwebserver.util.NetUtils;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.NetUtil;
 
 /**
@@ -42,6 +43,8 @@ public class WebCoreService extends Service {
     public void onCreate() {
         Log.i(TAG, "onCreate: ");
         isRunning=true;
+        //初始化默认值
+        CurrentConfig.getInstance().updateSetting();
         initServer();
     }
 

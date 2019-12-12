@@ -13,7 +13,7 @@ public class PhotoRecordDb  extends LitePalSupport{
 
     private Long date;
 
-    private Integer temp;
+    private float temp;
 
     public String getPersonPath() {
         return personPath;
@@ -33,11 +33,11 @@ public class PhotoRecordDb  extends LitePalSupport{
 
 
 
-    public Integer getTemp() {
+    public float getTemp() {
         return temp;
     }
 
-    public void setTemp(Integer temp) {
+    public void setTemp(float temp) {
         this.temp = temp;
     }
 

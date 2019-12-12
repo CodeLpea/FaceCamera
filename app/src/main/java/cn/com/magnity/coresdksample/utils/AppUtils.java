@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 
 import static cn.com.magnity.coresdksample.Config.DdnUpdateApkPath;
 import static cn.com.magnity.coresdksample.Config.MAC_ADRESS;
@@ -155,32 +157,32 @@ public class AppUtils {
      * @return
      */
     public static String getLocalMacAddressFromWifiInfo(Context context) {
-        String mac=null;
-        String mac_local_adress = PreferencesUtils.getString(MAC_ADRESS, "");
+
+        //获取本地数据库
+        String mac_local_adress = PreferencesUtils.getString(WebConfig.DEVICE_NO, "020000000000");
         Log.i(TAG, "mac_local_adress: "+mac_local_adress);
         //判断本地数据是否保存有，有的话就直接用
-        if(!mac_local_adress.equals("02000000000")&&!mac_local_adress.equals("")){
-            mac=PreferencesUtils.getString("MAC_ADRESS","");
-            Log.i(TAG, "直接用mac: "+mac);
-            return mac;
+        if(!mac_local_adress.equals("020000000000")){
+            Log.i(TAG, "getLocalMacAddressFromWifiInfo: "+mac_local_adress);
+            return mac_local_adress;
         }
         WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        Log.i(TAG, "wifi: "+wifi.toString());
         WifiInfo winfo = wifi.getConnectionInfo();
-        Log.i(TAG, "winfo: "+winfo.toString());
-        mac = winfo.getMacAddress();
-        Log.i(TAG, "winfo.getMacAddress()"+winfo.getMacAddress());
-        Log.i(TAG, "mac: "+mac.toString());
+        mac_local_adress = winfo.getMacAddress();
         //6.0以上获取mac地址
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mac = getMacFromHardware();
+            mac_local_adress = getMacFromHardware();
         }
         //不保留冒号
-        if(mac.contains(":")){
-            mac = mac.replace(":", "");
+        try {
+        if(mac_local_adress.contains(":")){
+            mac_local_adress = mac_local_adress.replace(":", "");
         }
-        PreferencesUtils.put(MAC_ADRESS,mac);
-        return mac;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        PreferencesUtils.put(WebConfig.DEVICE_NO,mac_local_adress);
+        return mac_local_adress;
     }
 
     /**

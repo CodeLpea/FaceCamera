@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample.Service;
+package cn.com.magnity.coresdksample.Service.handler;
 
 
 import android.os.Handler;
@@ -7,6 +7,7 @@ import android.util.Log;
 
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
+import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 /**
  * 延时操作Handler
@@ -17,14 +18,7 @@ public class DelayDoHandler extends Handler {
     /*延迟Hanlder的MSG*/
     public static final int MSGDELAY1 = 200;//自动连接指定的wifi
     public static final int MSG_VOICE = MSGDELAY1 + 1;//ftp语音，包括wifi信息
-    public static final int MSGDELAY3 = MSG_VOICE + 1;//人脸摄像头
-    public static final int MSGDELAY4 = MSGDELAY3 + 1;//配置文件检查语音/检测是否温度摄像头是否在线
-    public static final int MSGDELAY5 = MSGDELAY4 + 1;//温度摄像头语音
-    public static final int MSGDELAY6 = MSGDELAY5 + 1;//反复加载配置服务
-    public static final int MSGDELAY7 = MSGDELAY6 + 1;//亮度设置
-    public static final int MSGDELAY8 = MSGDELAY7 + 1;//更新播报
-    public static final int MSGDELAY9 = MSGDELAY8 + 1;//FFC校准播报
-    public static final int MSG10 = MSGDELAY9 + 1;//FFC校准
+    public static final int MSG_STARTBOOT = MSG_VOICE + 1;//FFC校准
 
     private static class InnerClass {
         public static DelayDoHandler intance = new DelayDoHandler();
@@ -45,6 +39,11 @@ public class DelayDoHandler extends Handler {
                 Log.i(TAG, "voice: " + CurrentConfig.getInstance().getCurrentData().getSystem_voice());
                 TtsSpeak.getInstance().SystemSpeech(voiceInfo);
                 break;
+            case MSG_STARTBOOT:
+                Log.i(TAG, "延时启动模块: ");
+                RunningInfo runningInfo=(RunningInfo) msg.obj;
+                runningInfo.upload();
+                break;
         }
     }
 
@@ -58,7 +57,19 @@ public class DelayDoHandler extends Handler {
         Message message = obtainMessage();
         message.what = MSG_VOICE;
         message.obj = voice;
-        DelayDoHandler.getInstance().sendMessageDelayed(message, delayTimes);
+        sendMessageDelayed(message, delayTimes);
+    }
+
+    /**
+     * 发送延迟语音消息
+     *
+     * @param delayTimes
+     */
+    public void sendDelayStart(Object obj ,long delayTimes) {
+        Message message = obtainMessage();
+        message.what = MSG_STARTBOOT;
+        message.obj = obj;
+        sendMessageDelayed(message, delayTimes);
     }
 
 }

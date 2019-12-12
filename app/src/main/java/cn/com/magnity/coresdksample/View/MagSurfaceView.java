@@ -25,6 +25,8 @@ import cn.com.magnity.coresdk.types.CameraInfo;
 import cn.com.magnity.coresdk.types.CorrectionPara;
 import cn.com.magnity.coresdk.types.StatisticInfo;
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
+import cn.com.magnity.coresdksample.Service.handler.RecordHolder;
 import cn.com.magnity.coresdksample.Temp.AreaUtil;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.Config;
@@ -442,9 +444,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                               y2 -= pad2 * 2 + cy2 * 2;
                           }
                           saveBmpCanvas.drawText(maxTmp2, x2, y2, textPaint);
-                          saveBitmap(bitmap1);
-                          Log.i(TAG, "saveBitmap: ");
-
+                          //保存记录
+                          RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_TEMP,bitmap1,TempThreshold);
                       }
                       else {
                           if(TempThreshold> CurrentConfig.getInstance().getCurrentData().getTemperature_threshold()){//当前温度阈值与默认温度阈值不同的时播报异常
@@ -460,35 +461,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
                   }
 
-    /**
-     * 保存图片到SD卡上
-     */
-    protected void saveBitmap(Bitmap baseBitmap) {
-        try {
-            // 保存图片到SD卡上
-            SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
-            String formatStr =formatter.format(new Date());
-            String maxTmp=String.valueOf(TempThreshold);
-            if(String.valueOf(maxTmp).length()>=4){//最多保留4位
-                maxTmp=maxTmp.substring(0,4);
-            }
-            String fileName=formatStr+"_"+maxTmp+  "Temp.png";
-            File file = new File(getFolderPathToday(),fileName);
-            if (file.exists()) {
-                file.delete();
-            }else {
-                photoNameSave.saveLog("温度照片",fileName+"\r\n");
-            }
 
-
-            FileOutputStream stream = new FileOutputStream(file);
-            baseBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            stream.flush();
-            stream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
 

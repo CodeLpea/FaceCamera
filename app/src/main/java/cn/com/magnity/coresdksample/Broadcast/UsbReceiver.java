@@ -7,7 +7,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import cn.com.magnity.coresdksample.usecache.CurrentConfig;
+import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
@@ -63,7 +63,9 @@ public class UsbReceiver extends BroadcastReceiver {
                 isInit=false;//完成初始化
             }
         }
-        runningInfo.upload();
+        //延时发送websocket，因为开机自启动的时候，系统没启动完成获取mac地址失败
+        DelayDoHandler.getInstance().sendDelayStart(runningInfo,1000);
+
     }
 }
 

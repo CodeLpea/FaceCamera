@@ -12,27 +12,19 @@ import android.util.Log;
 
 import com.example.lpnetstatus.NetStatusBus;
 import com.example.lpnetstatus.annotation.NetSubscribe;
-import com.example.lpnetstatus.annotation.type.Mode;
 import com.example.lpnetstatus.annotation.type.NetType;
-import com.example.lpnetstatus.annotation.type.ThreadWhere;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
+import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.ddnwebserver.WebCoreService;
-import cn.com.magnity.coresdksample.ddnwebserver.util.NetUtils;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.NetUtil;
 import cn.com.magnity.coresdksample.utils.WifiAdmin;
-import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
-import cn.com.magnity.coresdksample.websocket.service.WebSocketService;
 
 import static cn.com.magnity.coresdksample.Config.DefaultWifiName;
 import static cn.com.magnity.coresdksample.Config.DefaultWifiPassWord;
-import static cn.com.magnity.coresdksample.Config.MSG0;
 import static cn.com.magnity.coresdksample.Config.MSG1;
-import static cn.com.magnity.coresdksample.Config.WifiName;
-import static cn.com.magnity.coresdksample.Config.WifiPassWord;
 
 /**
  * 网络服务

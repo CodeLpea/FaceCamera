@@ -43,6 +43,29 @@ public class TimeUitl {
         return dateName;
     }
     /**
+     * 获取格式化后的时间
+     *
+     * @return 2019:11:19:11:22:33
+     */
+    public static String getDate() {
+        DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+        Calendar calendar = Calendar.getInstance();
+        String dateName = df.format(calendar.getTime());
+        return dateName;
+    }
+    /**
+     * 获取格式化后的时间
+     *
+     * @return 2019:11:19:11:22:33
+     */
+    public static String getNowRecordDate() {
+        DateFormat df = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss");
+        Calendar calendar = Calendar.getInstance();
+        String dateName = df.format(calendar.getTime());
+        return dateName;
+    }
+
+    /**
      * 获取当前时间
      */
     public static String currentDayTime() {

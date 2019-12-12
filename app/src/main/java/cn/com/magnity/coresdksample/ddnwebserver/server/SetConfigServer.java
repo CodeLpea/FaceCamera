@@ -14,7 +14,7 @@ import org.litepal.LitePal;
 import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
-import cn.com.magnity.coresdksample.Service.TempHandler;
+import cn.com.magnity.coresdksample.Service.handler.TempHandler;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
@@ -248,9 +248,13 @@ public class SetConfigServer {
         //统计条件查询的数量
         List<PhotoRecordDb> countSizeList = null;
         //排序条件 asc为升序，desc为降序。
-        String orders = "date asc";
+       // String orders = "date asc";
+        String orders = "id asc";
         if (recordQueryRequest.getOrders() != null) {
-            orders = recordQueryRequest.getOrders();
+            //如果包含了date
+            if(recordQueryRequest.getOrders().contains("date")){
+                 recordQueryRequest.setOrders(recordQueryRequest.getOrders().replace("date","id"));
+            }
             Log.i(TAG, "queryRecord:orders " + orders);
         }
         //判断是否有时间条件，如果没有时间则默认为查询所有
