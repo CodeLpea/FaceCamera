@@ -35,7 +35,7 @@ import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CurrentSettingData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.FFCData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.PhotoDataRespons;
-import cn.com.magnity.coresdksample.ddnwebserver.model.PictureData;
+import cn.com.magnity.coresdksample.ddnwebserver.database.PictureData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.RecordQueryRequest;
 import cn.com.magnity.coresdksample.ddnwebserver.model.ReturnData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.TemperCameraData;

@@ -476,7 +476,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             stream.close();
 
                             //保存记录
-                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON,bmp,TempThreshold);
+                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON,bmp,TempThreshold,MyApplication.getInstance().juGeFaceRect);
 
                         }
                     } catch (Exception ex) {

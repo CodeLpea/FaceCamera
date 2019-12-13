@@ -1,7 +1,10 @@
-package cn.com.magnity.coresdksample.ddnwebserver.model;
+package cn.com.magnity.coresdksample.ddnwebserver.database;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
+
+import org.litepal.crud.LitePalSupport;
+
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 
 /**
@@ -9,7 +12,7 @@ import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
  * 红外，人脸图片路径
  * 人脸框定位参数
  * */
-public class PictureData {
+public class PictureData  extends LitePalSupport{
 
     @JSONField(name = WebConfig.TEMPERPATH)
     private String temperPath;

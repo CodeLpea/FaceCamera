@@ -181,25 +181,6 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
     private void drawImage(Canvas canvas, Rect dstRect, CameraInfo cameraInfo,
                            StatisticInfo info, Paint paint) {
 
-
-     /*   mDev.lock();
-        bmp = mDev.getOutputImage();
-        mDev.getFrameStatisticInfo(info);
-       // Log.i(TAG, "指定区域的温度: "+  mDev.getTemperatureProbe(5,1));
-        mDev.getCameraInfo(cameraInfo);
-        mDev.unlock();
-
-        if (bmp != null) {
-            canvas.drawBitmap(bmp, null, dstRect, null);
-            drawMaxTemp(canvas, dstRect, cameraInfo, info, paint);
-            if(isGetFace){//如果捕捉到人脸
-                isGetFace=false;
-               // Log.i(TAG, "drawImage: 检测到人脸框，准备获取热成像相关温度");
-                GetRectTemperature(cameraInfo);//获取规定区域内的温度信息,并绘制人脸
-                drawFaceDetect(canvas,dstRect,cameraInfo,paint);//画出预览画面中的人两款
-            }
-        }*/
-
         showTemperatureDataVideo(canvas, dstRect, cameraInfo, paint);
     }
 
@@ -410,7 +391,6 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                   float maxTmp= (maxTemp[0]*0.001f+CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter());//减去黑体补偿
 
                       if(maxTmp>TempThreshold&&! TtsSpeak.getInstance().isSpeaking()){
-                          iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
                           TempThreshold=maxTmp;//超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
                           lampUtil.setlamp(2,500,3000);
                           String maxTmp2=String.valueOf(TempThreshold);
@@ -445,7 +425,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                           }
                           saveBmpCanvas.drawText(maxTmp2, x2, y2, textPaint);
                           //保存记录
-                          RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_TEMP,bitmap1,TempThreshold);
+                          RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_TEMP,bitmap1,TempThreshold,MyApplication.getInstance().juGeFaceRect);
+                          iftaken=true;//超过阈值，这先让人脸摄像头拍摄照片
                       }
                       else {
                           if(TempThreshold> CurrentConfig.getInstance().getCurrentData().getTemperature_threshold()){//当前温度阈值与默认温度阈值不同的时播报异常

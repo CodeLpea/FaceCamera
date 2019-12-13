@@ -22,7 +22,7 @@ import cn.com.magnity.coresdksample.ddnwebserver.model.CalibratPositionData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.FFCData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.PhotoDataRespons;
-import cn.com.magnity.coresdksample.ddnwebserver.model.PictureData;
+import cn.com.magnity.coresdksample.ddnwebserver.database.PictureData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.RecordQueryRequest;
 import cn.com.magnity.coresdksample.ddnwebserver.model.TemperCameraData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.TemperatureData;
@@ -175,27 +175,14 @@ public class SetConfigServer {
     /**
      * 获取图片路径
      * 人脸定位
+     * 用于预览和校准
      */
     public PictureData getPictureData() {
-        PictureData pictureData = new PictureData();
-        pictureData.setPersonPath(WebConfig.person_path);
-        pictureData.setTemperPath(WebConfig.temper_path);
-        pictureData.setX1(198);
-        pictureData.setY1(94);
-
-        pictureData.setX2(292);
-        pictureData.setY2(107);
-
-        pictureData.setX3(292);
-        pictureData.setY3(192);
-
-        pictureData.setX4(198);
-        pictureData.setY4(192);
-
+        //寻找最新保存的图片信息
+        PictureData pictureData = LitePal.findLast(PictureData.class);
         pictureData.setMoveX(PreferencesUtils.getInt(WebConfig.MOVEX, 0));
         pictureData.setMoveY(PreferencesUtils.getInt(WebConfig.MOVEY, 0));
         pictureData.setScale(PreferencesUtils.getFloat(WebConfig.SCALE, 1));
-
         return pictureData;
     }
 

@@ -66,24 +66,24 @@ public class MyApplication extends Application {
         FlieUtil.initFile(getFolderPathToday());
 
         //putDataIntoDb();
-        //LitePal.deleteAll(PhotoRecordDb.class);
+        LitePal.deleteAll(PhotoRecordDb.class);
     }
 
 
     //放入测试数据
     private void putDataIntoDb() {
         LitePal.deleteAll(PhotoRecordDb.class);
-        for(int i=0;i<100;i++){
-            PhotoRecordDb photoRecordDb=new PhotoRecordDb();
-            photoRecordDb.setPersonPath(person_path);
-            photoRecordDb.setTemperPath(temper_path);
-            photoRecordDb.setDate(Long.valueOf(TimeUtils.randomDate("20191001101010",TimeUtils.getYMDHMSDate())));
-            Random random=new Random();
-            float temp=random.nextFloat()+20;
-            photoRecordDb.setTemp(temp);
-            Log.i("放入测试数据", photoRecordDb.toString());
-            photoRecordDb.save();
-        }
+//        for(int i=0;i<100;i++){
+//            PhotoRecordDb photoRecordDb=new PhotoRecordDb();
+//            photoRecordDb.setPersonPath(person_path);
+//            photoRecordDb.setTemperPath(temper_path);
+//            photoRecordDb.setDate(Long.valueOf(TimeUtils.randomDate("20191001101010",TimeUtils.getYMDHMSDate())));
+//            Random random=new Random();
+//            float temp=random.nextFloat()+20;
+//            photoRecordDb.setTemp(temp);
+//            Log.i("放入测试数据", photoRecordDb.toString());
+//            photoRecordDb.save();
+//        }
     }
 
     private void init() {

@@ -11,7 +11,13 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import android.os.Handler;
+
+import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
+import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
+import cn.com.magnity.coresdksample.ddnwebserver.component.LoginInterceptor;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
+import cn.com.magnity.coresdksample.ddnwebserver.database.PictureData;
+import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 
 import static cn.com.magnity.coresdksample.Config.ROOT_DIR_NAME;
@@ -32,6 +38,8 @@ public class RecordHandler  extends Handler {
 
     private String personPath=null;
     private String tempPath=null;
+    private float temp;
+    private JuGeFaceRect faceRect;
     private static class InnerClass {
         public static RecordHandler intance = new RecordHandler();
     }
@@ -52,24 +60,27 @@ public class RecordHandler  extends Handler {
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
         switch (msg.what){
+            case MSG_RECODE_TEMP:
+                //保存温度记录信息
+                RecordHolder tempRecordHolder=(RecordHolder)msg.obj;
+                temp=tempRecordHolder.getTemp();
+                //保存图片，获得地址
+                tempPath = saveBitmap(tempRecordHolder.getBitmap(), tempRecordHolder.getTemp(), "Temp");
+                break;
             case MSG_RECODE_PERSON:
                 //保存人脸记录信息
-                RecordHolder recordHolder=(RecordHolder)msg.obj;
+                RecordHolder personRecordHolder=(RecordHolder)msg.obj;
                 //保存图片，获得地址
-                personPath = saveBitmap(recordHolder.getBitmap(), recordHolder.getTemp(), "Person");
-                break;
-            case MSG_RECODE_TEMP:
-                //保存人脸记录信息
-                RecordHolder recordHolder2=(RecordHolder)msg.obj;
-                //保存图片，获得地址
-                tempPath = saveBitmap(recordHolder2.getBitmap(), recordHolder2.getTemp(), "Temp");
+                personPath = saveBitmap(personRecordHolder.getBitmap(), personRecordHolder.getTemp(), "Person");
+
                 //添加记录进数据库
-                recordData(personPath,tempPath, recordHolder2.getTemp(),TimeUitl.getDate());
+                recordData(personPath,tempPath, temp,TimeUitl.getDate());
+                recordPicViewData(personPath,tempPath,faceRect);
                 break;
         }
     }
 
-    public void sendRecord(int MSG, Bitmap bitmap,float temp){
+    public void sendRecord(int MSG, Bitmap bitmap,float temp,JuGeFaceRect faceRect){
         Message message=this.obtainMessage();
         message.what=MSG;
         RecordHolder recordHolder=new RecordHolder();
@@ -78,6 +89,7 @@ public class RecordHandler  extends Handler {
         message.obj=recordHolder;
         //延时，避免保存冲突，确保每次间隔100毫秒。
         sendMessageDelayed(message,100);
+        this.faceRect=faceRect;
     }
 
 
@@ -91,6 +103,22 @@ public class RecordHandler  extends Handler {
         photoRecordDb.save();
         Log.e(TAG, "photoRecordDb: "+photoRecordDb.toString());
 
+    }
+
+    private void recordPicViewData(String personPath, String tempPath, JuGeFaceRect faceRect) {
+        PictureData pictureData=new PictureData();
+        pictureData.setPersonPath(personPath);
+        pictureData.setTemperPath(tempPath);
+        pictureData.setX1(faceRect.getxStart());
+        pictureData.setX2(faceRect.getxStart());
+        pictureData.setX3(faceRect.getxStop());
+        pictureData.setX4(faceRect.getxStop());
+        pictureData.setY1(faceRect.getyStart());
+        pictureData.setY2(faceRect.getyStart());
+        pictureData.setY3(faceRect.getyStop());
+        pictureData.setY4(faceRect.getyStop());
+        pictureData.save();
+        Log.e(TAG, "recordPicViewData: "+pictureData.toString());
     }
 
     /**
