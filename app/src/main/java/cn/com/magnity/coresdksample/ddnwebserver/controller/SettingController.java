@@ -117,7 +117,7 @@ public class SettingController {
         }
         VoiceData voiceData = JSON.parseObject(content, VoiceData.class);
         SetConfigServer.getInstance().setVoiceData(voiceData);
-        TtsSpeak.getInstance().SystemSpeech("设置有效区域预览成功");
+        TtsSpeak.getInstance().SystemSpeech("设置语音信息成功");
         return voiceData;
 
     }
@@ -231,7 +231,6 @@ public class SettingController {
         }
         TemperCameraData temperCameraData = JSON.parseObject(content, TemperCameraData.class);
         SetConfigServer.getInstance().setTemperatureCameraData(temperCameraData);
-        TtsSpeak.getInstance().SystemSpeech("设置目标距离"+temperCameraData.getDistance()+"成功");
         return temperCameraData;
     }
 

@@ -67,8 +67,8 @@ public class SetConfigServer {
      */
     public void setWifiData(WifiData wifiData) {
         /*SP操作，存入本地*/
-        PreferencesUtils.put(WebConfig.WIFI_NAME,wifiData.getWifi_name());
-        PreferencesUtils.put(WebConfig.WIFI_PASSWD,wifiData.getWifi_passwd());
+        PreferencesUtils.put(WebConfig.WIFI_NAME, wifiData.getWifi_name());
+        PreferencesUtils.put(WebConfig.WIFI_PASSWD, wifiData.getWifi_passwd());
         //缓存更新一下
         CurrentConfig.getInstance().updateSetting();
         /*启动wifi服务，发送*/
@@ -124,6 +124,8 @@ public class SetConfigServer {
         Log.i(TAG, "setTemperatureCameraData: " + temperCameraData.toString());
         PreferencesUtils.put(WebConfig.DISTANCE, temperCameraData.getDistance());
         CurrentConfig.getInstance().updateSetting();
+        //完成配置
+        TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_DISTANCE, temperCameraData.getDistance(), 100);
     }
 
 
@@ -153,19 +155,17 @@ public class SetConfigServer {
             //如果都是空的，则表示为平均黑体校准
             Log.i(TAG, "FFC平均黑体校准: ");
             //校准值为0，标志平均温度校准
-            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN,0,100);
-
-
+            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN, 0, 100);
             return;
         }
-        if (ffcData.getCompensation()!= 0) {
+        if (ffcData.getCompensation() != 0) {
             Log.i(TAG, "FFC补偿参数，可为负数 :" + ffcData.getCompensation());
             PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER, ffcData.getCompensation());
-        } else if (ffcData.getCalibration()!= 0) {
+        } else if (ffcData.getCalibration() != 0) {
             //如果黑体校准参数不为空，则表示为设置黑体校准参数
             Log.i(TAG, "FFC黑体校准参考值: " + ffcData.getCalibration());
             //开启指定温度黑体校准
-            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN,ffcData.getCompensation(),100);
+            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN, ffcData.getCompensation(), 100);
             PreferencesUtils.put(WebConfig.FFC_CALIBRATION_PARAMETER, ffcData.getCalibration());
         }
         CurrentConfig.getInstance().updateSetting();
@@ -235,13 +235,13 @@ public class SetConfigServer {
         //统计条件查询的数量
         List<PhotoRecordDb> countSizeList = null;
         //排序条件 asc为升序，desc为降序。
-       // String orders = "date asc";
-        String orders = "id asc";
+        String orders = "date asc";
+//        String orders = "id asc";
         if (recordQueryRequest.getOrders() != null) {
-            //如果包含了date
-            if(recordQueryRequest.getOrders().contains("date")){
-                 recordQueryRequest.setOrders(recordQueryRequest.getOrders().replace("date","id"));
-            }
+//            //如果包含了date
+//            if(recordQueryRequest.getOrders().contains("date")){
+//                 recordQueryRequest.setOrders(recordQueryRequest.getOrders().replace("date","id"));
+//            }
             Log.i(TAG, "queryRecord:orders " + orders);
         }
         //判断是否有时间条件，如果没有时间则默认为查询所有

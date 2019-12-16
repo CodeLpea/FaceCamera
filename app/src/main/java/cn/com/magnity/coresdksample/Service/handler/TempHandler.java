@@ -31,6 +31,9 @@ public class TempHandler extends Handler {
     public static final int MSG_OVER = MSG_DO + 1;
     public static final int MSG_OVER_TEST = MSG_OVER + 1;
 
+
+    public static final int MSG_DISTANCE = MSG_OVER_TEST + 1;
+
     //接收到命令的标志
     private static boolean runSign = false;
 
@@ -100,6 +103,17 @@ public class TempHandler extends Handler {
                 testCalibrat();
                 //还原标志，方便下次校准
                 runSign=false;
+                break;
+            case MSG_DISTANCE:
+                Log.e(TAG, "距离校准: ");
+                //距离校准
+                float distance=Float.valueOf(msg.obj.toString());
+                if(runSign){
+                    TtsSpeak.getInstance().SystemSpeech("正在校准FFC，请稍后配置");
+                    return;
+                }
+                setTempCorrect(distance);
+                TtsSpeak.getInstance().SystemSpeech("设置目标距离"+distance+"成功");
                 break;
 
         }

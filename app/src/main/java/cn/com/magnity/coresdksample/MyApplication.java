@@ -66,7 +66,7 @@ public class MyApplication extends Application {
         FlieUtil.initFile(getFolderPathToday());
 
         //putDataIntoDb();
-        LitePal.deleteAll(PhotoRecordDb.class);
+        //LitePal.deleteAll(PhotoRecordDb.class);
     }
 
 
