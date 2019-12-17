@@ -29,6 +29,7 @@ import com.yanzhenjie.andserver.util.MediaType;
 
 import java.io.IOException;
 
+import cn.com.magnity.coresdksample.Service.handler.StabilityTestHandler;
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CalibratPositionData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
@@ -137,6 +138,8 @@ public class SettingController {
         TemperatureData temperatureData = JSON.parseObject(content, TemperatureData.class);
         SetConfigServer.getInstance().setTemperatureData(temperatureData);
         TtsSpeak.getInstance().SystemSpeech("设置温度阀值"+temperatureData.getTemperature_threshold1()+"成功");
+        //在设置温度阈值的时候，进行温度信息的稳定性采集
+        StabilityTestHandler.getInstance().startStability();
         return temperatureData;
 
     }
