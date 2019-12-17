@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 import cn.com.magnity.coresdksample.MyApplication;
 import cn.com.magnity.coresdksample.Config;
@@ -152,7 +153,8 @@ public class DrawFaceRect {
             result=true;
             //Log.i(TAG, "张嘴了！！！！:");
         }else {
-            TtsSpeak.getInstance().SpeechRepead("请张开嘴巴   ", CurrentConfig.getInstance().getCurrentData().getError_voice());
+            Log.i(TAG, "暂时注释张嘴提醒，医院测试中提出 ");
+//            TtsSpeak.getInstance().SpeechRepead("请张开嘴巴   ", CurrentConfig.getInstance().getCurrentData().getError_voice());
         }
        // Log.i(TAG, "嘴唇开口比例: "+proportion);
          return result;

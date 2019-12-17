@@ -177,7 +177,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
         mDev = null;
     }
-    Bitmap bmp;
+
     private void drawImage(Canvas canvas, Rect dstRect, CameraInfo cameraInfo,
                            StatisticInfo info, Paint paint) {
 
@@ -245,7 +245,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         } else {
             paint.setStrokeWidth(2);//设置画笔的粗度
         }
-        int drawL= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStart()/4;;
+        int drawL= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStart()/4;
         int drawR= CurrentConfig.getInstance().getCurrentData().getMovex()+MyApplication.getInstance().juGeFaceRect.getxStop()/4;
         int drawU=(MyApplication.getInstance().juGeFaceRect.getyStart()/4)+ CurrentConfig.getInstance().getCurrentData().getMovey();//因为坐标原点在左下角，不是左上角，因此y轴是相反的。
         int drawD=(MyApplication.getInstance().juGeFaceRect.getyStop()/4)+ CurrentConfig.getInstance().getCurrentData().getMovey();
@@ -398,7 +398,9 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                               maxTmp2=maxTmp2.substring(0,4);
                               Log.i(TAG, "maxTmp2: "+maxTmp2);
                           }
-                          TtsSpeak.getInstance().SpeechRepead("口腔温度   "+maxTmp2,CurrentConfig.getInstance().getCurrentData().getError_voice());
+                          //TtsSpeak.getInstance().SpeechRepead("口腔温度   "+maxTmp2,CurrentConfig.getInstance().getCurrentData().getError_voice());
+                          //医院测试版本，取消多余播报直接播报温度
+                          TtsSpeak.getInstance().SpeechRepead(" "+maxTmp2,CurrentConfig.getInstance().getCurrentData().getError_voice());
                          // Log.i(TAG, "maxTmp2222: "+maxTmp2);
                           Canvas saveBmpCanvas=new Canvas(bitmap1);
                           float x2=maxTemp[1];
