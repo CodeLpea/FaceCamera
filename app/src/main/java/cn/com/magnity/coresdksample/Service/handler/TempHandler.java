@@ -252,16 +252,19 @@ public class TempHandler extends Handler {
         }
         //当到达指定帧数的时候
         Log.i(TAG, "到达指定帧数: nowInterval  " + nowInterval);
+        //保存一个原始数据到本地，以便观察
+        SaveTemps.saveIntTemps(FFCSingleTemps, SaveTemps.SaveType.ORIGIN);
 
         //求出每个点的平均值 ，得到总帧率下的单帧值
         for (int i = 0; i < FFCALLTemps.length; i++) {
-            FFCSingleTemps[i] = FFCALLTemps[i] / nowInterval;
+            FFCSingleTemps[i] = FFCALLTemps[i] / INTERVALFRAME;
         }
+
         //单帧值的每个点，与平均温度的补偿，就是FFC矩阵
         FFCTemps = FFCUtil.getFFC(FFCSingleTemps);
 
         //将每个点的校准数组FFCTemps保存到本地
-        saveFFCtoLoacl(FFCSingleTemps, FFCTemps);
+        saveFFCtoLoacl(FFCTemps);
 
         //如果目标值为不0，则还需要根据黑体温度更新补偿值
         if (targetTemp != 0) {
@@ -270,6 +273,7 @@ public class TempHandler extends Handler {
 //            int[] origin = getCameraTemps();
             int avg = TempUtil.MaxMinTemp(FFCSingleTemps)[2];//原始数据的平均值
             float BlackTempCom = targetTemp * 1000 - avg;  //计算黑体补偿,统一单位
+
             //黑体补偿等于原始数据平均值减去目标黑体温度。用于之后补偿。
             PreferencesUtils.put(WebConfig.FFC_COMPENSATION_PARAMETER, BlackTempCom * 0.001f);
             //更新补偿值
@@ -283,11 +287,10 @@ public class TempHandler extends Handler {
     /**
      * 将ffc数据保存到本地
      */
-    private void saveFFCtoLoacl(int[] origin, int[] ffc) {
+    private void saveFFCtoLoacl( int[] ffc) {
         //保存校准图，方便使用时，从本地读取
         Log.i(TAG, "保存校准图: ");
         FFCUtil.saveIntFfc(ffc);
-        SaveTemps.saveIntTemps(origin, SaveTemps.SaveType.ORIGIN);
         SaveTemps.saveIntTemps(ffc, SaveTemps.SaveType.FFC);
 
     }

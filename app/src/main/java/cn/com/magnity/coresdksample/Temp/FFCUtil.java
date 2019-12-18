@@ -37,13 +37,14 @@ public class FFCUtil {
      * 并再减的基础上增加10度，也就是增加10000
      */
     public static int[] getFFC(int[] a) {
+        int [] result=new int[120*160];
         int avg=intAvg(a);
         for(int i=0;i<a.length;i++){
-            a[i]=a[i]-avg;
+            result[i]=a[i]-avg;
         }
         //保存
         //saveFFC(a);
-        return a;
+        return result;
     }
     /**
      * 获取到FFC

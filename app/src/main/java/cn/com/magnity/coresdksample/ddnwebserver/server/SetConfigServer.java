@@ -165,7 +165,7 @@ public class SetConfigServer {
             //如果黑体校准参数不为空，则表示为设置黑体校准参数
             Log.i(TAG, "FFC黑体校准参考值: " + ffcData.getCalibration());
             //开启指定温度黑体校准
-            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN, ffcData.getCompensation(), 100);
+            TempHandler.getInstance().sendTemperMessge(TempHandler.MSG_IN, ffcData.getCalibration(), 100);
             PreferencesUtils.put(WebConfig.FFC_CALIBRATION_PARAMETER, ffcData.getCalibration());
         }
         CurrentConfig.getInstance().updateSetting();
