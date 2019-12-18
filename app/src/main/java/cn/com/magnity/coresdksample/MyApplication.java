@@ -13,6 +13,7 @@ import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
 import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
+import cn.com.magnity.coresdksample.Service.handler.StabilityTestHandler;
 import cn.com.magnity.coresdksample.Service.handler.TempHandler;
 import cn.com.magnity.coresdksample.View.MagSurfaceView;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
@@ -62,6 +63,7 @@ public class MyApplication extends Application {
         //初始化
         TempHandler.getInstance();
         RecordHandler.getInstance();
+        StabilityTestHandler.getInstance();
         //初始化文件夹
         FlieUtil.initFile(getFolderPathToday());
 

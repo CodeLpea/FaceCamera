@@ -123,7 +123,7 @@ public class StabilityTestHandler extends Handler {
         stringBuffer.append("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4) + "\n\r");
         stringBuffer.append("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4) + "\n\r");
         stringBuffer.append("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4) + "\n\r");
-        stringBuffer.append("平均温度为： " + String.valueOf(avg * 0.001f).substring(0, 4) + "\n\r");
+        stringBuffer.append("平均温度为： " + String.valueOf(avg * 0.001f) + "\n\r");
         stringBuffer.append("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()) + "\n\r");
 
         saveLog(stringBuffer.toString());
@@ -134,13 +134,17 @@ public class StabilityTestHandler extends Handler {
      */
 
     private void saveLog(String str) {
-        String path = XLOG_DIR + File.separator + getFileName() + File.separator + "稳定性测试" + TimeUitl.currentDayTime() + ".txt";
-        FlieUtil.isExistFlie(path);
-        File files1 = new File(path);
+        String logpath=XLOG_DIR + File.separator + getFileName();
+        File file1 =new File(logpath);
+        if (!file1.exists()) {
+            file1.mkdirs();
+        }
+        String path = logpath + File.separator + "stability" + TimeUitl.currentDayTime() + ".txt";
+        Log.i(TAG, "path: "+path);
         FileWriter file = null;
         try {
             //直接在文中后面追加
-            file = new FileWriter(files1, true);
+            file = new FileWriter(path, true);
             file.write(str);
             file.close();
         } catch (IOException e) {
