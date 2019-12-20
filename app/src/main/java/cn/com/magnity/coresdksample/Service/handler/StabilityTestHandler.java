@@ -119,10 +119,10 @@ public class StabilityTestHandler extends Handler {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("\n\r");
         stringBuffer.append(TimeUitl.getNowDate() + "\n\r");
-        stringBuffer.append("TDEV为：    " + String.valueOf(TDEV * 0.001f).substring(0, 4) + "\n\r");
-        stringBuffer.append("最大温度为： " + String.valueOf(max * 0.001f).substring(0, 4) + "\n\r");
-        stringBuffer.append("最小温度为： " + String.valueOf(min * 0.001f).substring(0, 4) + "\n\r");
-        stringBuffer.append("温度极差为： " + String.valueOf(cha * 0.001f).substring(0, 4) + "\n\r");
+        stringBuffer.append("TDEV为：    " + String.valueOf(TDEV * 0.001f) + "\n\r");
+        stringBuffer.append("最大温度为： " + String.valueOf(max * 0.001f) + "\n\r");
+        stringBuffer.append("最小温度为： " + String.valueOf(min * 0.001f) + "\n\r");
+        stringBuffer.append("温度极差为： " + String.valueOf(cha * 0.001f) + "\n\r");
         stringBuffer.append("平均温度为： " + String.valueOf(avg * 0.001f) + "\n\r");
         stringBuffer.append("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()) + "\n\r");
 
@@ -134,13 +134,13 @@ public class StabilityTestHandler extends Handler {
      */
 
     private void saveLog(String str) {
-        String logpath=XLOG_DIR + File.separator + getFileName();
-        File file1 =new File(logpath);
+        String logpath = XLOG_DIR + File.separator + getFileName();
+        File file1 = new File(logpath);
         if (!file1.exists()) {
             file1.mkdirs();
         }
         String path = logpath + File.separator + "stability" + TimeUitl.currentDayTime() + ".txt";
-        Log.i(TAG, "path: "+path);
+        Log.i(TAG, "path: " + path);
         FileWriter file = null;
         try {
             //直接在文中后面追加
