@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.iflytek.thirdparty.E;
+
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authority;
@@ -104,12 +106,13 @@ public class FtpService extends Service {
         factory.setPort(port); //设置端口号 非ROOT不可使用1024以下的端口
         serverFactory.addListener("default", factory.createListener());
 
+        if (NetUtil.getLocalIPAddress() == null) {
+            return;
+        }
         server = serverFactory.createServer();
         server.start();
         Log.i(TAG, "server.isStopped(): "+server.isStopped());
-        Log.e(TAG, "startFtp: "+
-                "ftp://" +
-                NetUtil.getLocalIPAddress().getHostAddress() +
+        Log.e(TAG, "startFtp: "+ "ftp://" + NetUtil.getLocalIPAddress().getHostAddress() +
                 ":2221\n" +
                 "账号:didano\n" +
                 "密码:12345678");

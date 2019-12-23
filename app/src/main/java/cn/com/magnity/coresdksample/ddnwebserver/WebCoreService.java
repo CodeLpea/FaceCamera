@@ -100,9 +100,12 @@ public class WebCoreService extends Service {
         if (mServer.isRunning()) {
             //正在运行中
             Log.i(TAG, "startServer: isRunning");
-            Log.i(TAG, "mServer.getInetAddress().getHostAddress(): "+mServer.getInetAddress().getHostAddress());
-            Log.i(TAG, "NetUtil.getLocalIPAddress(): "+NetUtil.getLocalIPAddress());
+//            Log.i(TAG, "mServer.getInetAddress().getHostAddress(): "+mServer.getInetAddress().getHostAddress());
+//            Log.i(TAG, "NetUtil.getLocalIPAddress(): "+NetUtil.getLocalIPAddress());
             //如果运行中的服务ip也连接的ip不符。则需要重新连接
+            if (NetUtil.getLocalIPAddress() == null) {
+                return;
+            }
             if(!mServer.getInetAddress().getHostAddress().equals(NetUtil.getLocalIPAddress().getHostAddress())){
                 Log.i(TAG, "服务ip也连接的ip不符。则需要重新连接: ");
                 initServer();
