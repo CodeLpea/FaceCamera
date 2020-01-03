@@ -148,9 +148,10 @@ public class StabilityTestHandler extends Handler {
         int max = 0;
         int maxIndex = 0;
         ArrayList result = new ArrayList();
+        int[] maxAndmin = TempUtil.MaxMinTemp(testCalibrat);
         for (int j = 0; j < testCalibrat.length; j++) {
-            //大于20度的都保存
-            if (testCalibrat[j] > 20) {
+            //大于平均温度+1度的都保存
+            if (testCalibrat[j] > maxAndmin[2]) {
                 max = testCalibrat[j];
                 maxIndex = j;
                 result.add( "-坐标-" + maxIndex + "-温度-" + max);
