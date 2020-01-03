@@ -8,6 +8,7 @@ import android.util.TimeUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
@@ -57,8 +58,8 @@ public class StabilityTestHandler extends Handler {
                 removeMessages(MSGSTABILITY_START);
                 //开始测试
                 Log.i(TAG, "开始测试: ");
-                testStability();
-
+//                testStability();
+                testNinePoint();
                 sendEmptyMessageDelayed(MSGSTABILITY_START, 60 * 1000);
                 break;
 
@@ -127,6 +128,40 @@ public class StabilityTestHandler extends Handler {
         stringBuffer.append("黑体补偿为： " + String.valueOf(CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter()) + "\n\r");
 
         saveLog(stringBuffer.toString());
+    }
+    /**
+     * 远距离测试黑体温度
+     * 采用最高温度九个点的数据保存，时间，坐标，温度
+     * */
+    private void testNinePoint(){
+        //获取测试数据
+        int[] testCalibrat = getCameraTemps();
+        //排序
+        String[] nineResult = findNine(testCalibrat);
+        StringBuffer stringBuffer = new StringBuffer();
+        String nowDate = TimeUitl.getNowDate();
+        for (int i = 0; i < nineResult.length; i++) {
+            stringBuffer.append(nowDate+nineResult[i]+"\n\r");
+        }
+        saveLog(stringBuffer.toString());
+    }
+    //找到温度最高的九个点，并返回坐标
+    private String []  findNine(int [] testCalibrat){
+        int max = 0;
+        int maxIndex = 0;
+        String []result=new String[9];
+        for (int i = 0; i < result.length; i++) {
+            for (int j = 0; j < testCalibrat.length; j++) {
+                if (testCalibrat[j] > max) {
+                    max = testCalibrat[j];
+                    maxIndex = j;
+                    //将已经作为最大值的置零避免重复计算
+                    testCalibrat[j]=0;
+                    result[i]="-坐标-"+maxIndex+"-温度-"+max;
+                }
+            }
+        }
+        return result;
     }
 
     /**
