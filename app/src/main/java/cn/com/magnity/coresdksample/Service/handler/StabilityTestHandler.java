@@ -3,21 +3,17 @@ package cn.com.magnity.coresdksample.Service.handler;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.util.TimeUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
-import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
-import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
-import static cn.com.magnity.coresdksample.Config.SavaRootDirPath;
 import static cn.com.magnity.coresdksample.Config.XLOG_DIR;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFileName;
@@ -59,7 +55,7 @@ public class StabilityTestHandler extends Handler {
                 //开始测试
                 Log.i(TAG, "开始测试: ");
 //                testStability();
-                testNinePoint();
+                testareaPoint();
                 sendEmptyMessageDelayed(MSGSTABILITY_START, 60 * 1000);
                 break;
 
@@ -129,38 +125,38 @@ public class StabilityTestHandler extends Handler {
 
         saveLog(stringBuffer.toString());
     }
+
     /**
      * 远距离测试黑体温度
-     * 采用最高温度九个点的数据保存，时间，坐标，温度
-     * */
-    private void testNinePoint(){
+     * 采用最高温度点的数据保存，时间，坐标，温度
+     */
+    private void testareaPoint() {
         //获取测试数据
         int[] testCalibrat = getCameraTemps();
         //排序
-        String[] nineResult = findNine(testCalibrat);
+        ArrayList areaResult = findArea(testCalibrat);
         StringBuffer stringBuffer = new StringBuffer();
         String nowDate = TimeUitl.getNowDate();
-        for (int i = 0; i < nineResult.length; i++) {
-            stringBuffer.append(nowDate+nineResult[i]+"\n\r");
+        for (int i = 0; i < areaResult.size(); i++) {
+            stringBuffer.append(nowDate + areaResult.get(i).toString() + "\n\r");
         }
         saveLog(stringBuffer.toString());
     }
-    //找到温度最高的九个点，并返回坐标
-    private String []  findNine(int [] testCalibrat){
+
+    //找到温度最高的区域，并返回坐标
+    private ArrayList findArea(int[] testCalibrat) {
         int max = 0;
         int maxIndex = 0;
-        String []result=new String[9];
-        for (int i = 0; i < result.length; i++) {
-            for (int j = 0; j < testCalibrat.length; j++) {
-                if (testCalibrat[j] > max) {
-                    max = testCalibrat[j];
-                    maxIndex = j;
-                    //将已经作为最大值的置零避免重复计算
-                    testCalibrat[j]=0;
-                    result[i]="-坐标-"+maxIndex+"-温度-"+max;
-                }
+        ArrayList result = new ArrayList();
+        for (int j = 0; j < testCalibrat.length; j++) {
+            //大于20度的都保存
+            if (testCalibrat[j] > 20) {
+                max = testCalibrat[j];
+                maxIndex = j;
+                result.add( "-坐标-" + maxIndex + "-温度-" + max);
             }
         }
+
         return result;
     }
 
