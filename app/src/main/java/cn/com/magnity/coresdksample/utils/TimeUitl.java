@@ -37,7 +37,7 @@ public class TimeUitl {
      * @return 2019:11:19:11:22:33
      */
     public static String getNowDate() {
-        DateFormat df = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar calendar = Calendar.getInstance();
         String dateName = df.format(calendar.getTime());
         return dateName;
