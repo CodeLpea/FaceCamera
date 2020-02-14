@@ -20,9 +20,12 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
+import cn.com.magnity.coresdksample.utils.ic2.ADS1110A0Converter;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 
 import static cn.com.magnity.coresdksample.MyApplication.isQuest;
@@ -76,9 +79,29 @@ public class LinkFragment extends Fragment {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_link, container, false);
         initUi();
+//        testI2c();
         return view;
     }
 
+    /**
+     * 测试I2c读取
+     * */
+    private void testI2c() {
+        Timer timer=new Timer();
+        TimerTask timerTask=new TimerTask() {
+            @Override
+            public void run() {
+
+                Log.i(TAG, "测试I2C读取");
+                boolean moduleOk = ADS1110A0Converter.GetInstance().ModuleOk();
+                ADS1110A0Converter.ADTemperature temperature = ADS1110A0Converter.GetInstance().Temperature();
+                Log.i(TAG, "I2C :moduleOk: "+moduleOk);
+                Log.i(TAG, "getmAdc: "+temperature.getmAdc());
+                Log.i(TAG, "getmAdsTemperature: "+temperature.getmAdsTemperature());
+            }
+        };
+        timer.schedule(timerTask,0,50);
+    }
 
 
     @Override

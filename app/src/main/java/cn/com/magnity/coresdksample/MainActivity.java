@@ -433,6 +433,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             params.setExposureCompensation(CurrentConfig.getInstance().getCurrentData().getCamera_explore());
             //给摄像头设置参数配置
             mCamera.setParameters(params);
+            mCamera.setDisplayOrientation(90);
             //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
             //mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
 
@@ -591,7 +592,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if (face != null) {
                         //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
                         //否则同一个人不会反复拍摄同样温度的照片
-                        if (TimeUitl.timeInterval(500)) {
+                        if (TimeUitl.timeInterval(500*2)) {
                             Log.i(TAG, "检测到不同人脸  ");
                             TempThreshold = CurrentConfig.getInstance().getCurrentData().getTemperature_threshold();//超过间隔则表示第二个人，则回复默认的阈值
                         }
@@ -602,10 +603,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             }
                             //检测是否在有效区域
                             if (DrawFaceRect.scopeDetection(face, PREVIEW_HEIGHT, PREVIEW_WIDTH, canvas)) {
-                                //检测是否张嘴
-                                if (DrawFaceRect.MouthDetection(face)) {//张嘴才进行问读检测
+//                                //检测是否张嘴
+//                                if (DrawFaceRect.MouthDetection(face)) {//张嘴才进行问读检测
+//                                    isGetFace = true;//进行温度检测
+//                                }
                                     isGetFace = true;//进行温度检测
-                                }
+
                             }
                             //绘制人脸检测的区域
                             DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, frontCamera);
