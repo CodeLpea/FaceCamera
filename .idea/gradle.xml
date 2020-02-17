@@ -9,7 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/lplivertmppush" />
             <option value="$PROJECT_DIR$/lpnetstatus" />
+            <option value="$PROJECT_DIR$/lpnginx" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

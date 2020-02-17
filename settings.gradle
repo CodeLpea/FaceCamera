@@ -1,1 +1,1 @@
-include ':app', ':lpnetstatus'
+include ':app', ':lpnetstatus', ':lplivertmppush', ':lpnginx'

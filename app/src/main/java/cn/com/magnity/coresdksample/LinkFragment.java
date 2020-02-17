@@ -25,6 +25,7 @@ import java.util.TimerTask;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
+import cn.com.magnity.coresdksample.Service.LampService;
 import cn.com.magnity.coresdksample.utils.ic2.ADS1110A0Converter;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 
@@ -278,7 +279,7 @@ private int conut=1;
         if (r == MagDevice.CONN_SUCC) {
                     play();
                     Log.i(TAG, "linkResult: runOnUiThread 连接成功");
-                    lampUtil.setlamp(1,500,-1);//设置成正常灯光
+//                    lampUtil.setlamp(1,500,-1);//设置成正常灯光
 
                     isQuest=false;//修改状态，方便下次进入连接流程
         }

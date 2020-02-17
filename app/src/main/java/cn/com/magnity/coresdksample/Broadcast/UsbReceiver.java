@@ -7,6 +7,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import cn.com.magnity.coresdksample.Service.LampService;
 import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
@@ -38,7 +39,8 @@ public class UsbReceiver extends BroadcastReceiver {
             if(usbDevice.getProductName().equals(HDUSBCamera)){
                 Log.i(TAG, "人脸摄像头已连接，请重新开关机: ");
                 runningInfo.setCameraStatus("人脸摄像头已连接，请重新开关机: ");
-                lampUtil.setlamp(1,500,-1);//设置默认的故障灯光
+//                lampUtil.setlamp(1,500,-1);//设置默认的故障灯光
+                LampService.setStatus(LampService.LampStatus.error);
                 TtsSpeak.getInstance().SystemSpeech("人脸摄像头已连接，请重新开关机");
             }
         } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
@@ -50,12 +52,14 @@ public class UsbReceiver extends BroadcastReceiver {
             if(usbDevice.getProductName().equals(HDUSBCamera)){
                 Log.i(TAG, "人脸摄像头已拔出: ");
                 runningInfo.setCameraStatus("人脸摄像头已拔出: ");
-                lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+//                lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+                LampService.setStatus(LampService.LampStatus.error);
                 TtsSpeak.getInstance().SystemSpeech("人脸摄像头已拔出");
             }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isplay==false&&isInit==false){
                 Log.i(TAG, "热成像摄像头已拔出: ");
                 runningInfo.setInfrared_camera_status("热成像摄像头已拔出: ");
-                lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+//                lampUtil.setlamp(2,500,-1);//设置默认的故障灯光
+                LampService.setStatus(LampService.LampStatus.error);
                 TtsSpeak.getInstance().SystemSpeech("热成像摄像头已拔出");
             }else if(usbDevice.getProductName().equals(ThermoCubeStream)&&isInit==true){
                 Log.i(TAG, "完成热成像摄像头初始化: ");

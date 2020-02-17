@@ -25,6 +25,7 @@ import cn.com.magnity.coresdk.types.CameraInfo;
 import cn.com.magnity.coresdk.types.CorrectionPara;
 import cn.com.magnity.coresdk.types.StatisticInfo;
 import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.Service.LampService;
 import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
 import cn.com.magnity.coresdksample.Service.handler.RecordHolder;
 import cn.com.magnity.coresdksample.Temp.AreaUtil;
@@ -392,7 +393,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
                       if(maxTmp>TempThreshold&&! TtsSpeak.getInstance().isSpeaking()){
                           TempThreshold=maxTmp;//超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
-                          lampUtil.setlamp(2,500,3000);
+//                          lampUtil.setlamp(2,500,3000);
+                          LampService.setLamp(LampService.LampColor.red);
                           String maxTmp2=String.valueOf(TempThreshold);
                           if(String.valueOf(maxTmp).length()>=4){//最多保留4位
                               maxTmp2=maxTmp2.substring(0,4);
@@ -433,11 +435,13 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                       else {
                           if(TempThreshold> CurrentConfig.getInstance().getCurrentData().getTemperature_threshold()){//当前温度阈值与默认温度阈值不同的时播报异常
                               //TtsSpeak.getInstance().SpeechRepead("体温异常   ",CurrentConfig.getInstance().getCurrentData().getError_voice());
-                              lampUtil.setlamp(2,500,3000);
+//                              lampUtil.setlamp(2,500,3000);
+                              LampService.setLamp(LampService.LampColor.red);
                           }
                           else {//在没有超过阈值的情况下才会播报异常
                               TtsSpeak.getInstance().SpeechRepead("体温正常   ", CurrentConfig.getInstance().getCurrentData().getError_voice());
-                              lampUtil.setlamp(1,500,2000);
+//                              lampUtil.setlamp(1,500,2000);
+                              LampService.setLamp(LampService.LampColor.green);
                           }
 
                       }

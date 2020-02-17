@@ -4,6 +4,7 @@ import android.Manifest;
 
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,9 +34,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.alex.livertmppushsdk.LpRtmp;
 import com.iflytek.cloud.FaceDetector;
 import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.util.Accelerometer;
+import com.taopao.androidnginxrtmp.service.NginxUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,6 +58,7 @@ import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.Detect.Result;
+import cn.com.magnity.coresdksample.Service.LampService;
 import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.Service.FtpService;
 
@@ -135,10 +139,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private QiuView QiuView1, QiuView2;
     private Button BtLocate, BtLink, BtArea;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_vertical);
+
         Log.i(TAG, "onCreate: ");
         SpeechUtility.createUtility(this, "appid=" + "5833f456"); //设置AppKey用于注册,AppID
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
@@ -447,7 +453,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             runningInfo.setCameraStatus("人脸摄像头开启失败，请检查");
             runningInfo.upload();
 
-            lampUtil.setlamp(2, 500, -1);//设置默认的故障灯光
+//            lampUtil.setlamp(2, 500, -1);//设置默认的故障灯光
+            LampService.setStatus(LampService.LampStatus.error);
             return;
         }
         try {
@@ -464,6 +471,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onPreviewFrame(byte[] bytes, Camera camera) {
                 System.arraycopy(bytes, 0, nv21, 0, bytes.length);
+                mLpRtmp.inputData(nv21);
                 if (iftaken == true) {
                     iftaken = false;
                     Camera.Size size = camera.getParameters().getPreviewSize();
@@ -477,7 +485,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             stream.close();
 
                             //保存记录
-                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON,bmp,TempThreshold,MyApplication.getInstance().juGeFaceRect);
+                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON, bmp, TempThreshold, MyApplication.getInstance().juGeFaceRect);
 
                         }
                     } catch (Exception ex) {
@@ -489,7 +497,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     }
-
 
 
     /**
@@ -519,6 +526,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mPreviewSurface.setLayoutParams(params);
     }
 
+    private LpRtmp mLpRtmp;
     /**
      * 用于显示摄像头拍摄到的图像
      */
@@ -528,6 +536,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.i(TAG, "surfaceDestroyed: ");
             closeCamera();//关闭摄像头，并释放资源
+            mLpRtmp.stopRtmp();
         }
 
         @Override
@@ -535,6 +544,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             //requestPermission(new String[]{Manifest.permission.CAMERA},2000);
             Log.i(TAG, "surfaceCreated: ");
             openCamera();//打开摄像头
+            mLpRtmp = new LpRtmp();
+            mLpRtmp.startRtmp("rtmp://localhost:1935/live/camera");
         }
 
         @Override
@@ -592,7 +603,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if (face != null) {
                         //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
                         //否则同一个人不会反复拍摄同样温度的照片
-                        if (TimeUitl.timeInterval(500*2)) {
+                        if (TimeUitl.timeInterval(500 * 2)) {
                             Log.i(TAG, "检测到不同人脸  ");
                             TempThreshold = CurrentConfig.getInstance().getCurrentData().getTemperature_threshold();//超过间隔则表示第二个人，则回复默认的阈值
                         }
@@ -607,7 +618,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                                if (DrawFaceRect.MouthDetection(face)) {//张嘴才进行问读检测
 //                                    isGetFace = true;//进行温度检测
 //                                }
-                                    isGetFace = true;//进行温度检测
+                                isGetFace = true;//进行温度检测
 
                             }
                             //绘制人脸检测的区域

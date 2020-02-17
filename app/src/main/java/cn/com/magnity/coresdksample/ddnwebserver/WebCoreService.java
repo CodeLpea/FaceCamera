@@ -55,7 +55,7 @@ public class WebCoreService extends Service {
     private void initServer(){
         mServer = AndServer.serverBuilder(this)
                 .inetAddress(NetUtils.getLocalIPAddress())
-                .port(8080)
+                .port(8088)
                 .timeout(10, TimeUnit.SECONDS)
                 .listener(new Server.ServerListener() {
                     @Override

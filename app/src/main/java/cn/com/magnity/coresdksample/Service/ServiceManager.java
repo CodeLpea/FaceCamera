@@ -60,6 +60,10 @@ public class ServiceManager {
         if(!FtpService.isServiceRunning()) {
             mContext.startService(new Intent(mContext, FtpService.class));
         }
+        //开启灯服务
+        if(!LampService.isServiceRunning()) {
+            mContext.startService(new Intent(mContext, LampService.class));
+        }
 
 
     }
@@ -93,7 +97,10 @@ public class ServiceManager {
         if(FtpService.isServiceRunning()) {
             mContext.stopService(new Intent(mContext, FtpService.class));
         }
-
+        //关闭灯控制服务
+        if(LampService.isServiceRunning()) {
+            mContext.stopService(new Intent(mContext, LampService.class));
+        }
 
     }
 }

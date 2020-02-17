@@ -124,8 +124,14 @@ public class NetService extends Service {
     /**
      * 检查网络是否畅通
      */
+    long contTimes=System.currentTimeMillis();
     private void checkNet() {
         boolean networkConnected = NetUtil.isNetworkConnected(this);
+        //五分钟内不重复播报
+        if(System.currentTimeMillis()-contTimes<60*1000){
+            return;
+        }
+        contTimes=System.currentTimeMillis();
         if (!networkConnected) {
             //两秒后播报网络状态
             DelayDoHandler.getInstance().sendDelayVoice("网络不通 请检查", 2 * 1000);

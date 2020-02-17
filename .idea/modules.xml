@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/demo.iml" filepath="$PROJECT_DIR$/demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lplivertmppush/lplivertmppush.iml" filepath="$PROJECT_DIR$/lplivertmppush/lplivertmppush.iml" />
       <module fileurl="file://$PROJECT_DIR$/lpnetstatus/lpnetstatus.iml" filepath="$PROJECT_DIR$/lpnetstatus/lpnetstatus.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lpnginx/lpnginx.iml" filepath="$PROJECT_DIR$/lpnginx/lpnginx.iml" />
     </modules>
   </component>
 </project>
