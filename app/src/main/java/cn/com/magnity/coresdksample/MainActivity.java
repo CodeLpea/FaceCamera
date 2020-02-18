@@ -545,6 +545,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Log.i(TAG, "surfaceCreated: ");
             openCamera();//打开摄像头
             mLpRtmp = new LpRtmp();
+            mLpRtmp.setSizeAndDgree(480,640,90);
             mLpRtmp.startRtmp("rtmp://localhost:1935/live/camera");
         }
 

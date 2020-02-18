@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.alex.livertmppushsdk.LpRtmp;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,7 @@ import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.Config;
 import cn.com.magnity.coresdksample.Temp.FFCUtil;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
+import cn.com.magnity.coresdksample.utils.ImageUtils;
 import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
@@ -68,7 +71,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
     private int xProportion=160/640;
     private int yProportion=120/480;
 
-
+    private  LpRtmp lpRtmp;
     public MagSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
@@ -93,6 +96,10 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         SavePhotoPaint.setStrokeCap(Paint.Cap.ROUND);
         /* bilinear */
         mPfd = new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+
+        lpRtmp = new LpRtmp();
+        lpRtmp.setSizeAndDgree(120,160,0);
+        lpRtmp.startRtmp("rtmp://localhost:1935/live/temp");
     }
 
     @Override
@@ -103,6 +110,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
     public void surfaceDestroyed(SurfaceHolder holder) {
         mPaint = null;
         mPfd = null;
+        lpRtmp.stopRtmp();
     }
 
     public void invalidate_() {
@@ -116,7 +124,9 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         mLock.unlock();
     }
 
+
     public void startDrawingThread(MagDevice dev) {
+
         if (mIsDrawing) {
             return;
         }
@@ -161,6 +171,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         if (!mIsDrawing) {
             return;
         }
+
+
 
         mIsDrawing = false;
 
@@ -224,6 +236,11 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         int []maxTemp=TempUtil.DDNgetRectTemperatureInfo(AfterTemps,0,m_FrameWidth,0,m_FrameHeight);//获取指定矩形区域中最大的值
 
         drawMaxTemp(canvas, dstRect, cameraInfo, maxTemp, paint);
+        Bitmap bitmap2=bitmap1.copy(Bitmap.Config.ARGB_8888, true);//复制图，以便编辑
+        Canvas rtmpCavas=new Canvas(bitmap2);
+//        rtmpCavas.drawText("测试", 80, 80, paint);
+        byte[] bytes = ImageUtils.bitmapToNv21(bitmap2, bitmap2.getWidth(), bitmap2.getHeight());
+        lpRtmp.inputData(bytes);
 
 
         if(isGetFace){//如果捕捉到人脸

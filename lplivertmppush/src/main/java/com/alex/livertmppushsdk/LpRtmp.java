@@ -8,9 +8,9 @@ import java.util.concurrent.Executors;
  * LpRtmp入口
  */
 public class LpRtmp implements ILpRtmp {
-    //rtmp算法中的宽高和摄像头是相反的
-    private int WIDTH_DEF = 480;
-    private int HEIGHT_DEF = 640;
+    //rtmp算法中的宽高和摄像头是相反的,因为还要旋转90度
+    private  int WIDTH_DEF = 480;
+    private  int HEIGHT_DEF = 640;
     private final int FRAMERATE_DEF = 20;
     private final int BITRATE_DEF = 800 * 1000;
 
@@ -25,9 +25,7 @@ public class LpRtmp implements ILpRtmp {
     private byte[] buffer = new byte[WIDTH_DEF * HEIGHT_DEF * 2];
 
     public LpRtmp() {
-        _swEncH264 = new SWVideoEncoder(WIDTH_DEF, HEIGHT_DEF, FRAMERATE_DEF, BITRATE_DEF);
-        _swEncH264.start(_iCameraCodecType);
-        _rtmpSessionMgr = new RtmpSessionManager();
+
     }
 
     @Override
@@ -47,6 +45,9 @@ public class LpRtmp implements ILpRtmp {
     @Override
     public void startRtmp(String rtmpUrl) {
         this._rtmpUrl = rtmpUrl;
+        _swEncH264 = new SWVideoEncoder(WIDTH_DEF, HEIGHT_DEF, FRAMERATE_DEF, BITRATE_DEF);
+        _swEncH264.start(_iCameraCodecType);
+        _rtmpSessionMgr = new RtmpSessionManager();
         _rtmpSessionMgr.Start(_rtmpUrl);
 
     }
@@ -93,6 +94,10 @@ public class LpRtmp implements ILpRtmp {
             _yuvEdit = _swEncH264.YUV420pRotate270(yuv420, HEIGHT_DEF, WIDTH_DEF);
         } else if (degree == 90) {
             _yuvEdit = _swEncH264.YUV420pRotate90(yuv420, HEIGHT_DEF, WIDTH_DEF);
+        }else if(degree==180){
+             _swEncH264.YUV420pRotate180(_yuvEdit,yuv420, HEIGHT_DEF, WIDTH_DEF);
+        }else if(degree==0){
+            _yuvEdit=yuv420;
         }
         byte[] h264Data = _swEncH264.EncoderH264(_yuvEdit);
         if (h264Data != null) {
