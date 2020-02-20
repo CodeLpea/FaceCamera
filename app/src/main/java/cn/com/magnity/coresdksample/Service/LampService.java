@@ -30,6 +30,9 @@ public class LampService extends Service {
         lampColor = Color;
     }
 
+    /**
+     *设置常亮状态，红为Error
+     * */
     public static void setStatus(LampStatus Status) {
         lampStatus = Status;
     }

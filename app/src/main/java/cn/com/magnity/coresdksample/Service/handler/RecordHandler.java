@@ -2,26 +2,20 @@ package cn.com.magnity.coresdksample.Service.handler;
 
 import android.graphics.Bitmap;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.TimeUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import android.os.Handler;
 
-import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
-import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
-import cn.com.magnity.coresdksample.ddnwebserver.component.LoginInterceptor;
+import cn.com.magnity.coresdksample.Detect.FaceRect;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PictureData;
-import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 
 import static cn.com.magnity.coresdksample.Config.ROOT_DIR_NAME;
-import static cn.com.magnity.coresdksample.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.MyApplication.photoNameSave;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFileName;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
@@ -34,12 +28,11 @@ public class RecordHandler  extends Handler {
     public static final int MSG_RECODE_PERSON=500;
     public static final int MSG_RECODE_TEMP=MSG_RECODE_PERSON+1;
 
-    private static long cacheTime = 0;
 
     private String personPath=null;
     private String tempPath=null;
-    private float temp;
-    private JuGeFaceRect faceRect;
+    private String temp;
+    private FaceRect faceRect;
     private static class InnerClass {
         public static RecordHandler intance = new RecordHandler();
     }
@@ -49,12 +42,6 @@ public class RecordHandler  extends Handler {
         return InnerClass.intance;
     }
 
-    public enum photoType {
-        //人像
-        PERSON,
-        //温度
-        TEMP
-    }
 
     @Override
     public void handleMessage(Message msg) {
@@ -63,33 +50,36 @@ public class RecordHandler  extends Handler {
             case MSG_RECODE_TEMP:
                 //保存温度记录信息
                 RecordHolder tempRecordHolder=(RecordHolder)msg.obj;
-                temp=tempRecordHolder.getTemp();
                 //保存图片，获得地址
-                tempPath = saveBitmap(tempRecordHolder.getBitmap(), tempRecordHolder.getTemp(), "Temp");
+                tempPath = saveBitmap(tempRecordHolder.getBitmap(), temp, "Temp");
                 break;
             case MSG_RECODE_PERSON:
                 //保存人脸记录信息
                 RecordHolder personRecordHolder=(RecordHolder)msg.obj;
                 //保存图片，获得地址
-                personPath = saveBitmap(personRecordHolder.getBitmap(), personRecordHolder.getTemp(), "Person");
+                personPath = saveBitmap(personRecordHolder.getBitmap(), temp, "Person");
 
                 //添加记录进数据库
-                recordData(personPath,tempPath, temp,TimeUitl.getDate());
+                recordData(personPath,tempPath, Float.parseFloat(temp),TimeUitl.getDate());
                 recordPicViewData(personPath,tempPath,faceRect);
                 break;
         }
     }
 
-    public void sendRecord(int MSG, Bitmap bitmap,float temp,JuGeFaceRect faceRect){
+    public void sendRecord(int MSG, Bitmap bitmap,@Nullable String temp,@Nullable FaceRect faceRect){
         Message message=this.obtainMessage();
         message.what=MSG;
         RecordHolder recordHolder=new RecordHolder();
-        recordHolder.setTemp(temp);
         recordHolder.setBitmap(bitmap);
         message.obj=recordHolder;
         //延时，避免保存冲突，确保每次间隔100毫秒。
         sendMessageDelayed(message,100);
-        this.faceRect=faceRect;
+        if(temp!=null){
+            this.temp=temp;
+        }
+        if(faceRect!=null){
+            this.faceRect=faceRect;
+        }
     }
 
 
@@ -105,18 +95,18 @@ public class RecordHandler  extends Handler {
 
     }
 
-    private void recordPicViewData(String personPath, String tempPath, JuGeFaceRect faceRect) {
+    private void recordPicViewData(String personPath, String tempPath, FaceRect faceRect) {
         PictureData pictureData=new PictureData();
         pictureData.setPersonPath(personPath);
         pictureData.setTemperPath(tempPath);
-        pictureData.setX1(faceRect.getxStart());
-        pictureData.setX2(faceRect.getxStart());
-        pictureData.setX3(faceRect.getxStop());
-        pictureData.setX4(faceRect.getxStop());
-        pictureData.setY1(faceRect.getyStart());
-        pictureData.setY2(faceRect.getyStart());
-        pictureData.setY3(faceRect.getyStop());
-        pictureData.setY4(faceRect.getyStop());
+        pictureData.setX1(faceRect.faceRect.left);
+        pictureData.setX2(faceRect.faceRect.left);
+        pictureData.setX3(faceRect.faceRect.right);
+        pictureData.setX4(faceRect.faceRect.right);
+        pictureData.setY1(faceRect.faceRect.top);
+        pictureData.setY2(faceRect.faceRect.top);
+        pictureData.setY3(faceRect.faceRect.bottom);
+        pictureData.setY4(faceRect.faceRect.bottom);
         pictureData.save();
         Log.e(TAG, "recordPicViewData: "+pictureData.toString());
     }
@@ -124,14 +114,11 @@ public class RecordHandler  extends Handler {
     /**
      * 保存图片到SD卡上
      */
-    private String saveBitmap(Bitmap bitmap, float temp, String type) {
+    private String saveBitmap(Bitmap bitmap, String  temp, String type) {
         Log.i(TAG, "保存图片到SD卡上: ");
         // 保存图片到SD卡上
-        String maxTmp = String.valueOf(temp);
-        if (String.valueOf(maxTmp).length() >= 4) {//最多保留4位
-            maxTmp = maxTmp.substring(0, 4);
-        }
-        String fileName = TimeUitl.getDate() + "_" + maxTmp + "_" + type + ".png";
+
+        String fileName = TimeUitl.getDate() + "_" + temp + "_" + type + ".png";
         File file = new File(getFolderPathToday(), fileName);
         if (file.exists()) {
             file.delete();

@@ -14,25 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
-import cn.com.magnity.coresdksample.MainActivity;
-import cn.com.magnity.coresdksample.Temp.FFCHolder;
-import cn.com.magnity.coresdksample.utils.AppUtils;
-import cn.com.magnity.coresdksample.Config;
-import cn.com.magnity.coresdksample.utils.PreferencesUtils;
 
-import static cn.com.magnity.coresdksample.MyApplication.isplay;
-import static cn.com.magnity.coresdksample.Config.DdnPropertiesPath;
-import static cn.com.magnity.coresdksample.Config.DdnUpdateApkPath;
-import static cn.com.magnity.coresdksample.Config.InitLoadServieAction;
-import static cn.com.magnity.coresdksample.Config.MSG10;
-import static cn.com.magnity.coresdksample.Config.MSG4;
-import static cn.com.magnity.coresdksample.Config.MSG7;
-import static cn.com.magnity.coresdksample.Config.MSG8;
-import static cn.com.magnity.coresdksample.Config.MSG9;
-import static cn.com.magnity.coresdksample.Config.ReLoadServieAction;
-import static cn.com.magnity.coresdksample.Config.ifBlackfFFC;
-import static cn.com.magnity.coresdksample.utils.FlieUtil.clearInfoForFile;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.isExistFlie;
 
 /**

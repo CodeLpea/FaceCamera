@@ -4,7 +4,6 @@ import android.Manifest;
 
 
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,25 +37,20 @@ import com.alex.livertmppushsdk.LpRtmp;
 import com.iflytek.cloud.FaceDetector;
 import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.util.Accelerometer;
-import com.taopao.androidnginxrtmp.service.NginxUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import cn.com.magnity.coresdk.MagDevice;
 
 import cn.com.magnity.coresdk.types.EnumInfo;
 import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
+import cn.com.magnity.coresdksample.Detect.FaceRectCollect;
 import cn.com.magnity.coresdksample.Detect.Result;
 import cn.com.magnity.coresdksample.Service.LampService;
 import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
@@ -65,7 +59,6 @@ import cn.com.magnity.coresdksample.Service.FtpService;
 import cn.com.magnity.coresdksample.Service.ServiceManager;
 
 import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
-import cn.com.magnity.coresdksample.Service.handler.RecordHolder;
 import cn.com.magnity.coresdksample.View.QiuView;
 
 import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
@@ -76,8 +69,6 @@ import cn.com.magnity.coresdksample.utils.Screenutil;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 import cn.com.magnity.coresdksample.utils.Utils;
 
-import cn.com.magnity.coresdksample.utils.lampUtil;
-
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
 
 
@@ -85,12 +76,10 @@ import static cn.com.magnity.coresdksample.MyApplication.WhereFragmentID;
 
 import static cn.com.magnity.coresdksample.MyApplication.isGetFace;
 import static cn.com.magnity.coresdksample.MyApplication.mDev;
-import static cn.com.magnity.coresdksample.MyApplication.photoNameSave2;
 
 import static cn.com.magnity.coresdksample.Config.TempThreshold;
 
 import static cn.com.magnity.coresdksample.Config.iftaken;
-import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 import static cn.com.magnity.coresdksample.utils.Screenutil.setCameraDisplayOrientation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -124,8 +113,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private byte[] buffer;
     // 缩放矩阵
     private Matrix mScaleMatrix = new Matrix();
-    // 加速度感应器，用于获取手机的朝向
-    private Accelerometer accelerometer;
     private FaceDetector mFaceDetector;//调用讯飞的SDK来实现人脸识别
     private int degrees;//旋转角度
     /*    private boolean istaken;//拍照状态按钮*/
@@ -300,7 +287,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mFaceSurface.setZOrderOnTop(true);
         nv21 = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
         buffer = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
-        accelerometer = new Accelerometer(this);
+
         mFaceDetector = FaceDetector.createDetector(this, null);//实例化人脸检测对象
         setSurfaceSize();
         // openCamera();//打开摄像头
@@ -434,15 +421,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             //设置预览的分辨率，这里设置640*480，到目前为止只支持该分辨率的人脸检测
             params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
             params.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-            params.setPreviewFrameRate(5);
             params.setRotation(degrees);
             params.setExposureCompensation(CurrentConfig.getInstance().getCurrentData().getCamera_explore());
             //给摄像头设置参数配置
             mCamera.setParameters(params);
             mCamera.setDisplayOrientation(90);
-            //给摄像头设置预览回到，这里使用的Lambda表达式代表的只有一个回调函数的匿名内部类
-            //mCamera.setPreviewCallback((data, camera) -> System.arraycopy(data, 0, nv21, 0, data.length));
-
+            mCamera.addCallbackBuffer(new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 3 / 2]);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -470,10 +454,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mCamera.setPreviewCallback(new Camera.PreviewCallback() {
             @Override
             public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+                camera.addCallbackBuffer(bytes);
                 System.arraycopy(bytes, 0, nv21, 0, bytes.length);
                 mLpRtmp.inputData(nv21);
-                if (iftaken == true) {
-                    iftaken = false;
+
+                if (FaceRectCollect.getInstance().ifTaken == true) {
+                    FaceRectCollect.getInstance().ifTaken = false;
                     Camera.Size size = camera.getParameters().getPreviewSize();
                     try {
                         YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
@@ -485,7 +472,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             stream.close();
 
                             //保存记录
-                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON, bmp, TempThreshold, MyApplication.getInstance().juGeFaceRect);
+                            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_PERSON, bmp, null, null);
 
                         }
                     } catch (Exception ex) {
@@ -545,7 +532,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Log.i(TAG, "surfaceCreated: ");
             openCamera();//打开摄像头
             mLpRtmp = new LpRtmp();
-            mLpRtmp.setSizeAndDgree(480,640,90);
+            mLpRtmp.setSizeAndDgree(480, 640, 90);
             mLpRtmp.startRtmp("rtmp://localhost:1935/live/camera");
         }
 
@@ -561,14 +548,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     };
 
+
     @Override
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume: ");
         //openCamera();
-        if (null != accelerometer) {
-            accelerometer.start();
-        }
         stop = false;
         new Thread(new Runnable() {
             @Override
@@ -578,57 +563,54 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         continue;
                     }
                     synchronized (nv21) {
-                        //System.arraycopy(nv21, 0, buffer, 0, nv21.length);
-                    }
-                    int direction = Accelerometer.getDirection();// 获取手机朝向
-                    boolean frontCamera = (Camera.CameraInfo.CAMERA_FACING_FRONT == mCameraId);
-                    if (frontCamera) {
-                        direction = (4 - direction) % 4;// 0,1,2,3,4分别表示0,90,180,270和360度
-                        Log.i(TAG, "direction: " + direction);
-                    }
-                    String result = mFaceDetector.trackNV21(
-                            nv21, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, 1);//获取人脸检测结果
-                    FaceRect face = Result.result(result);//获取返回的数据
-                    // Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
-                    Canvas canvas = mSurfaceHolder.lockCanvas();//锁定画布用于绘制
-                    if (null == canvas) {
-                        continue;
-                    }
-                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//清除之前的绘制图像
-                    canvas.setMatrix(mScaleMatrix);
-                    if (face == null) {
-                        mSurfaceHolder.unlockCanvasAndPost(canvas);
-                        continue;
-                    }
-                    DrawFaceRect.DrawScopeDetection(PREVIEW_HEIGHT, PREVIEW_WIDTH, canvas);
-                    if (face != null) {
-                        //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
-                        //否则同一个人不会反复拍摄同样温度的照片
-                        if (TimeUitl.timeInterval(500 * 2)) {
-                            Log.i(TAG, "检测到不同人脸  ");
-                            TempThreshold = CurrentConfig.getInstance().getCurrentData().getTemperature_threshold();//超过间隔则表示第二个人，则回复默认的阈值
+                        //i3为原始的旋转角度0,1,2,3,4分别表示0,90,180,270和360度
+                        String result = mFaceDetector.trackNV21(nv21, PREVIEW_WIDTH, PREVIEW_HEIGHT, 1, 1);//获取人脸检测结果
+
+                        FaceRect face = Result.result(result);//获取返回的数据
+                        // Log.e(TAG, "result:" + result);//输出检测结果,该结果为JSON数据
+                        Canvas canvas = mSurfaceHolder.lockCanvas();//锁定画布用于绘制
+                        if (null == canvas) {
+                            continue;
                         }
-                        face.bound = DrawFaceRect.RotateDeg90(face.bound, PREVIEW_HEIGHT);//绘制人脸的区域
-                        if (face.point != null) {//绘制脸上关键点
-                            for (int i = 0; i < face.point.length; i++) {
-                                face.point[i] = DrawFaceRect.RotateDeg90(face.point[i], PREVIEW_HEIGHT);
+                        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//清除之前的绘制图像
+                        canvas.setMatrix(mScaleMatrix);
+                        if (face == null) {
+                            mSurfaceHolder.unlockCanvasAndPost(canvas);
+                            continue;
+                        }
+                        DrawFaceRect.DrawScopeDetection(PREVIEW_HEIGHT, PREVIEW_WIDTH, canvas);
+                        if (face != null) {
+
+                            //判断两次检测到人脸的间隔时间，如果超过500ms，则判断为第二个人，就重置温度阈值
+                            //否则同一个人不会反复拍摄同样温度的照片
+                            if (TimeUitl.timeInterval(500 * 2)) {
+                                Log.i(TAG, "检测到不同人脸  ");
+                                TempThreshold = CurrentConfig.getInstance().getCurrentData().getTemperature_threshold();//超过间隔则表示第二个人，则回复默认的阈值
                             }
-                            //检测是否在有效区域
-                            if (DrawFaceRect.scopeDetection(face, PREVIEW_HEIGHT, PREVIEW_WIDTH, canvas)) {
+                            //绘制人脸的区域
+                            face.faceRect = DrawFaceRect.RotateDeg90(face.faceRect, PREVIEW_HEIGHT);
+                            if (face.facePoints != null) {//绘制脸上关键点
+                                for (int i = 0; i < face.facePoints.length; i++) {
+                                    face.facePoints[i] = DrawFaceRect.RotateDeg90(face.facePoints[i], PREVIEW_HEIGHT);
+                                }
+                                //检测是否在有效区域
+                                if (DrawFaceRect.scopeDetection(face, PREVIEW_HEIGHT, PREVIEW_WIDTH, canvas)) {
 //                                //检测是否张嘴
 //                                if (DrawFaceRect.MouthDetection(face)) {//张嘴才进行问读检测
 //                                    isGetFace = true;//进行温度检测
 //                                }
-                                isGetFace = true;//进行温度检测
-
+                                    isGetFace = true;//进行温度检测
+                                    //将人脸框信息缓存
+                                    FaceRectCollect.getInstance().setFaceRect(face);
+                                }
+                                //绘制人脸检测的区域
+                                DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, false);
                             }
-                            //绘制人脸检测的区域
-                            DrawFaceRect.drawFaceRect(canvas, face, PREVIEW_WIDTH, frontCamera);
+                        } else {
+                            Log.e(TAG, "没有检测出人脸");
                         }
-                    } else {
-                        Log.e(TAG, "没有检测出人脸");
+                        mSurfaceHolder.unlockCanvasAndPost(canvas);
                     }
-                    mSurfaceHolder.unlockCanvasAndPost(canvas);
                 }
             }
         }).start();
@@ -640,9 +622,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onPause();
         Log.i(TAG, "onPause: ");
         stop = true;
-        if (null != accelerometer) {
-            accelerometer.stop();
-        }
 
         //closeCamera();
 

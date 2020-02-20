@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample.utils.ic2;
+package cn.com.magnity.coresdksample.Temp.ic2;
 
 import android.util.Log;
 

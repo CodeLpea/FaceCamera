@@ -6,7 +6,7 @@ import org.apache.ftpserver.command.impl.PROT;
 
 public class RecordHolder {
     private Bitmap bitmap;
-    private float temp;
+    private String temp;
 
     public Bitmap getBitmap() {
         return bitmap;
@@ -16,11 +16,11 @@ public class RecordHolder {
         this.bitmap = bitmap;
     }
 
-    public float getTemp() {
+    public String getTemp() {
         return temp;
     }
 
-    public void setTemp(float temp) {
+    public void setTemp(String temp) {
         this.temp = temp;
     }
 

@@ -8,11 +8,12 @@ import android.graphics.Rect;
 import android.util.Log;
 
 import cn.com.magnity.coresdksample.MyApplication;
-import cn.com.magnity.coresdksample.Config;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
-import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
 
 public class DrawFaceRect {
+
+    public static Paint paint =new Paint();
+
     /**
      * 绘制人脸检测框
      *
@@ -26,52 +27,26 @@ public class DrawFaceRect {
         if (canvas == null) {
             return;
         }
-        Paint paint = new Paint(); //创建画笔对象
-        paint.setColor(Color.GREEN);//设置画笔的颜色
-        int len = (face.bound.bottom - face.bound.top) / 8;
-        if (len / 8 >= 2) {
-            paint.setStrokeWidth(len / 8);//设置画笔的粗度
-        } else {
-            paint.setStrokeWidth(2);//设置画笔的粗度
-        }
-        Rect rect = face.bound;//获取人脸区域
-        if (frontCamera) {
-            int top = rect.top;
-            rect.top = width - rect.bottom;
-            rect.bottom = width - top;
-        }
-        int drawL = rect.left - len;
-        int drawR = rect.right + len;
-        int drawU = rect.top - len;
-        int drawD = rect.bottom + len;
-    /*     Log.i("人脸框坐标", "len "+len);
-         Log.i("人脸框坐标", "left "+drawL);
-         Log.i("人脸框坐标", "right "+drawR);
-         Log.i("人脸框坐标", "top "+drawU);
-         Log.i("人脸框坐标", "bottom "+drawD);*/
-         if(MyApplication.getInstance().mView!=null){
-             MyApplication.getInstance().faceRect.bound=face.bound;
-             MyApplication.getInstance().faceRect.point=face.point;
-         MyApplication.getInstance().juGeFaceRect.setxStart(drawL);//设置区域
-         MyApplication.getInstance().juGeFaceRect.setxStop(drawR);
-         MyApplication.getInstance().juGeFaceRect.setyStart(drawU);
-         MyApplication.getInstance().juGeFaceRect.setyStop(drawD);
-         }
-        //绘制人脸识别框，每两个一组
-        canvas.drawLine(drawL, drawD, drawL, drawD - len, paint);
-        canvas.drawLine(drawL, drawD, drawL + len, drawD, paint);
-        canvas.drawLine(drawR, drawD, drawR, drawD - len, paint);
-        canvas.drawLine(drawR, drawD, drawR - len, drawD, paint);
-        canvas.drawLine(drawL, drawU, drawL, drawU + len, paint);
-        canvas.drawLine(drawL, drawU, drawL + len, drawU, paint);
-        canvas.drawLine(drawR, drawU, drawR, drawU + len, paint);
-        canvas.drawLine(drawR, drawU, drawR - len, drawU, paint);
+         //设置画笔的颜色
+         paint.setColor(Color.GREEN);
+         paint.setStrokeWidth(2);//设置画笔的粗度
+
+         Rect rect = face.faceRect;//获取人脸区域
+         //绘制人脸识别框
+         //左
+         canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, paint);
+         //右
+         canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, paint);
+         //上
+         canvas.drawLine(rect.left, rect.top, rect.right, rect.top, paint);
+         //下
+         canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, paint);
         /**
          * 绘制人脸监测点
          */
-        if (face.point != null) {
+        if (face.facePoints != null) {
             //遍历检测点，并绘制
-            for (Point p : face.point) {
+            for (Point p : face.facePoints) {
                 if (frontCamera) {
                     p.y = width - p.y;
                 }
@@ -79,29 +54,29 @@ public class DrawFaceRect {
             }
 
           /**
-           * face.point[20]右下角嘴巴
-           * face.point[19]左下角嘴巴
-           * face.point[18]鼻尖
-           * face.point[17]右眼中间
-           * face.point[16]左眼中间
-           * face.point[15]下嘴唇中间
-           * face.point[14]中间嘴唇
-           * face.point[13]上嘴唇中间
+           * face.facePoints[20]右下角嘴巴
+           * face.facePoints[19]左下角嘴巴
+           * face.facePoints[18]鼻尖
+           * face.facePoints[17]右眼中间
+           * face.facePoints[16]左眼中间
+           * face.facePoints[15]下嘴唇中间
+           * face.facePoints[14]中间嘴唇
+           * face.facePoints[13]上嘴唇中间
            * 换算比例7
            * (float)（下嘴唇-上嘴唇）/（右嘴唇-左边嘴唇）
            *
-           *  Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
-           Log.i(TAG, "上嘴唇face.point[13].y: "+face.point[13].y);
-           Log.i(TAG, "右嘴角face.point[20].x: "+face.point[20].x);
-           Log.i(TAG, "左嘴角face.point[19].x: "+face.point[19].x);
-           int Ver=face.point[15].y-face.point[13].y;
-           int Hor=face.point[20].x-face.point[19].x;
+           *  Log.i(TAG, "下嘴唇face.facePoints[15].y: "+face.facePoints[15].y);
+           Log.i(TAG, "上嘴唇face.facePoints[13].y: "+face.facePoints[13].y);
+           Log.i(TAG, "右嘴角face.facePoints[20].x: "+face.facePoints[20].x);
+           Log.i(TAG, "左嘴角face.facePoints[19].x: "+face.facePoints[19].x);
+           int Ver=face.facePoints[15].y-face.facePoints[13].y;
+           int Hor=face.facePoints[20].x-face.facePoints[19].x;
            float proportion=(float)((float)Ver/(float) Hor);
 
            Log.i(TAG, "嘴唇开口比例: "+proportion);
            * */
-         /*   for(int i=0;i<face.point.length;i++){
-                Point p=face.point[i];
+         /*   for(int i=0;i<face.facePoints.length;i++){
+                Point p=face.facePoints[i];
                 if(i>12){
                     if (frontCamera) {
                         p.y = width - p.y;
@@ -142,12 +117,12 @@ public class DrawFaceRect {
 
     public  static boolean MouthDetection(FaceRect face){
          boolean result=false;
-     /*   Log.i(TAG, "下嘴唇face.point[15].y: "+face.point[15].y);
-        Log.i(TAG, "上嘴唇face.point[13].y: "+face.point[13].y);
-        Log.i(TAG, "右嘴角face.point[20].x: "+face.point[20].x);
-        Log.i(TAG, "左嘴角face.point[19].x: "+face.point[19].x);*/
-        int Ver=face.point[15].y-face.point[13].y;
-        int Hor=face.point[20].x-face.point[19].x;
+     /*   Log.i(TAG, "下嘴唇face.facePoints[15].y: "+face.facePoints[15].y);
+        Log.i(TAG, "上嘴唇face.facePoints[13].y: "+face.facePoints[13].y);
+        Log.i(TAG, "右嘴角face.facePoints[20].x: "+face.facePoints[20].x);
+        Log.i(TAG, "左嘴角face.facePoints[19].x: "+face.facePoints[19].x);*/
+        int Ver=face.facePoints[15].y-face.facePoints[13].y;
+        int Hor=face.facePoints[20].x-face.facePoints[19].x;
         float proportion=(float)((float)Ver/(float) Hor);
         if(proportion>0.5){
             result=true;
@@ -161,8 +136,8 @@ public class DrawFaceRect {
     }
     public  static boolean scopeDetection(FaceRect face,int PREVIEW__WIDTH,int PREVIEW_HEIGHT,Canvas canvas){//这个宽和高是反的。
         boolean result=false;
-        int xPlace=face.point[14].x;//中间嘴唇的x轴位置
-        int yPlace=face.point[14].y;//中间嘴唇的y轴位置
+        int xPlace=face.facePoints[14].x;//中间嘴唇的x轴位置
+        int yPlace=face.facePoints[14].y;//中间嘴唇的y轴位置
       /*  Paint paint = new Paint(); //创建画笔对象
         paint.setColor(Color.RED);//设置画笔的颜色
         paint.setStrokeWidth(3);//设置画笔的粗度

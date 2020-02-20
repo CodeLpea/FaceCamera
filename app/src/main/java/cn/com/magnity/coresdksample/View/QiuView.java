@@ -42,7 +42,7 @@ private String TAG="QiuView";
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         //Log.i(TAG, "onDraw: ");
-       // canvas.drawCircle(point.x, point.y, 20, paint);
+       // canvas.drawCircle(facePoints.x, facePoints.y, 20, paint);
       bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.point2);//通过使用bitmapfactory的decoderesource来获得bitmap
         canvas.drawBitmap(bitmap,planeX-bitmap.getWidth()/2,planeY-bitmap.getHeight()/2,new Paint());
     }
@@ -52,7 +52,7 @@ private String TAG="QiuView";
     public void setPlane(float x,float y) {
         planeX=x;
         planeY=y;
-       // point.set(x,y);
+       // facePoints.set(x,y);
     }
 }
 

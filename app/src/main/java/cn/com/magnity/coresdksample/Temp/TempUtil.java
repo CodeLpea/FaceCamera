@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import cn.com.magnity.coresdk.MagDevice;
+
 import static android.content.ContentValues.TAG;
 import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameHeight;
 import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameWidth;
@@ -22,11 +24,11 @@ import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameWidth;
 public class TempUtil {
 
 
-    public static Bitmap CovertToBitMap(int[] date, int min, int max){
+    public static Bitmap CovertToBitMap(int[] data, int min, int max){
 
-       int[] data= ReLoadY(date);
-
-        data=ReLoadX(data);
+//       int[] data= ReLoadY(date);
+//
+//        data=ReLoadX(data);
 
         Bitmap bmp = null;
         //找到数组中的最大值和最小值
@@ -58,6 +60,19 @@ public class TempUtil {
     }
 
 
+    /**
+     * 获取当前温度矩阵
+     * 并旋转为左上角坐标系
+    *
+    * */
+    public static int[] getTemps(MagDevice mDev){
+        mDev.lock();
+        int[] temps = new int[160*120];
+        mDev.getTemperatureData(temps,true,true);
+        mDev.unlock();
+        temps=ReLoad(temps);
+        return temps;
+    }
     public static int[] ReLoad(int[] data) {
         data= ReLoadY(data);
         data=ReLoadX(data);
@@ -142,6 +157,31 @@ public class TempUtil {
         MaxMin[2]=avg;
         return MaxMin;
     }
+
+    /**
+     * FFC补偿矩阵去除挡片位置的补偿
+     * x:0-120 m_FrameWidth
+     * y:0-160 m_FrameHeight
+     * */
+    public static int[] DDNIc2FFCInfo(int[] FFCTemps,int x0,int x1,int y0,int y1){
+        //旋转原始数据，x，y都旋转，才能与安卓坐标系对应
+        //转换为二位数组
+        int[][]b=new int[m_FrameWidth][m_FrameHeight];
+        for(int i=0;i<FFCTemps.length;i++){
+            b[i%m_FrameWidth][i/m_FrameWidth]=FFCTemps[i];//将一维数组转换为2维数组，坐标原点为（0，0）
+        }
+        for (int i = x0; i < x1; i++) {
+            for (int k= y0; k < y1; k++) {
+                //置零
+                b[i][k]=0;
+            }
+        }
+        //转换为一位数组
+
+        return null;
+    }
+
+
     /**
      * 根据原始温度temps
      * 获取指定区域的最高温度

@@ -26,20 +26,20 @@ public class Result {
             JSONObject position = items.getJSONObject(0).getJSONObject("position");
             //获取人脸检测框数据
             rect = new FaceRect();
-            rect.bound.left = position.getInt("left");//左边起始位置点
-            rect.bound.top = position.getInt("top");//上端起始位置点
-            rect.bound.right = position.getInt("right");//右边结束位置点
-            rect.bound.bottom = position.getInt("bottom");//下端结束位置点
+            rect.faceRect.left = position.getInt("left");//左边起始位置点
+            rect.faceRect.top = position.getInt("top");//上端起始位置点
+            rect.faceRect.right = position.getInt("right");//右边结束位置点
+            rect.faceRect.bottom = position.getInt("bottom");//下端结束位置点
             // 提取关键点数据
             JSONObject landmark = items.getJSONObject(0).getJSONObject("landmark");
             int keyPoint = landmark.length();//人脸检测点数据
-            rect.point = new Point[keyPoint];//人脸检测点数组
+            rect.facePoints = new Point[keyPoint];//人脸检测点数组
             Iterator it = landmark.keys();//使用迭代器解析人脸监测点数据
             int point = 0;
             while (it.hasNext()) {//检测点，的坐标
                 String key = (String) it.next();
                 JSONObject object = landmark.getJSONObject(key);
-                rect.point[point] = new Point(object.getInt("x"), object.getInt("y"));
+                rect.facePoints[point] = new Point(object.getInt("x"), object.getInt("y"));
                 point++;
             }
         } catch (JSONException e) {

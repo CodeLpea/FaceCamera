@@ -25,9 +25,7 @@ import java.util.TimerTask;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.EnumInfo;
-import cn.com.magnity.coresdksample.Service.LampService;
-import cn.com.magnity.coresdksample.utils.ic2.ADS1110A0Converter;
-import cn.com.magnity.coresdksample.utils.lampUtil;
+import cn.com.magnity.coresdksample.Temp.ic2.ADS1110A0Converter;
 
 import static cn.com.magnity.coresdksample.MyApplication.isQuest;
 import static cn.com.magnity.coresdksample.MyApplication.isplay;

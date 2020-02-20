@@ -200,10 +200,9 @@ public class TempHandler extends Handler {
      * @return int[]
      */
     private int[] getCameraTemps() {
-        int[] temps = new int[120 * 160];
-        mDev.lock();
-        mDev.getTemperatureData(temps, true, true);
-        mDev.unlock();
+        int[] temps = new int[160*120];
+        //获取旋转后的红外矩阵
+        temps=TempUtil.getTemps(mDev);
         return temps;
     }
 
@@ -262,6 +261,8 @@ public class TempHandler extends Handler {
 
         //单帧值的每个点，与平均温度的补偿，就是FFC矩阵
         FFCTemps = FFCUtil.getFFC(FFCSingleTemps);
+
+        // TODO: 如果采用挡片黑体，则加入挡片温度之后，要将挡片覆盖区域的补偿全部设为0
 
         //将每个点的校准数组FFCTemps保存到本地
         saveFFCtoLoacl(FFCTemps);

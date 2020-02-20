@@ -12,7 +12,7 @@ import java.util.Random;
 
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
-import cn.com.magnity.coresdksample.Detect.JuGeFaceRect;
+
 import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
 import cn.com.magnity.coresdksample.Service.handler.StabilityTestHandler;
 import cn.com.magnity.coresdksample.Service.handler.TempHandler;
@@ -41,7 +41,7 @@ public class MyApplication extends Application {
     public static boolean isInit = true;//启动标志
     public static int WhereFragmentID = 1;//用来标记当前出于哪个Fragment，1为linkFragment，2为LocationFragment；
 
-    public JuGeFaceRect juGeFaceRect;
+
     public FaceRect faceRect;
     public MagSurfaceView mView;
     public static logSave photoNameSave;//全局照片名称保存对象
@@ -93,10 +93,8 @@ public class MyApplication extends Application {
 
     private void init() {
         mDev = new MagDevice();//初始化全局MagDevice
-        juGeFaceRect = new JuGeFaceRect();//初始化全局标记框
         faceRect = new FaceRect();
         TtsSpeak.getInstance();//初始化全局语音播放工具
-//        new lampUtil(Config.LAMP,Config.TIME);
         //启动Nginx服务器（在新的进程中，否则与灯控制冲突）
         NginxUtils.startNginx(this);
         LogcatHelper.getInstance(this).start();//启动日志
