@@ -1,4 +1,4 @@
-package cn.com.magnity.coresdksample.View;
+package cn.com.magnity.coresdksample.surview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -40,10 +40,9 @@ import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameWidth;
 
 import static cn.com.magnity.coresdksample.Config.FFCTemps;
 import static cn.com.magnity.coresdksample.Config.TempThreshold;
-import static cn.com.magnity.coresdksample.Config.iftaken;
 import static cn.com.magnity.coresdksample.Temp.FFCUtil.m_FrameHeight;
 
-public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callback, MagDevice.INewFrameCallback {
     private volatile boolean mIsDrawing;
     private DrawThread mDrawThread;
 
@@ -64,12 +63,21 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
     private int yProportion = 120 / 480;
 
     private LpRtmp lpRtmp;
+    public MagSurfaceView(Context context) {
+        this(context, null);
+    }
 
     public MagSurfaceView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        getHolder().addCallback(this);
-
+        this(context, attrs, 0);
     }
+
+    public MagSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        getHolder().addCallback(this);
+        this.setZOrderOnTop(true);
+    }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -180,6 +188,11 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         mDev = null;
     }
 
+    @Override
+    public void newFrame(int i, int i1) {
+        invalidate_();
+    }
+
 
     private class DrawThread extends Thread {
         @Override
@@ -259,6 +272,7 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
         //如果捕捉到人脸
         FaceRect faceRect = FaceRectCollect.getInstance().getFaceRect();
+        byte[] nv21 = FaceRectCollect.getInstance().getNv21();
         if (faceRect != null) {
             //转换人脸框，获取指定测温区域
             float[] limitRect = transRect(faceRect);
@@ -271,8 +285,8 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             //绘制指定区域内最大温度点
             drawTempPoint(tempCavas, maxTemp);
 
-            //获取规定区域内的温度信息,并绘制人脸
-            getRectTemperature(TempBitmap, faceRect, maxTemp);
+            //获取规定区域内的温度信息,并判断温度，是否保存
+            getRectTemperature(TempBitmap, faceRect, nv21, maxTemp);
 
             //清除人脸框
             FaceRectCollect.getInstance().clearFaceRect();
@@ -410,27 +424,32 @@ public class MagSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
      * y = pos / w;
      * x = pos - y * w; (w - CameraInfo中的FPAWidth值)
      *
-     * @param bitmap1
+     * @param tempBitmap
      * @param faceRect
+     * @param nv21
      */
-    private void getRectTemperature(Bitmap bitmap1, FaceRect faceRect, int[] maxTemp) {
+    private void getRectTemperature(Bitmap tempBitmap, FaceRect faceRect, byte[] nv21, int[] maxTemp) {
         //减去黑体补偿
         float maxTmp = (maxTemp[0] * 0.001f + CurrentConfig.getInstance().getCurrentData().getFFC_compensation_parameter());
 
         //如果最大温度超过阈值，而且没有语音播报时
         if (maxTmp > TempThreshold && !TtsSpeak.getInstance().isSpeaking()) {
+
+            //超过阈值，让人脸摄像头保存照片
+            Bitmap personBitmap = ImageUtils.Nv21ToBitmap(nv21);
+
             //超过阈值，同一人重新赋值，避免反复保存相同温度照片maxTmp.substring(0,4);
             TempThreshold = maxTmp;
             LampService.setLamp(LampService.LampColor.red);
             String sMax = String.format(Locale.ENGLISH, "%.1f", maxTmp);
             //TtsSpeak.getInstance().SpeechRepead("口腔温度   "+maxTmp2,CurrentConfig.getInstance().getCurrentData().getError_voice());
+
             //医院测试版本，取消多余播报直接播报温度
             TtsSpeak.getInstance().SpeechRepead(sMax, CurrentConfig.getInstance().getCurrentData().getError_voice());
 
-            //保存记录
-            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE_TEMP, bitmap1, sMax, faceRect);
-            //超过阈值，这先让人脸摄像头拍摄照片
-            FaceRectCollect.getInstance().ifTaken = true;
+            //保存记录，温度图片，人像图片，最高温度，人脸框信息
+            RecordHandler.getInstance().sendRecord(RecordHandler.MSG_RECODE, tempBitmap, personBitmap, sMax, faceRect);
+
         } else {
             if (TempThreshold > CurrentConfig.getInstance().getCurrentData().getTemperature_threshold()) {//当前温度阈值与默认温度阈值不同的时播报异常
                 //TtsSpeak.getInstance().SpeechRepead("体温异常   ",CurrentConfig.getInstance().getCurrentData().getError_voice());

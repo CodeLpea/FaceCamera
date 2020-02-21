@@ -8,27 +8,21 @@ import com.taopao.androidnginxrtmp.service.NginxUtils;
 
 import org.litepal.LitePal;
 
-import java.util.Random;
-
 import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdksample.Detect.FaceRect;
 
 import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
 import cn.com.magnity.coresdksample.Service.handler.StabilityTestHandler;
 import cn.com.magnity.coresdksample.Service.handler.TempHandler;
-import cn.com.magnity.coresdksample.View.MagSurfaceView;
+import cn.com.magnity.coresdksample.surview.MagSurfaceView;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.server.SetConfigServer;
-import cn.com.magnity.coresdksample.ddnwebserver.util.TimeUtils;
 import cn.com.magnity.coresdksample.utils.FlieUtil;
 import cn.com.magnity.coresdksample.utils.LogcatHelper;
 import cn.com.magnity.coresdksample.utils.SPUtil;
 import cn.com.magnity.coresdksample.utils.voice.TtsSpeak;
-import cn.com.magnity.coresdksample.utils.lampUtil;
 import cn.com.magnity.coresdksample.utils.logSave;
 
-import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.person_path;
-import static cn.com.magnity.coresdksample.ddnwebserver.WebConfig.temper_path;
 import static cn.com.magnity.coresdksample.Config.CONFIG_DIR;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 
@@ -37,7 +31,6 @@ public class MyApplication extends Application {
     public static MagDevice mDev;
     public static boolean isplay = false; //红外播放状态
     public static boolean isQuest = false; //红外权限状态
-    public static boolean isGetFace = false; //红外权限状态
     public static boolean isInit = true;//启动标志
     public static int WhereFragmentID = 1;//用来标记当前出于哪个Fragment，1为linkFragment，2为LocationFragment；
 

@@ -134,25 +134,11 @@ public class DrawFaceRect {
        // Log.i(TAG, "嘴唇开口比例: "+proportion);
          return result;
     }
-    public  static boolean scopeDetection(FaceRect face,int PREVIEW__WIDTH,int PREVIEW_HEIGHT,Canvas canvas){//这个宽和高是反的。
+    public  static boolean scopeDetection(FaceRect face){//这个宽和高是反的。
         boolean result=false;
-        int xPlace=face.facePoints[14].x;//中间嘴唇的x轴位置
-        int yPlace=face.facePoints[14].y;//中间嘴唇的y轴位置
-      /*  Paint paint = new Paint(); //创建画笔对象
-        paint.setColor(Color.RED);//设置画笔的颜色
-        paint.setStrokeWidth(3);//设置画笔的粗度
+        int xPlace=face.facePoints[18].x;//中间嘴唇的x轴位置
+        int yPlace=face.facePoints[18].y;//中间嘴唇的y轴位置
 
-        //画上方的一条线
-        canvas.drawLine(0,Config.AreaUp,PREVIEW__WIDTH,Config.AreaUp,paint);
-        //画左侧竖的一条线
-        canvas.drawLine(Config.AreaLeft,0,Config.AreaLeft,PREVIEW_HEIGHT,paint);
-        //画右侧竖的一条线
-        canvas.drawLine(Config.AreaRight,0,Config.AreaRight,PREVIEW_HEIGHT,paint);
-
-        //画下方的一条线
-        canvas.drawLine(0,Config.AreaBottom,PREVIEW__WIDTH,Config.AreaBottom,paint);*/
-       /* Log.i(TAG, "PREVIEW__WIDTH-intervalX: "+(PREVIEW__WIDTH-intervalX));
-        Log.i(TAG, "xPlace: "+xPlace);*/
         if(CurrentConfig.getInstance().getCurrentData().getLineLeft()<=xPlace&&xPlace<=
                 CurrentConfig.getInstance().getCurrentData().getLineRight()&&
                 CurrentConfig.getInstance().getCurrentData().getLineDown()>=yPlace&&

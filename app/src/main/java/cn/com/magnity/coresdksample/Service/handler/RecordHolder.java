@@ -4,16 +4,28 @@ import android.graphics.Bitmap;
 
 import org.apache.ftpserver.command.impl.PROT;
 
-public class RecordHolder {
-    private Bitmap bitmap;
-    private String temp;
+import cn.com.magnity.coresdksample.Detect.FaceRect;
 
-    public Bitmap getBitmap() {
-        return bitmap;
+public class RecordHolder {
+    private Bitmap personBitmap;
+    private Bitmap tempBitmap;
+    private String temp;
+    private FaceRect faceRect;
+
+    public Bitmap getPersonBitmap() {
+        return personBitmap;
     }
 
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
+    public void setPersonBitmap(Bitmap personBitmap) {
+        this.personBitmap = personBitmap;
+    }
+
+    public Bitmap getTempBitmap() {
+        return tempBitmap;
+    }
+
+    public void setTempBitmap(Bitmap tempBitmap) {
+        this.tempBitmap = tempBitmap;
     }
 
     public String getTemp() {
@@ -24,11 +36,11 @@ public class RecordHolder {
         this.temp = temp;
     }
 
-    @Override
-    public String toString() {
-        return "RecordHolder{" +
-                "bitmap=" + bitmap +
-                ", temp=" + temp +
-                '}';
+    public FaceRect getFaceRect() {
+        return faceRect;
+    }
+
+    public void setFaceRect(FaceRect faceRect) {
+        this.faceRect = faceRect;
     }
 }

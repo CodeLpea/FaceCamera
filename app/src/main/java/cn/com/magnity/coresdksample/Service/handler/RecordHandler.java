@@ -23,16 +23,14 @@ import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 /**
  * 保存信息handler
  */
-public class RecordHandler  extends Handler {
-    private String TAG="RecordHandler";
-    public static final int MSG_RECODE_PERSON=500;
-    public static final int MSG_RECODE_TEMP=MSG_RECODE_PERSON+1;
+public class RecordHandler extends Handler {
+    private String TAG = "RecordHandler";
+    public static final int MSG_RECODE = 500;
 
 
-    private String personPath=null;
-    private String tempPath=null;
-    private String temp;
-    private FaceRect faceRect;
+    private String personPath = null;
+    private String tempPath = null;
+
     private static class InnerClass {
         public static RecordHandler intance = new RecordHandler();
     }
@@ -46,57 +44,55 @@ public class RecordHandler  extends Handler {
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
-        switch (msg.what){
-            case MSG_RECODE_TEMP:
+        switch (msg.what) {
+            case MSG_RECODE:
                 //保存温度记录信息
-                RecordHolder tempRecordHolder=(RecordHolder)msg.obj;
-                //保存图片，获得地址
-                tempPath = saveBitmap(tempRecordHolder.getBitmap(), temp, "Temp");
-                break;
-            case MSG_RECODE_PERSON:
-                //保存人脸记录信息
-                RecordHolder personRecordHolder=(RecordHolder)msg.obj;
-                //保存图片，获得地址
-                personPath = saveBitmap(personRecordHolder.getBitmap(), temp, "Person");
+                RecordHolder tempRecordHolder = (RecordHolder) msg.obj;
 
-                //添加记录进数据库
-                recordData(personPath,tempPath, Float.parseFloat(temp),TimeUitl.getDate());
-                recordPicViewData(personPath,tempPath,faceRect);
+                String temp=tempRecordHolder.getTemp();
+                //保存图片，获得地址
+                tempPath = saveBitmap(tempRecordHolder.getTempBitmap(),temp, "Temp");
+                personPath = saveBitmap(tempRecordHolder.getPersonBitmap(), temp, "Person");
+
+                //添加温度记录进数据库
+                recordData(personPath, tempPath, Float.parseFloat(temp), TimeUitl.getDate());
+
+                //添加预览记录
+                recordPicViewData(personPath, tempPath, tempRecordHolder.getFaceRect());
                 break;
         }
     }
 
-    public void sendRecord(int MSG, Bitmap bitmap,@Nullable String temp,@Nullable FaceRect faceRect){
-        Message message=this.obtainMessage();
-        message.what=MSG;
-        RecordHolder recordHolder=new RecordHolder();
-        recordHolder.setBitmap(bitmap);
-        message.obj=recordHolder;
+    public void sendRecord(int MSG, Bitmap tempBitmap, Bitmap personBitmap, String temp, FaceRect faceRect) {
+        Message message = this.obtainMessage();
+        message.what = MSG;
+        RecordHolder recordHolder = new RecordHolder();
+        recordHolder.setTempBitmap(tempBitmap);
+        recordHolder.setPersonBitmap(personBitmap);
+        recordHolder.setTemp(temp);
+        recordHolder.setFaceRect(faceRect);
+        message.obj = recordHolder;
+
         //延时，避免保存冲突，确保每次间隔100毫秒。
-        sendMessageDelayed(message,100);
-        if(temp!=null){
-            this.temp=temp;
-        }
-        if(faceRect!=null){
-            this.faceRect=faceRect;
-        }
+        sendMessageDelayed(message, 100);
+
     }
 
 
     private void recordData(String personPath, String tempPath, float temp, String date) {
         Log.e(TAG, "记录保存到数据库: ");
-        PhotoRecordDb photoRecordDb=new PhotoRecordDb();
+        PhotoRecordDb photoRecordDb = new PhotoRecordDb();
         photoRecordDb.setDate(Long.valueOf(date));
         photoRecordDb.setPersonPath(personPath);
         photoRecordDb.setTemperPath(tempPath);
         photoRecordDb.setTemp(temp);
         photoRecordDb.save();
-        Log.e(TAG, "photoRecordDb: "+photoRecordDb.toString());
+        Log.e(TAG, "photoRecordDb: " + photoRecordDb.toString());
 
     }
 
     private void recordPicViewData(String personPath, String tempPath, FaceRect faceRect) {
-        PictureData pictureData=new PictureData();
+        PictureData pictureData = new PictureData();
         pictureData.setPersonPath(personPath);
         pictureData.setTemperPath(tempPath);
         pictureData.setX1(faceRect.faceRect.left);
@@ -108,13 +104,13 @@ public class RecordHandler  extends Handler {
         pictureData.setY3(faceRect.faceRect.bottom);
         pictureData.setY4(faceRect.faceRect.bottom);
         pictureData.save();
-        Log.e(TAG, "recordPicViewData: "+pictureData.toString());
+        Log.e(TAG, "recordPicViewData: " + pictureData.toString());
     }
 
     /**
      * 保存图片到SD卡上
      */
-    private String saveBitmap(Bitmap bitmap, String  temp, String type) {
+    private String saveBitmap(Bitmap bitmap, String temp, String type) {
         Log.i(TAG, "保存图片到SD卡上: ");
         // 保存图片到SD卡上
 
@@ -123,21 +119,21 @@ public class RecordHandler  extends Handler {
         if (file.exists()) {
             file.delete();
         } else {
-            photoNameSave.saveLog(type+"照片", fileName + "\r\n");
+            photoNameSave.saveLog(type + "照片", fileName + "\r\n");
         }
         //保存到指定文件
         saveBitmapIntoLocal(file, bitmap);
 
         //必须保存相对路径到数据库，web服务才可以访问到
         String relativePath = ROOT_DIR_NAME + File.separator + "Pictures" + File.separator + getFileName() + File.separator + fileName;
-        Log.e(TAG, "relativePath: "+relativePath);
+        Log.e(TAG, "relativePath: " + relativePath);
         return relativePath;
 
     }
 
     /**
      * 将图片保存到指定File
-     * */
+     */
     private void saveBitmapIntoLocal(File file, Bitmap bitmap) {
         Log.e(TAG, "将图片保存到指定File: ");
         //保存到指定文件

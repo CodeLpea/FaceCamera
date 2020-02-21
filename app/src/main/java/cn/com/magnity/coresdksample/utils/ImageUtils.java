@@ -36,7 +36,7 @@ public class ImageUtils {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             image.compressToJpeg(new Rect(0, 0,640, 480), 80, stream);
             Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-//            bmp = Screenutil.rotaingImageView(90, bmp);//旋转照片
+            bmp = Screenutil.rotaingImageView(90, bmp);//旋转照片
             try {
                 stream.close();
             } catch (IOException e) {

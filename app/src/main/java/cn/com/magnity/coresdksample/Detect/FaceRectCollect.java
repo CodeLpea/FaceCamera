@@ -2,6 +2,8 @@ package cn.com.magnity.coresdksample.Detect;
 
 public class FaceRectCollect {
 
+    //原始数据，用于在红外判断处保存图片
+    public byte[] Nv21;
     public FaceRect faceRect;
     public volatile boolean ifTaken=false;
     private static FaceRectCollect Instance;
@@ -15,7 +17,15 @@ public class FaceRectCollect {
         return Instance;
     }
 
-    public FaceRect getFaceRect() {
+    public byte[] getNv21() {
+        return Nv21;
+    }
+
+    public void setNv21(byte[] nv21) {
+        Nv21 = nv21;
+    }
+
+    public  FaceRect getFaceRect() {
         return faceRect;
     }
 
