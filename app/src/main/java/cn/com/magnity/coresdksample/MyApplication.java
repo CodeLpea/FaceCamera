@@ -10,6 +10,7 @@ import org.litepal.LitePal;
 
 import cn.com.magnity.coresdk.MagDevice;
 
+import cn.com.magnity.coresdksample.database.UpRecordDb;
 import cn.com.magnity.coresdksample.handler.RecordHandler;
 import cn.com.magnity.coresdksample.handler.StabilityTestHandler;
 import cn.com.magnity.coresdksample.handler.TempHandler;
@@ -39,6 +40,7 @@ public class MyApplication extends Application {
     }
 
     private void init() {
+
         //初始化全局MagDevice
         mDev = new MagDevice();
         //初始化全局语音播放工具
@@ -61,6 +63,8 @@ public class MyApplication extends Application {
 
         //初始化文件夹
         FlieUtil.initFile(getFolderPathToday());
+
+        LitePal.deleteAll(UpRecordDb.class);
 
     }
 

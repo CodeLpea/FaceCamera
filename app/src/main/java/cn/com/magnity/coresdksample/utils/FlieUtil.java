@@ -141,6 +141,11 @@ public class FlieUtil {
         String date = format.format(new Date(System.currentTimeMillis()));
         return date;// 2012年10月03日 23:41:31
     }
+    public static String getTodayFileName() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String date = format.format(new Date(System.currentTimeMillis()));
+        return date;// 2012年10月03日 23:41:31
+    }
 
     /**
      * @return 文件夹（按照天自动创建文件夹）

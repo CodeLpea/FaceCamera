@@ -107,7 +107,12 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activity.MagBaseActivity"></activity>
+        <activity android:name=".activity.MagBaseActivity" />
+
+        <service
+            android:name=".service.UpLoadRecordService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

@@ -23,4 +23,11 @@ public interface NetWorkAPIs {
      */
     @POST
     Call<ResponseEntry<UpgradePackageVersionInfoEntry>> getUpgradePackageVersionInfo(@Url String url, @Body RequestBody body);
+
+
+    /**
+     * 上传未识别的红外记录信息
+     * */
+    @POST
+    Call<ResponseEntry> upLoadUnKonwRecord(@Url String url, @Body RequestBody body);
 }

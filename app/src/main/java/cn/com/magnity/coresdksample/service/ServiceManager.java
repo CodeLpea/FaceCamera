@@ -64,6 +64,10 @@ public class ServiceManager {
         if(!LampService.isServiceRunning()) {
             mContext.startService(new Intent(mContext, LampService.class));
         }
+        //开启上传温度信息服务
+        if(!UpLoadRecordService.isServiceRunning()) {
+            mContext.startService(new Intent(mContext, UpLoadRecordService.class));
+        }
 
 
     }
@@ -100,6 +104,11 @@ public class ServiceManager {
         //关闭灯控制服务
         if(LampService.isServiceRunning()) {
             mContext.stopService(new Intent(mContext, LampService.class));
+        }
+
+        //关闭上传温度信息服务
+        if(UpLoadRecordService.isServiceRunning()) {
+            mContext.stopService(new Intent(mContext, UpLoadRecordService.class));
         }
 
     }

@@ -13,8 +13,9 @@ public class Config {
 
     //程序数据存储的主路径
 
+    public static final String ROOT =Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String ROOT_DIR_NAME = "DdnTempCamera";
-    public static final String ROOT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + ROOT_DIR_NAME;
+    public static final String ROOT_DIR =ROOT + File.separator + ROOT_DIR_NAME;
     //程序运行日志存放路径
     public static final String XLOG_DIR = ROOT_DIR + File.separator + "xlog";
     //设备配置文件路径
@@ -112,8 +113,11 @@ public class Config {
 
 
     //服务器相关
-    public static final String API_XIAONUO_BASE = "http://120.77.237.242:8081/";//默认的小诺的正式服务器地址
+//    public static final String API_XIAONUO_BASE = "http://120.77.237.242:8081/";//默认的小诺的正式服务器地址
+    public static final String API_XIAONUO_BASE = "http://www.didano.cn/";;//默认的小诺的正式服务器地址
     public static final String VERSIONURL = "api/service/getVersion";
+    public static final String UP_LOAD_UNKNOW_INFO = "api/student/putDetectionClaimOne";
+    public static final String UP_LOAD_KNOW_INFO= "api/student/putStudentDetectionOne";
     public static final int SOFTWARE_SYSTEM_TYTE = 12;//设备版本号
 
 }

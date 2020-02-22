@@ -7,7 +7,9 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import cn.com.magnity.coresdksample.Config;
 import cn.com.magnity.coresdksample.http.model.ResponseEntry;
+import cn.com.magnity.coresdksample.http.model.UpRecordEntry;
 import cn.com.magnity.coresdksample.http.model.UpgradePackageVersionInfoEntry;
 import cn.com.magnity.coresdksample.http.model.UpgradePackageVersionInfoRequest;
 import cn.com.magnity.coresdksample.MyApplication;
@@ -102,5 +104,37 @@ public class RetrofitClient {
         }
 
         return versionInfo;
+    }
+
+
+    /**
+     * 上传家长接送信息
+     *
+     * @param upRecordEntry
+     */
+    public boolean upLoadUnKonwRecord(UpRecordEntry upRecordEntry) {
+
+        boolean result = false;
+        String requestStr = mGson.toJson(upRecordEntry);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), requestStr);
+        Call<ResponseEntry> call = mNetWorkAPIs.upLoadUnKonwRecord(Config.UP_LOAD_UNKNOW_INFO, body);
+        ResponseEntry response;
+        try {
+            response = call.execute().body();
+            if (response != null) {
+                if (response.getCode() == ResponseEntry.SUCCESS) {
+                    Log.i(TAG, mGson.toJson(response));
+                    Log.e(TAG, "upLoadUnKonwRecord: 上传成功"+response.getData().toString() );
+                    result = true;
+
+
+                }
+            }
+            Log.e(TAG, "response: "+response.toString() );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

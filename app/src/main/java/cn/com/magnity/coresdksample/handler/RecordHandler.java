@@ -9,12 +9,18 @@ import java.io.FileOutputStream;
 
 import android.os.Handler;
 
+import cn.com.magnity.coresdksample.Config;
+import cn.com.magnity.coresdksample.MyApplication;
+import cn.com.magnity.coresdksample.database.UpRecordDb;
 import cn.com.magnity.coresdksample.detect.FaceRect;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PictureData;
+import cn.com.magnity.coresdksample.usecache.CurrentConfig;
+import cn.com.magnity.coresdksample.utils.AppUtils;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 
 import static cn.com.magnity.coresdksample.Config.ROOT_DIR_NAME;
+import static cn.com.magnity.coresdksample.Config.TempThreshold;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFileName;
 import static cn.com.magnity.coresdksample.utils.FlieUtil.getFolderPathToday;
 
@@ -86,6 +92,20 @@ public class RecordHandler extends Handler {
         photoRecordDb.setTemp(temp);
         photoRecordDb.save();
         Log.e(TAG, "photoRecordDb: " + photoRecordDb.toString());
+
+
+        //保存需要上传的数据
+        UpRecordDb upRecordDb=new UpRecordDb();
+        upRecordDb.setCreate_time(date);
+        upRecordDb.setDevice_no(AppUtils.getLocalMacAddressFromWifiInfo(MyApplication.getInstance()));
+        upRecordDb.setEnv_temperature(String.valueOf(CurrentConfig.getInstance().getCurrentData().getTemperature_threshold()));
+        upRecordDb.setRedImgUrl(Config.ROOT+File.separator+tempPath);
+        upRecordDb.setImgUrl(Config.ROOT+File.separator+personPath);
+        upRecordDb.setTemperature(String.valueOf(temp));
+        Log.e(TAG, "upRecordDb: " + upRecordDb.toString());
+
+
+        upRecordDb.save();
 
     }
 
