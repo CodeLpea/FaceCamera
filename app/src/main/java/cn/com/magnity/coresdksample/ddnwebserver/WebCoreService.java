@@ -26,7 +26,7 @@ import com.yanzhenjie.andserver.Server;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
+import cn.com.magnity.coresdksample.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.ddnwebserver.util.NetUtils;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.NetUtil;

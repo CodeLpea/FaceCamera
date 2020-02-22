@@ -1,11 +1,8 @@
 package cn.com.magnity.coresdksample.websocket;
 
-import android.os.Build;
 import android.util.Log;
 
-import cn.com.magnity.coresdksample.Service.update.SoftWareUpgradeService;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
-import cn.com.magnity.coresdksample.websocket.bean.SoftWareVersionsInfo;
 
 
 /**

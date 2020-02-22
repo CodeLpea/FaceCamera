@@ -22,11 +22,11 @@ import cn.com.magnity.coresdk.MagDevice;
 import cn.com.magnity.coresdk.types.CameraInfo;
 import cn.com.magnity.coresdk.types.CorrectionPara;
 import cn.com.magnity.coresdk.types.StatisticInfo;
-import cn.com.magnity.coresdksample.Detect.FaceRect;
-import cn.com.magnity.coresdksample.Detect.FaceRectCollect;
+import cn.com.magnity.coresdksample.detect.FaceRect;
+import cn.com.magnity.coresdksample.detect.FaceRectCollect;
 
-import cn.com.magnity.coresdksample.Service.LampService;
-import cn.com.magnity.coresdksample.Service.handler.RecordHandler;
+import cn.com.magnity.coresdksample.service.LampService;
+import cn.com.magnity.coresdksample.handler.RecordHandler;
 import cn.com.magnity.coresdksample.Temp.AreaUtil;
 import cn.com.magnity.coresdksample.Temp.TempUtil;
 import cn.com.magnity.coresdksample.Temp.FFCUtil;

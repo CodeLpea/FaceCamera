@@ -13,10 +13,10 @@ import android.view.SurfaceView;
 
 import com.iflytek.cloud.FaceDetector;
 
-import cn.com.magnity.coresdksample.Detect.DrawFaceRect;
-import cn.com.magnity.coresdksample.Detect.FaceRect;
-import cn.com.magnity.coresdksample.Detect.FaceRectCollect;
-import cn.com.magnity.coresdksample.Detect.Result;
+import cn.com.magnity.coresdksample.detect.DrawFaceRect;
+import cn.com.magnity.coresdksample.detect.FaceRect;
+import cn.com.magnity.coresdksample.detect.FaceRectCollect;
+import cn.com.magnity.coresdksample.detect.Result;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.utils.TimeUitl;
 
@@ -25,7 +25,7 @@ import static cn.com.magnity.coresdksample.Config.TempThreshold;
 /**
  * 绘制人脸框
  */
-public class TrackSurfView extends SurfaceView implements SurfaceHolder.Callback {
+public class TrackSurfView extends SurfaceView implements SurfaceHolder.Callback,Nv21DataListenner {
 
     private static final String TAG = "PerCamSurfView";
     private FaceDetector mFaceDetector;
@@ -57,9 +57,11 @@ public class TrackSurfView extends SurfaceView implements SurfaceHolder.Callback
         this.mFaceDetector = mFaceDetector;
     }
 
-    public void setNv21Datas(byte[] nv21Datas) {
+    @Override
+    public void dataListenner(byte[] nv21Datas) {
         Nv21Datas = nv21Datas;
     }
+
 
     private void init() {
         holder = getHolder();

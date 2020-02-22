@@ -13,8 +13,8 @@ import android.widget.Toast;
 import com.alex.livertmppushsdk.LpRtmp;
 
 import cn.com.magnity.coresdksample.MyApplication;
-import cn.com.magnity.coresdksample.Service.LampService;
-import cn.com.magnity.coresdksample.Service.handler.DelayDoHandler;
+import cn.com.magnity.coresdksample.service.LampService;
+import cn.com.magnity.coresdksample.handler.DelayDoHandler;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.websocket.bean.RunningInfo;
@@ -30,7 +30,8 @@ public class CamSurfView extends SurfaceView implements SurfaceHolder.Callback {
     private int PREVIEW_WIDTH = 640;
     private int PREVIEW_HEIGHT = 480;
 
-    private TrackSurfView mTrackSurfView;
+
+    private Nv21DataListenner nv21DataListenner;
 
     private SurfaceHolder holder;
     // 缩放矩阵
@@ -60,8 +61,8 @@ public class CamSurfView extends SurfaceView implements SurfaceHolder.Callback {
         Nv21 = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
     }
 
-    public void setmTrackSurfView(TrackSurfView mTrackSurfView) {
-        this.mTrackSurfView = mTrackSurfView;
+    public void setNv21DataListenner(Nv21DataListenner nv21DataListenner) {
+        this.nv21DataListenner = nv21DataListenner;
     }
 
     @Override
@@ -168,7 +169,9 @@ public class CamSurfView extends SurfaceView implements SurfaceHolder.Callback {
             System.arraycopy(data, 0, Nv21, 0, data.length);
 
             //传递Nv21给人脸识别使用
-            mTrackSurfView.setNv21Datas(Nv21);
+            if(nv21DataListenner!=null){
+                nv21DataListenner.dataListenner(Nv21);
+            }
 
             //发送到Rtmp服务器
             mLpRtmp.inputData(Nv21);

@@ -29,7 +29,7 @@ import com.yanzhenjie.andserver.util.MediaType;
 
 import java.io.IOException;
 
-import cn.com.magnity.coresdksample.Service.handler.StabilityTestHandler;
+import cn.com.magnity.coresdksample.handler.StabilityTestHandler;
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CalibratPositionData;
 import cn.com.magnity.coresdksample.ddnwebserver.model.CameraData;

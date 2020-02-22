@@ -14,7 +14,7 @@ import org.litepal.LitePal;
 import java.util.List;
 
 import cn.com.magnity.coresdksample.MyApplication;
-import cn.com.magnity.coresdksample.Service.handler.TempHandler;
+import cn.com.magnity.coresdksample.handler.TempHandler;
 import cn.com.magnity.coresdksample.usecache.CurrentConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.WebConfig;
 import cn.com.magnity.coresdksample.ddnwebserver.database.PhotoRecordDb;

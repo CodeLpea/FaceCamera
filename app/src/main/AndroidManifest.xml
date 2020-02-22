@@ -53,7 +53,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
@@ -64,10 +64,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".Service.FtpService" />
+        <service android:name=".service.FtpService" />
         <!-- //BootReceiver是上面建的广播类 -->
         <receiver
-            android:name=".Broadcast.BootReceiver"
+            android:name=".broadcast.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter android:priority="2147483647"> <!-- //优先级 -->
@@ -77,14 +77,14 @@
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".Broadcast.UpdateRestartReceiver">
+        <receiver android:name=".broadcast.UpdateRestartReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
 
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".Broadcast.UsbReceiver">
+        <receiver android:name=".broadcast.UsbReceiver">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
                 <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
@@ -92,22 +92,22 @@
         </receiver>
 
         <service
-            android:name=".Service.LoadService"
+            android:name=".service.LoadService"
             android:exported="false" />
         <service
-            android:name=".Service.update.SoftWareUpgradeService"
+            android:name=".service.update.SoftWareUpgradeService"
             android:exported="false" />
         <service
             android:name=".websocket.service.WebSocketService"
             android:exported="false" />
         <service android:name=".ddnwebserver.WebCoreService" />
-        <service android:name=".Service.NetService" />
+        <service android:name=".service.NetService" />
         <service
-            android:name=".Service.LampService"
+            android:name=".service.LampService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".MagBaseActivity"></activity>
+        <activity android:name=".activity.MagBaseActivity"></activity>
     </application>
 
 </manifest>
