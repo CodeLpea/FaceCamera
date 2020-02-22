@@ -29,6 +29,6 @@ public class PageController {
     @GetMapping(path = "/")
     public String index() {
         // Equivalent to [return "/index"].
-        return "forward:/webindex.html";
+        return "forward:/index.html";
     }
 }

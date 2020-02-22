@@ -1,7 +1,7 @@
 {
   "data": {
-    "username": "admin",
-    "password": "admin"
+    "username": "LingAdmin",
+    "password": "LingAdmin"
   },
   "errorCode": 200,
   "login": true,

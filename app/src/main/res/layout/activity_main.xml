@@ -6,28 +6,35 @@
     android:background="@drawable/main_bg"
     tools:context=".activity.MainActivity">
 
+
     <RelativeLayout
-        android:id="@+id/cam_rl"
+        android:layout_width="960dp"
+        android:layout_height="640dp"
         android:layout_centerInParent="true"
-        android:layout_width="480dp"
-        android:layout_height="640dp">
+        android:background="@drawable/shape_corner"
+        >
+
         <cn.com.magnity.coresdksample.surview.CamSurfView
-            android:layout_centerInParent="true"
             android:id="@+id/surf_cam"
             android:layout_width="480dp"
             android:layout_height="640dp"
-
+            android:layout_alignParentRight="true"
             />
+
         <cn.com.magnity.coresdksample.surview.TrackSurfView
-            android:layout_centerInParent="true"
             android:id="@+id/surf_track"
             android:layout_width="480dp"
             android:layout_height="640dp"
-            />
+            android:layout_alignParentRight="true" />
+
         <cn.com.magnity.coresdksample.surview.MagSurfaceView
             android:id="@+id/surf_mag"
-            android:layout_width="120dp"
-            android:layout_height="160dp" />
+            android:layout_width="480dp"
+            android:layout_height="640dp"
+            android:layout_alignParentLeft="true"
+            />
+
     </RelativeLayout>
+
 
 </RelativeLayout>

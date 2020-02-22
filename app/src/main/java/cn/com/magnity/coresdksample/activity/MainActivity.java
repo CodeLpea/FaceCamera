@@ -107,21 +107,6 @@ public class MainActivity extends MagBaseActivity implements View.OnClickListene
 
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i(TAG, "onResume: ");
-        //openCamera();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i(TAG, "onPause: ");
-
-    }
-
-    @Override
     protected void onStart() {
         Log.i(TAG, "onStart: ");
         EventBus.getDefault().register(this);

@@ -1,6 +1,7 @@
 package cn.com.magnity.coresdksample.surview;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
@@ -95,6 +96,13 @@ public class CamSurfView extends SurfaceView implements SurfaceHolder.Callback {
      * 打开摄像头
      */
     private boolean openCamera() {
+        //检查是否有摄像头
+        if (!checkCameraHardware(MyApplication.getInstance())) {
+            RunningInfo runningInfo = new RunningInfo();
+            runningInfo.setCameraStatus("没有人脸摄像头设备，请检查");
+            runningInfo.upload();
+            return false;
+        }
         if (mCamera != null) {
             return true;
         }
@@ -159,6 +167,16 @@ public class CamSurfView extends SurfaceView implements SurfaceHolder.Callback {
         Log.e(TAG, "ExposureNow: " + parameters.getExposureCompensation());
     }
 
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            Log.e(TAG, "搜索到摄像头硬件: ");
+            return true;
+        } else {
+            Log.e(TAG, "不具备摄像头硬件: ");
+            return false;
+        }
+    }
+
     private class CamPreCallback implements Camera.PreviewCallback {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
@@ -169,7 +187,7 @@ public class CamSurfView extends SurfaceView implements SurfaceHolder.Callback {
             System.arraycopy(data, 0, Nv21, 0, data.length);
 
             //传递Nv21给人脸识别使用
-            if(nv21DataListenner!=null){
+            if (nv21DataListenner != null) {
                 nv21DataListenner.dataListenner(Nv21);
             }
 
