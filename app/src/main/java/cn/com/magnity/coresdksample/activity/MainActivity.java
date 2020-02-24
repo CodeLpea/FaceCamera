@@ -97,8 +97,6 @@ public class MainActivity extends MagBaseActivity implements View.OnClickListene
 
     @Override
     protected void onDestroy() {
-
-        stopService(new Intent(this, FtpService.class));
         //关闭所有通用服务
         ServiceManager.getInstance().stopServices();
 

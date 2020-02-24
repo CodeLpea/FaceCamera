@@ -97,7 +97,7 @@ public class ServiceManager {
         if(NetService.isServiceRunning()) {
             mContext.stopService(new Intent(mContext, NetService.class));
         }
-        //关闭网络连接服务
+        //关闭ftp连接服务
         if(FtpService.isServiceRunning()) {
             mContext.stopService(new Intent(mContext, FtpService.class));
         }

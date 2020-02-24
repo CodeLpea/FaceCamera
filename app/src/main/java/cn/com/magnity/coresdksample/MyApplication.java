@@ -64,8 +64,6 @@ public class MyApplication extends Application {
         //初始化文件夹
         FlieUtil.initFile(getFolderPathToday());
 
-        LitePal.deleteAll(UpRecordDb.class);
-
     }
 
 }

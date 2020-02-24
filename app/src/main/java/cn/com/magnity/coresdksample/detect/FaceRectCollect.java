@@ -5,7 +5,6 @@ public class FaceRectCollect {
     //原始数据，用于在红外判断处保存图片
     public byte[] Nv21;
     public FaceRect faceRect;
-    public volatile boolean ifTaken=false;
     private static FaceRectCollect Instance;
 
     public static FaceRectCollect getInstance() {
